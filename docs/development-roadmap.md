@@ -543,7 +543,72 @@ useEffect(() => {
 
 ### Issue一覧
 
-#### #22 [Phase 4] コード進行プリセット機能
+#### #22 [Phase 4] ノンダイアトニックコード入力機能（優先度：高）
+**説明**: ダイアトニックコード以外の任意のコードを入力できるカスタムコード入力機能
+
+**タスク**:
+- [ ] `CustomChordBuilder` コンポーネントの作成
+- [ ] ルート音選択UI（12音のドロップダウンまたはボタン）
+- [ ] コードクオリティ選択UI
+  - Major, Minor, Diminished, Augmented
+  - sus2, sus4, 6th, add9 など
+- [ ] セブンス選択UI
+  - なし, 7, maj7, m7, m7♭5, dim7, aug7
+- [ ] テンション選択UI（複数選択可）
+  - ♭9, 9, #9
+  - 11, #11
+  - ♭13, 13
+- [ ] 選択されたコードのプレビュー表示
+- [ ] "Add Chord" ボタンでコード進行に追加
+- [ ] 機能和声分析のノンダイアトニックコード対応
+  - セカンダリードミナント検出
+  - 借用和音（モーダルインターチェンジ）検出
+  - 代理コード検出
+
+**技術詳細**:
+```typescript
+// src/components/CustomChordBuilder.tsx
+interface CustomChordBuilderProps {
+  selectedKey: Key;
+  onChordAdd: (chord: Chord) => void;
+}
+
+// 機能和声分析の拡張
+function analyzeNonDiatonicFunction(chord: Chord, key: Key): HarmonicFunction {
+  // セカンダリードミナント: V7/X
+  // 借用和音: ♭VII, ♭VI など
+  // 代理コード: ♭II7 (Tritone Substitution)
+}
+```
+
+**UI設計例**:
+```
+┌─────────────────────────────────────────┐
+│  Custom Chord Builder                   │
+├─────────────────────────────────────────┤
+│  Root:  [C ▼]                           │
+│  Quality: ○ Major  ○ Minor  ○ Dim      │
+│            ○ Aug    ○ sus2   ○ sus4    │
+│  7th:   ○ None  ○ 7  ○ maj7  ○ m7     │
+│  Tensions: ☐ ♭9  ☐ 9  ☐ #9            │
+│            ☐ 11  ☐ #11                 │
+│            ☐ ♭13 ☐ 13                  │
+│  Preview: [G7♭9]                        │
+│  [Add Chord to Progression]             │
+└─────────────────────────────────────────┘
+```
+
+**完了条件**:
+- 任意のルート音・クオリティ・テンションのコードを作成可能
+- 作成したコードがコード進行に追加される
+- 音声再生が正しく動作する
+- 色生成が適切に機能する（ノンダイアトニックコードの機能判定）
+
+**関連Issue**: #3（色生成ロジック）でノンダイアトニックコード対応の基礎実装済み
+
+---
+
+#### #29 [Phase 4] コード進行プリセット機能
 **説明**: よくあるコード進行のテンプレート
 
 **タスク**:
@@ -582,7 +647,7 @@ https://harmonic-colors.com/?progression=eyJrZXkiOi...
 
 ---
 
-#### #24 [Phase 4] 動画・GIFエクスポート機能
+#### #30 [Phase 4] 動画・GIFエクスポート機能
 **説明**: ビジュアルを動画やGIFとして保存
 
 **タスク**:
@@ -603,7 +668,7 @@ const recorder = new MediaRecorder(stream);
 
 ---
 
-#### #25 [Phase 4] 拍子の変更対応
+#### #31 [Phase 4] 拍子の変更対応
 **説明**: 4/4以外の拍子に対応
 
 **タスク**:
@@ -616,7 +681,7 @@ const recorder = new MediaRecorder(stream);
 
 ---
 
-#### #26 [Phase 4] 複雑なコードタイプ対応
+#### #32 [Phase 4] 複雑なコードタイプ対応
 **説明**: sus4, add9, 6thなどの対応
 
 **タスク**:
@@ -630,7 +695,7 @@ const recorder = new MediaRecorder(stream);
 
 ---
 
-#### #27 [Phase 4] MIDIファイルインポート
+#### #33 [Phase 4] MIDIファイルインポート
 **説明**: MIDIファイルからコード進行を自動解析
 
 **タスク**:
@@ -652,7 +717,7 @@ const chords = extractChords(midi);
 
 ---
 
-#### #28 [Phase 4] チュートリアル・ヘルプ機能
+#### #34 [Phase 4] チュートリアル・ヘルプ機能
 **説明**: 初回ユーザー向けガイド
 
 **タスク**:
