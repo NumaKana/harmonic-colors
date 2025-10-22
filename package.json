@@ -1,0 +1,39 @@
+{
+  "name": "harmonic-colors",
+  "version": "1.0.0",
+  "description": "コード進行を色彩とビジュアルエフェクトで表現する、音楽視覚化Webアプリケーション",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "tsc --noEmit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NumaKana/harmonic-colors.git"
+  },
+  "keywords": ["music", "visualization", "harmony", "chord-progression"],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NumaKana/harmonic-colors/issues"
+  },
+  "homepage": "https://github.com/NumaKana/harmonic-colors#readme",
+  "dependencies": {
+    "@react-three/drei": "^10.7.6",
+    "@react-three/fiber": "^9.4.0",
+    "@types/three": "^0.180.0",
+    "@vitejs/plugin-react": "^5.0.4",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "three": "^0.180.0",
+    "tone": "^15.1.22",
+    "vite": "^7.1.11"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "typescript": "^5.9.3"
+  }
+}
