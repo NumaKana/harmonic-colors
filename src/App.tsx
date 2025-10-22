@@ -1,13 +1,24 @@
 import { useState } from 'react';
 import './App.css';
 import KeySelector from './components/KeySelector';
-import { Key } from './types';
+import ChordPalette from './components/ChordPalette';
+import ChordSequence from './components/ChordSequence';
+import { Key, Chord } from './types';
 
 function App() {
   const [selectedKey, setSelectedKey] = useState<Key>({
     tonic: 'C',
     mode: 'major',
   });
+  const [chordProgression, setChordProgression] = useState<Chord[]>([]);
+
+  const handleAddChord = (chord: Chord) => {
+    setChordProgression([...chordProgression, chord]);
+  };
+
+  const handleRemoveChord = (index: number) => {
+    setChordProgression(chordProgression.filter((_, i) => i !== index));
+  };
 
   return (
     <div className="app">
@@ -17,9 +28,8 @@ function App() {
       <main className="main">
         <div className="controls-section">
           <KeySelector selectedKey={selectedKey} onKeyChange={setSelectedKey} />
-        </div>
-        <div className="info-section">
-          <p>Current Key: {selectedKey.tonic} {selectedKey.mode}</p>
+          <ChordPalette selectedKey={selectedKey} onChordSelect={handleAddChord} />
+          <ChordSequence chords={chordProgression} onRemoveChord={handleRemoveChord} />
         </div>
       </main>
     </div>
