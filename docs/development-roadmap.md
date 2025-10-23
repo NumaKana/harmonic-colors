@@ -360,27 +360,89 @@ synth.connect(reverb);
 
 ---
 
-#### #14 [Phase 2] タイミング精度の向上
-**説明**: BPMとビート同期の正確な実装
+#### #14 [Phase 2] メトロノーム機能の実装
+**説明**: 拍を聴覚的に示すクリック音機能
+
+**背景**:
+コード進行を再生する際、音だけでは拍がわかりづらいという課題がある。
+メトロノームのクリック音を追加することで、リズム感を把握しやすくする。
 
 **タスク**:
-- [ ] `Tone.Transport` を使用したスケジューリング
-- [ ] 各コードの拍数設定機能
-- [ ] メトロノーム機能（オプション）
-- [ ] ループ再生機能
-- [ ] 再生位置の視覚的フィードバック
+- [ ] `audioEngine.ts` にメトロノーム機能を追加
+  - クリック音の生成（Tone.MetalSynthまたはシンプルな高周波音）
+  - 1拍目: アクセント音（高音・大音量）
+  - 2-4拍目: 通常音（低音・小音量）
+- [ ] Tone.Transportと同期したクリック音のスケジューリング
+  - `Tone.Loop` または `Transport.scheduleRepeat` を使用
+  - BPMに応じた正確なタイミング
+- [ ] メトロノームON/OFF切り替えUI
+  - トグルボタンまたはチェックボックス
+  - 再生コントロール近くに配置
+- [ ] メトロノーム音量の調整機能（オプション）
+  - コード音声とは独立した音量設定
+- [ ] メトロノーム設定の保存（LocalStorage）
 
 **技術詳細**:
 ```typescript
-Tone.Transport.bpm.value = bpm;
-Tone.Transport.scheduleRepeat((time) => {
-  playChord(currentChord, time);
-}, '4n'); // 4分音符ごと
+// src/utils/audioEngine.ts
+class AudioEngine {
+  private metronome: Tone.MetalSynth | null = null;
+  private metronomeLoop: Tone.Loop | null = null;
+  private metronomeEnabled: boolean = false;
+
+  setupMetronome(bpm: number) {
+    this.metronome = new Tone.MetalSynth({
+      frequency: 880,
+      envelope: { attack: 0.001, decay: 0.05, release: 0.01 },
+      volume: -10
+    }).toDestination();
+
+    let beatCount = 0;
+    this.metronomeLoop = new Tone.Loop((time) => {
+      const isDownbeat = beatCount % 4 === 0;
+      this.metronome.frequency.value = isDownbeat ? 1200 : 800;
+      this.metronome.volume.value = isDownbeat ? -5 : -10;
+      this.metronome.triggerAttackRelease("16n", time);
+      beatCount++;
+    }, "4n"); // 4分音符ごと
+
+    this.metronomeLoop.start(0);
+  }
+
+  toggleMetronome(enabled: boolean) {
+    this.metronomeEnabled = enabled;
+    if (this.metronomeLoop) {
+      this.metronomeLoop.mute = !enabled;
+    }
+  }
+}
+```
+
+**UI配置例**:
+```
+[▶ Play] [⏹ Stop]  ☑ Metronome
 ```
 
 **完了条件**:
-- BPMが正確
-- 拍節感が安定
+- [ ] 再生中に正確な拍でクリック音が鳴る
+- [ ] 1拍目と他の拍で音が区別できる
+- [ ] ON/OFFを切り替え可能
+- [ ] BPM変更に追従する
+- [ ] 設定が保存される
+
+---
+
+#### #15 [Phase 2] ループ再生とタイミング精度の向上
+**説明**: ループ再生機能と再生位置フィードバック
+
+**タスク**:
+- [ ] ループ再生機能の実装
+- [ ] 各コードの拍数設定機能
+- [ ] 再生位置の視覚的フィードバック
+
+**完了条件**:
+- ループ再生が可能
+- 再生位置が明確
 
 ---
 
@@ -391,7 +453,7 @@ Tone.Transport.scheduleRepeat((time) => {
 
 ### Issue一覧
 
-#### #15 [Phase 3] テンションノート入力UIの実装
+#### #16 [Phase 3] テンションノート入力UIの実装
 **説明**: 7th, 9th, 11th, 13thとオルタードテンションの入力機能
 
 **タスク**:
@@ -418,7 +480,7 @@ function generateChordNotation(chord: Chord): string
 
 ---
 
-#### #16 [Phase 3] パーティクルシステムの実装
+#### #17 [Phase 3] パーティクルシステムの実装
 **説明**: カラースプレー（テンション粒子）のビジュアル実装
 
 **タスク**:
@@ -450,7 +512,7 @@ interface ParticleSystemProps {
 
 ---
 
-#### #17 [Phase 3] パーティクル遷移アニメーション
+#### #18 [Phase 3] パーティクル遷移アニメーション
 **説明**: コード変化時の粒子のフェードイン/アウト
 
 **タスク**:
@@ -465,7 +527,7 @@ interface ParticleSystemProps {
 
 ---
 
-#### #18 [Phase 3] 色相環回転調整UIの実装
+#### #19 [Phase 3] 色相環回転調整UIの実装
 **説明**: C音の色相角度を調整する設定機能
 
 **タスク**:
@@ -490,7 +552,7 @@ useEffect(() => {
 
 ---
 
-#### #19 [Phase 3] 詳細設定パネルの実装
+#### #20 [Phase 3] 詳細設定パネルの実装
 **説明**: マーブル比率、粒子密度などの調整機能
 
 **タスク**:
@@ -507,7 +569,7 @@ useEffect(() => {
 
 ---
 
-#### #20 [Phase 3] UI/UXの洗練
+#### #21 [Phase 3] UI/UXの洗練
 **説明**: 全体的なデザイン改善とユーザビリティ向上
 
 **タスク**:
@@ -526,7 +588,7 @@ useEffect(() => {
 
 ---
 
-#### #21 [Phase 3] パフォーマンス最適化
+#### #22 [Phase 3] パフォーマンス最適化
 **説明**: 全体的なパフォーマンスチューニング
 
 **タスク**:
@@ -550,7 +612,7 @@ useEffect(() => {
 
 ### Issue一覧
 
-#### #22 [Phase 4] ノンダイアトニックコード入力機能（優先度：高）
+#### #23 [Phase 4] ノンダイアトニックコード入力機能（優先度：高）
 **説明**: ダイアトニックコード以外の任意のコードを入力できるカスタムコード入力機能
 
 **タスク**:
@@ -615,7 +677,7 @@ function analyzeNonDiatonicFunction(chord: Chord, key: Key): HarmonicFunction {
 
 ---
 
-#### #29 [Phase 4] コード進行プリセット機能
+#### #24 [Phase 4] コード進行プリセット機能
 **説明**: よくあるコード進行のテンプレート
 
 **タスク**:
@@ -632,7 +694,7 @@ function analyzeNonDiatonicFunction(chord: Chord, key: Key): HarmonicFunction {
 
 ---
 
-#### #23 [Phase 4] コード進行の保存・共有機能
+#### #25 [Phase 4] コード進行の保存・共有機能
 **説明**: 作成したコード進行をファイルまたはURLで共有
 
 **タスク**:
@@ -654,7 +716,7 @@ https://harmonic-colors.com/?progression=eyJrZXkiOi...
 
 ---
 
-#### #30 [Phase 4] 動画・GIFエクスポート機能
+#### #26 [Phase 4] 動画・GIFエクスポート機能
 **説明**: ビジュアルを動画やGIFとして保存
 
 **タスク**:
@@ -675,7 +737,7 @@ const recorder = new MediaRecorder(stream);
 
 ---
 
-#### #31 [Phase 4] 拍子の変更対応
+#### #27 [Phase 4] 拍子の変更対応
 **説明**: 4/4以外の拍子に対応
 
 **タスク**:
@@ -688,7 +750,7 @@ const recorder = new MediaRecorder(stream);
 
 ---
 
-#### #32 [Phase 4] 複雑なコードタイプ対応
+#### #28 [Phase 4] 複雑なコードタイプ対応
 **説明**: sus4, add9, 6thなどの対応
 
 **タスク**:
@@ -702,7 +764,7 @@ const recorder = new MediaRecorder(stream);
 
 ---
 
-#### #33 [Phase 4] MIDIファイルインポート
+#### #29 [Phase 4] MIDIファイルインポート
 **説明**: MIDIファイルからコード進行を自動解析
 
 **タスク**:
@@ -724,7 +786,7 @@ const chords = extractChords(midi);
 
 ---
 
-#### #34 [Phase 4] チュートリアル・ヘルプ機能
+#### #30 [Phase 4] チュートリアル・ヘルプ機能
 **説明**: 初回ユーザー向けガイド
 
 **タスク**:
