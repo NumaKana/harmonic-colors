@@ -1,5 +1,6 @@
 import { Chord } from '../types';
 import { getChordDisplayName } from '../utils/diatonic';
+import { audioEngine } from '../utils/audioEngine';
 import './ChordSequence.css';
 
 interface ChordSequenceProps {
@@ -9,6 +10,10 @@ interface ChordSequenceProps {
 }
 
 const ChordSequence = ({ chords, onRemoveChord, currentIndex }: ChordSequenceProps) => {
+  const handleChordClick = async (chord: Chord) => {
+    await audioEngine.playChord(chord, 2);
+  };
+
   if (chords.length === 0) {
     return (
       <div className="chord-sequence">
@@ -31,7 +36,11 @@ const ChordSequence = ({ chords, onRemoveChord, currentIndex }: ChordSequencePro
             key={index}
             className={`chord-item ${currentIndex === index ? 'chord-item-current' : ''}`}
           >
-            <div className="chord-item-content">
+            <div
+              className="chord-item-content"
+              onClick={() => handleChordClick(chord)}
+              style={{ cursor: 'pointer' }}
+            >
               <span className="chord-item-index">{index + 1}</span>
               <span className="chord-item-name">{getChordDisplayName(chord)}</span>
             </div>

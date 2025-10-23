@@ -1,5 +1,6 @@
 import { Key, Chord } from '../types';
 import { getDiatonicChords, getRomanNumeral, getChordDisplayName } from '../utils/diatonic';
+import { audioEngine } from '../utils/audioEngine';
 import './ChordPalette.css';
 
 interface ChordPaletteProps {
@@ -10,6 +11,13 @@ interface ChordPaletteProps {
 const ChordPalette = ({ selectedKey, onChordSelect }: ChordPaletteProps) => {
   const diatonicChords = getDiatonicChords(selectedKey);
 
+  const handleChordClick = async (chord: Chord) => {
+    // Play the chord sound
+    await audioEngine.playChord(chord, 2);
+    // Add to progression
+    onChordSelect(chord);
+  };
+
   return (
     <div className="chord-palette">
       <h3 className="chord-palette-title">Diatonic Chords</h3>
@@ -18,7 +26,7 @@ const ChordPalette = ({ selectedKey, onChordSelect }: ChordPaletteProps) => {
           <button
             key={index}
             className="chord-button"
-            onClick={() => onChordSelect(chord)}
+            onClick={() => handleChordClick(chord)}
             title={`${getRomanNumeral(selectedKey, index)} - ${getChordDisplayName(chord)}`}
           >
             <div className="chord-button-roman">{getRomanNumeral(selectedKey, index)}</div>
