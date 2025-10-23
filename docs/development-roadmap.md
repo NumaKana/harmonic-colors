@@ -114,29 +114,36 @@ const noteToHue: Record<Note, number> = {
 
 ---
 
-#### #5 [Phase 1] 単色表示コンポーネントの実装
+#### #4 [Phase 1] 単色表示コンポーネントの実装 ✅
 **説明**: 生成された色を画面に表示するシンプルなビジュアルコンポーネント
 
 **タスク**:
-- [ ] `VisualizationCanvas` コンポーネントの作成
-- [ ] HSL色をCSS形式に変換する関数
-- [ ] 単色または2色の縦グラデーション表示
-- [ ] 800x600pxの固定サイズ表示エリア
-- [ ] 現在のコード情報の表示（コード名、機能和声）
+- [x] `VisualizationCanvas` コンポーネントの作成
+- [x] HSL色をCSS形式に変換する関数（colorGenerator.tsで実装済み）
+- [x] 単色または2色の縦グラデーション表示
+- [x] 800x600pxの固定サイズ表示エリア（レスポンシブ対応）
+- [x] 現在のコード情報の表示（コード名、機能和声）
+- [x] 色見本の表示（Color 1とColor 2）
+- [x] 機能和声情報の表示
 
 **技術詳細**:
 ```typescript
 // src/components/VisualizationCanvas.tsx
 interface VisualizationCanvasProps {
-  color1: ColorHSL;
-  color2: ColorHSL;
+  selectedKey: Key;
   currentChord?: Chord;
+  hueRotation?: number;
 }
 ```
 
 **完了条件**:
-- 選択したキー・コードに応じて色が変化
-- 視覚的に色の違いが確認できる
+- [x] 選択したキー・コードに応じて色が変化
+- [x] 視覚的に色の違いが確認できる
+- [x] 機能和声情報が正確に表示される
+- [x] CSS transitionで滑らかに色が遷移する
+
+**実装日**: 2025-10-22
+**関連PR**: #18
 
 ---
 

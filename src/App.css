@@ -40,3 +40,8 @@
   flex-direction: column;
   gap: 1rem;
 }
+
+.visualization-section {
+  display: flex;
+  justify-content: center;
+}
