@@ -3,6 +3,7 @@ import './App.css';
 import KeySelector from './components/KeySelector';
 import ChordPalette from './components/ChordPalette';
 import ChordSequence from './components/ChordSequence';
+import PlaybackControls from './components/PlaybackControls';
 import VisualizationCanvas from './components/VisualizationCanvas';
 import { Key, Chord } from './types';
 
@@ -12,7 +13,7 @@ function App() {
     mode: 'major',
   });
   const [chordProgression, setChordProgression] = useState<Chord[]>([]);
-  const [currentChordIndex, setCurrentChordIndex] = useState<number | undefined>(undefined);
+  const [currentChordIndex, setCurrentChordIndex] = useState<number>(-1);
 
   const handleAddChord = (chord: Chord) => {
     setChordProgression([...chordProgression, chord]);
@@ -22,14 +23,18 @@ function App() {
     setChordProgression(chordProgression.filter((_, i) => i !== index));
     // Reset current chord index if removed
     if (currentChordIndex === index) {
-      setCurrentChordIndex(undefined);
-    } else if (currentChordIndex !== undefined && index < currentChordIndex) {
+      setCurrentChordIndex(-1);
+    } else if (currentChordIndex >= 0 && index < currentChordIndex) {
       setCurrentChordIndex(currentChordIndex - 1);
     }
   };
 
+  const handlePlayingIndexChange = (index: number) => {
+    setCurrentChordIndex(index);
+  };
+
   // Get current chord for visualization
-  const currentChord = currentChordIndex !== undefined
+  const currentChord = currentChordIndex >= 0
     ? chordProgression[currentChordIndex]
     : chordProgression.length > 0
     ? chordProgression[chordProgression.length - 1]
@@ -44,10 +49,14 @@ function App() {
         <div className="controls-section">
           <KeySelector selectedKey={selectedKey} onKeyChange={setSelectedKey} />
           <ChordPalette selectedKey={selectedKey} onChordSelect={handleAddChord} />
+          <PlaybackControls
+            chords={chordProgression}
+            onPlayingIndexChange={handlePlayingIndexChange}
+          />
           <ChordSequence
             chords={chordProgression}
             onRemoveChord={handleRemoveChord}
-            currentIndex={currentChordIndex}
+            currentIndex={currentChordIndex >= 0 ? currentChordIndex : undefined}
           />
         </div>
         <div className="visualization-section">
