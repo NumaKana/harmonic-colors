@@ -7,6 +7,8 @@ import { Chord, Note } from '../types';
 class AudioEngine {
   private synth: Tone.PolySynth | null = null;
   private isInitialized = false;
+  private isPlaying = false;
+  private currentSequence: Tone.Part | null = null;
 
   /**
    * Initialize the audio engine
@@ -133,6 +135,112 @@ class AudioEngine {
   }
 
   /**
+   * Play a chord progression sequentially
+   * @param chords Array of chords to play
+   * @param bpm Beats per minute (default: 120)
+   * @param onChordChange Callback called when each chord starts playing
+   */
+  async playProgression(
+    chords: Chord[],
+    bpm: number = 120,
+    onChordChange?: (index: number) => void
+  ): Promise<void> {
+    if (chords.length === 0) {
+      return;
+    }
+
+    if (!this.isInitialized) {
+      await this.initialize();
+    }
+
+    if (!this.synth) {
+      throw new Error('Synthesizer not initialized');
+    }
+
+    // Stop any currently playing sequence
+    this.stopProgression();
+
+    // Set the BPM
+    Tone.Transport.bpm.value = bpm;
+
+    // Create events for each chord
+    const events: Array<{ time: string; chord: Chord; index: number }> = [];
+    let currentTime = 0;
+
+    chords.forEach((chord, index) => {
+      events.push({
+        time: `${currentTime}:0:0`,
+        chord,
+        index,
+      });
+      currentTime += chord.duration;
+    });
+
+    // Create a Tone.Part to schedule the chord sequence
+    this.currentSequence = new Tone.Part((time, event) => {
+      const notes = this.getChordNotes(event.chord);
+      const durationInSeconds = (60 / bpm) * event.chord.duration;
+
+      // Trigger the chord at the scheduled time
+      this.synth!.triggerAttackRelease(notes, durationInSeconds, time);
+
+      // Call the callback to update UI
+      if (onChordChange) {
+        // Schedule the callback to run at the same time as the chord
+        Tone.Draw.schedule(() => {
+          onChordChange(event.index);
+        }, time);
+      }
+    }, events);
+
+    this.currentSequence.start(0);
+    this.isPlaying = true;
+
+    // Start the transport
+    await Tone.Transport.start();
+
+    // Schedule stopping the transport after all chords are played
+    const totalDuration = events.reduce((sum, event) => sum + event.chord.duration, 0);
+    const totalSeconds = (60 / bpm) * totalDuration;
+
+    Tone.Transport.schedule(() => {
+      this.stopProgression();
+      if (onChordChange) {
+        Tone.Draw.schedule(() => {
+          onChordChange(-1); // Signal that playback has ended
+        }, Tone.now());
+      }
+    }, `+${totalSeconds}`);
+  }
+
+  /**
+   * Stop the currently playing progression
+   */
+  stopProgression(): void {
+    if (this.currentSequence) {
+      this.currentSequence.stop();
+      this.currentSequence.dispose();
+      this.currentSequence = null;
+    }
+
+    Tone.Transport.stop();
+    Tone.Transport.cancel();
+
+    if (this.synth) {
+      this.synth.releaseAll();
+    }
+
+    this.isPlaying = false;
+  }
+
+  /**
+   * Check if a progression is currently playing
+   */
+  getIsPlaying(): boolean {
+    return this.isPlaying;
+  }
+
+  /**
    * Stop all currently playing notes
    */
   stop(): void {
@@ -145,6 +253,8 @@ class AudioEngine {
    * Clean up resources
    */
   dispose(): void {
+    this.stopProgression();
+
     if (this.synth) {
       this.synth.dispose();
       this.synth = null;
