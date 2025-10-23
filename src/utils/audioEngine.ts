@@ -119,7 +119,7 @@ class AudioEngine {
   /**
    * Play a chord
    * @param chord The chord to play
-   * @param duration Duration in seconds (default: 2)
+   * @param duration Duration in seconds (default: 1)
    */
   async playChord(chord: Chord, duration: number = 1): Promise<void> {
     if (!this.isInitialized) {
@@ -145,24 +145,11 @@ class AudioEngine {
     bpm: number = 120,
     onChordChange?: (index: number) => void
   ): Promise<void> {
-    console.log('🎵 playProgression called with:', {
-      chordsCount: chords.length,
-      bpm,
-      chords: chords.map((c, i) => ({
-        index: i,
-        root: c.root,
-        quality: c.quality,
-        duration: c.duration,
-      })),
-    });
-
     if (chords.length === 0) {
-      console.warn('⚠️ No chords to play');
       return;
     }
 
     if (!this.isInitialized) {
-      console.log('🔧 Initializing audio engine...');
       await this.initialize();
     }
 
@@ -175,38 +162,25 @@ class AudioEngine {
 
     // Set the BPM
     Tone.getTransport().bpm.value = bpm;
-    console.log('⏱️ BPM set to:', bpm);
 
     // Create events for each chord
-    const events: Array<{ time: string; chord: Chord; index: number }> = [];
+    const events: Array<{ time: number; chord: Chord; index: number }> = [];
     let currentTime = 0;
 
     chords.forEach((chord, index) => {
-      const timeString = `${currentTime}:0:0`;
+      const timeInSeconds = (60 / bpm) * currentTime;
       events.push({
-        time: timeString,
+        time: timeInSeconds,
         chord,
         index,
       });
-      console.log(`📅 Event ${index}: time=${timeString}, chord=${chord.root}${chord.quality}, duration=${chord.duration} beats`);
       currentTime += chord.duration;
     });
 
-    console.log('📊 Total events scheduled:', events.length);
-    console.log('⏰ Total duration:', currentTime, 'beats');
-
     // Create a Tone.Part to schedule the chord sequence
     this.currentSequence = new Tone.Part((time, event) => {
-      console.log(`🎹 Playing chord ${event.index} at time ${time}:`, {
-        chord: event.chord.root + event.chord.quality,
-        scheduledTime: time,
-        currentTime: Tone.now(),
-      });
-
       const notes = this.getChordNotes(event.chord);
       const durationInSeconds = (60 / bpm) * event.chord.duration;
-
-      console.log(`  Notes: ${notes.join(', ')}, duration: ${durationInSeconds}s`);
 
       // Trigger the chord at the scheduled time
       this.synth!.triggerAttackRelease(notes, durationInSeconds, time);
@@ -215,7 +189,6 @@ class AudioEngine {
       if (onChordChange) {
         // Schedule the callback to run at the same time as the chord
         Tone.getDraw().schedule(() => {
-          console.log(`🎨 UI update: highlighting chord ${event.index}`);
           onChordChange(event.index);
         }, time);
       }
@@ -225,29 +198,19 @@ class AudioEngine {
     this.currentSequence.loop = false;
     this.isPlaying = true;
 
-    console.log('▶️ Starting Tone.Transport...');
-    console.log('🔄 Transport state before start:', Tone.getTransport().state);
-
     // Start the transport
     await Tone.getTransport().start();
-
-    console.log('🔄 Transport state after start:', Tone.getTransport().state);
-    console.log('⏱️ Transport position:', Tone.getTransport().position);
 
     // Schedule stopping the transport after all chords are played
     const totalDuration = events.reduce((sum, event) => sum + event.chord.duration, 0);
     const totalSeconds = (60 / bpm) * totalDuration;
 
-    console.log(`⏹️ Scheduling stop after ${totalSeconds}s (${totalDuration} beats)`);
-
-    Tone.getTransport().schedule(() => {
-      console.log('⏹️ Playback completed, stopping...');
+    Tone.getTransport().schedule((time) => {
       this.stopProgression();
       if (onChordChange) {
         Tone.getDraw().schedule(() => {
-          console.log('🎨 UI update: clearing highlight (index -1)');
           onChordChange(-1); // Signal that playback has ended
-        }, Tone.now());
+        }, time);
       }
     }, `+${totalSeconds}`);
   }
@@ -256,27 +219,20 @@ class AudioEngine {
    * Stop the currently playing progression
    */
   stopProgression(): void {
-    console.log('⏹️ stopProgression called');
-
     if (this.currentSequence) {
-      console.log('  Stopping and disposing current sequence');
       this.currentSequence.stop();
       this.currentSequence.dispose();
       this.currentSequence = null;
     }
 
-    console.log('  Stopping Transport');
     Tone.getTransport().stop();
-    console.log('  Canceling scheduled events');
     Tone.getTransport().cancel();
 
     if (this.synth) {
-      console.log('  Releasing all notes');
       this.synth.releaseAll();
     }
 
     this.isPlaying = false;
-    console.log('✅ Progression stopped');
   }
 
   /**
