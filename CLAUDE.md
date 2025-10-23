@@ -190,3 +190,5 @@ docs/
 - 開発時にReact strict modeが有効
 - プロジェクトはESモジュールを使用（package.jsonで`"type": "module"`）
 - Viteが開発中のホットモジュールリプレースメントを処理
+- 開発を始めるときは必ずbranchを切る
+- issueに対応したPRを作成するときはissue numberを末尾につける
