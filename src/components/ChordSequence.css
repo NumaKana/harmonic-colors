@@ -5,52 +5,11 @@
   border: 1px solid #444;
 }
 
-.chord-sequence-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-  gap: 1rem;
-}
-
 .chord-sequence-title {
-  margin: 0;
+  margin: 0 0 1rem 0;
   font-size: 1rem;
   color: #aaa;
   font-weight: 500;
-}
-
-.progression-play-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border: none;
-  border-radius: 6px;
-  color: #fff;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  white-space: nowrap;
-}
-
-.progression-play-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-}
-
-.progression-play-button:active {
-  transform: translateY(0);
-}
-
-.progression-play-button.playing {
-  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
-}
-
-.progression-play-button.playing:hover {
-  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
 }
 
 .chord-sequence-empty {
@@ -137,14 +96,4 @@
 
 .chord-item-remove:active {
   transform: scale(0.9);
-}
-
-.chord-item-remove:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.chord-item-remove:disabled:hover {
-  background-color: transparent;
-  color: #888;
 }
