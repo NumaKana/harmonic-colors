@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import KeySelector from './components/KeySelector';
 import ChordPalette from './components/ChordPalette';
@@ -6,6 +6,7 @@ import ChordSequence from './components/ChordSequence';
 import PlaybackControls from './components/PlaybackControls';
 import VisualizationCanvas from './components/VisualizationCanvas';
 import { Key, Chord } from './types';
+import { audioEngine } from './utils/audioEngine';
 
 function App() {
   const [selectedKey, setSelectedKey] = useState<Key>({
@@ -39,6 +40,13 @@ function App() {
     : chordProgression.length > 0
     ? chordProgression[chordProgression.length - 1]
     : undefined;
+
+  // Cleanup audio engine on unmount
+  useEffect(() => {
+    return () => {
+      audioEngine.dispose();
+    };
+  }, []);
 
   return (
     <div className="app">

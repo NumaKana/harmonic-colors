@@ -25,12 +25,19 @@ const PlaybackControls = ({ chords, onPlayingIndexChange }: PlaybackControlsProp
     }
 
     setIsPlaying(true);
-    await audioEngine.playProgression(chords, bpm, (index) => {
-      onPlayingIndexChange(index);
-      if (index === -1) {
-        setIsPlaying(false);
-      }
-    });
+    try {
+      await audioEngine.playProgression(chords, bpm, (index) => {
+        onPlayingIndexChange(index);
+        if (index === -1) {
+          setIsPlaying(false);
+        }
+      });
+    } catch (error) {
+      console.error('Failed to play progression:', error);
+      setIsPlaying(false);
+      onPlayingIndexChange(-1);
+      alert('Failed to play audio. Please check your browser audio settings.');
+    }
   };
 
   const handleBpmChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,7 +60,13 @@ const PlaybackControls = ({ chords, onPlayingIndexChange }: PlaybackControlsProp
           className={`playback-button ${isPlaying ? 'playing' : ''}`}
           onClick={handlePlayProgression}
           disabled={chords.length === 0}
-          title={isPlaying ? 'Stop progression' : 'Play progression'}
+          title={
+            chords.length === 0
+              ? 'Add chords to the progression to enable playback'
+              : isPlaying
+              ? 'Stop progression playback'
+              : `Play chord progression at ${bpm} BPM`
+          }
         >
           {isPlaying ? '⏸ Stop' : '▶ Play'}
         </button>
@@ -73,6 +86,8 @@ const PlaybackControls = ({ chords, onPlayingIndexChange }: PlaybackControlsProp
           min={40}
           max={240}
           disabled={isPlaying}
+          title={isPlaying ? 'Cannot change BPM during playback' : 'Set playback tempo (40-240 BPM)'}
+          aria-label="Beats per minute"
         />
       </div>
     </div>

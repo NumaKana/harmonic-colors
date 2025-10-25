@@ -11,7 +11,11 @@ interface ChordSequenceProps {
 
 const ChordSequence = ({ chords, onRemoveChord, currentIndex }: ChordSequenceProps) => {
   const handleChordClick = async (chord: Chord) => {
-    await audioEngine.playChord(chord, 1);
+    try {
+      await audioEngine.playChord(chord, 1);
+    } catch (error) {
+      console.error('Failed to play chord preview:', error);
+    }
   };
 
   if (chords.length === 0) {
@@ -40,6 +44,7 @@ const ChordSequence = ({ chords, onRemoveChord, currentIndex }: ChordSequencePro
               className="chord-item-content"
               onClick={() => handleChordClick(chord)}
               style={{ cursor: 'pointer' }}
+              title={`Click to preview ${getChordDisplayName(chord)}`}
             >
               <span className="chord-item-index">{index + 1}</span>
               <span className="chord-item-name">{getChordDisplayName(chord)}</span>
@@ -47,7 +52,8 @@ const ChordSequence = ({ chords, onRemoveChord, currentIndex }: ChordSequencePro
             <button
               className="chord-item-remove"
               onClick={() => onRemoveChord(index)}
-              title="Remove chord"
+              title={`Remove ${getChordDisplayName(chord)} from progression`}
+              aria-label={`Remove ${getChordDisplayName(chord)}`}
             >
               ×
             </button>

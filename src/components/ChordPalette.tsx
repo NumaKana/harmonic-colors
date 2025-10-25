@@ -12,8 +12,13 @@ const ChordPalette = ({ selectedKey, onChordSelect }: ChordPaletteProps) => {
   const diatonicChords = getDiatonicChords(selectedKey);
 
   const handleChordClick = async (chord: Chord) => {
-    // Play the chord sound
-    await audioEngine.playChord(chord, 2);
+    try {
+      // Play the chord sound
+      await audioEngine.playChord(chord, 2);
+    } catch (error) {
+      console.error('Failed to play chord:', error);
+      // Continue with adding to progression even if audio fails
+    }
     // Add to progression
     onChordSelect(chord);
   };
