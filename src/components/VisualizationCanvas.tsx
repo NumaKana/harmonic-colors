@@ -7,6 +7,7 @@ import { analyzeHarmonicFunction } from '../utils/harmonicAnalysis';
 import ColorGradientMesh from './ColorGradientMesh';
 import TimelineVisualization from './TimelineVisualization';
 import CameraReset from './CameraReset';
+import CompactPlayButton from './CompactPlayButton';
 import './VisualizationCanvas.css';
 
 interface VisualizationCanvasProps {
@@ -16,6 +17,11 @@ interface VisualizationCanvasProps {
   chordProgression?: Chord[];
   currentChordIndex?: number;
   playbackPosition?: number;
+  bpm?: number;
+  metronomeEnabled?: boolean;
+  timeSignature?: number;
+  onPlayingIndexChange?: (index: number) => void;
+  onPlaybackPositionChange?: (position: number) => void;
 }
 
 const VisualizationCanvas = ({
@@ -24,7 +30,12 @@ const VisualizationCanvas = ({
   hueRotation = 0,
   chordProgression = [],
   currentChordIndex = -1,
-  playbackPosition = 0
+  playbackPosition = 0,
+  bpm = 120,
+  metronomeEnabled = false,
+  timeSignature = 4,
+  onPlayingIndexChange,
+  onPlaybackPositionChange
 }: VisualizationCanvasProps) => {
   const fallbackCanvasRef = useRef<HTMLDivElement>(null);
   const [webGLSupported, setWebGLSupported] = useState(true);
@@ -107,6 +118,16 @@ const VisualizationCanvas = ({
             <div className="timeline-hint">
               💡 Drag to scroll horizontally
             </div>
+          )}
+          {onPlayingIndexChange && onPlaybackPositionChange && (
+            <CompactPlayButton
+              chords={chordProgression}
+              bpm={bpm}
+              metronomeEnabled={metronomeEnabled}
+              timeSignature={timeSignature}
+              onPlayingIndexChange={onPlayingIndexChange}
+              onPlaybackPositionChange={onPlaybackPositionChange}
+            />
           )}
           <div className="visualization-canvas">
           <Canvas
