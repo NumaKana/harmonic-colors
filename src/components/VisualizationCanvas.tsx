@@ -57,7 +57,16 @@ const VisualizationCanvas = ({
         <div className="visualization-canvas">
           <Canvas
             orthographic
-            camera={{ zoom: 1, position: [0, 0, 1] }}
+            camera={{
+              zoom: 1,
+              position: [0, 0, 5],
+              left: -1,
+              right: 1,
+              top: 1,
+              bottom: -1,
+              near: 0.1,
+              far: 1000
+            }}
             style={{ width: '100%', height: '100%' }}
           >
             <ColorGradientMesh color1={color1} color2={color2} />
