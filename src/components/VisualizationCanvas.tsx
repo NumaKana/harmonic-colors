@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { Chord, Key } from '../types';
-import { generateKeyColor, generateChordColor, hslToCSS } from '../utils/colorGenerator';
+import { generateKeyColor, generateChordColor, getMarbleRatio, hslToCSS } from '../utils/colorGenerator';
 import { getChordDisplayName } from '../utils/diatonic';
 import { analyzeHarmonicFunction } from '../utils/harmonicAnalysis';
 import ColorGradientMesh from './ColorGradientMesh';
@@ -26,6 +26,11 @@ const VisualizationCanvas = ({
   const color2 = currentChord
     ? generateChordColor(currentChord, selectedKey, color1)
     : color1;
+
+  // Calculate marble ratio based on harmonic function
+  const marbleRatio = currentChord
+    ? getMarbleRatio(currentChord, selectedKey)
+    : 0.7; // Default to tonic ratio when no chord
 
   // Get harmonic function info
   const harmonicFunction = currentChord
@@ -69,7 +74,11 @@ const VisualizationCanvas = ({
             }}
             style={{ width: '100%', height: '100%' }}
           >
-            <ColorGradientMesh color1={color1} color2={color2} />
+            <ColorGradientMesh
+              color1={color1}
+              color2={color2}
+              marbleRatio={marbleRatio}
+            />
           </Canvas>
         </div>
       ) : (
