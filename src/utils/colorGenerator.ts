@@ -140,12 +140,12 @@ export function getMarbleRatio(chord: Chord, key: Key): number {
 
   switch (harmonicFunction) {
     case 'tonic':
-      return 0.7; // 70% color1, 30% color2
+      return 0.8; // 80% color1, 20% color2
     case 'subdominant':
-      return 0.5; // 50% color1, 50% color2
+      return 0.65; // 65% color1, 35% color2
     case 'dominant':
-      return 0.3; // 30% color1, 70% color2
+      return 0.5; // 50% color1, 50% color2
     default:
-      return 0.5;
+      return 0.65;
   }
 }
