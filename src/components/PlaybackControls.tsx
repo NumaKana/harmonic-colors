@@ -8,9 +8,11 @@ interface PlaybackControlsProps {
   onPlayingIndexChange: (index: number) => void;
   onPlaybackPositionChange?: (position: number) => void;
   onTimeSignatureChange?: (timeSignature: number) => void;
+  onBpmChange?: (bpm: number) => void;
+  onMetronomeChange?: (enabled: boolean) => void;
 }
 
-const PlaybackControls = ({ chords, onPlayingIndexChange, onPlaybackPositionChange, onTimeSignatureChange }: PlaybackControlsProps) => {
+const PlaybackControls = ({ chords, onPlayingIndexChange, onPlaybackPositionChange, onTimeSignatureChange, onBpmChange, onMetronomeChange }: PlaybackControlsProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [bpm, setBpm] = useState(120);
   const [metronomeEnabled, setMetronomeEnabled] = useState(false);
@@ -97,6 +99,9 @@ const PlaybackControls = ({ chords, onPlayingIndexChange, onPlaybackPositionChan
     const value = parseInt(e.target.value, 10);
     if (!isNaN(value)) {
       setBpm(value);
+      if (onBpmChange) {
+        onBpmChange(value);
+      }
     }
   };
 
@@ -110,6 +115,9 @@ const PlaybackControls = ({ chords, onPlayingIndexChange, onPlaybackPositionChan
     const newValue = !metronomeEnabled;
     setMetronomeEnabled(newValue);
     audioEngine.setMetronomeEnabled(newValue);
+    if (onMetronomeChange) {
+      onMetronomeChange(newValue);
+    }
   };
 
   const handleTimeSignatureChange = (e: React.ChangeEvent<HTMLSelectElement>) => {

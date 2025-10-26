@@ -18,6 +18,8 @@ function App() {
   const [selectedChordIndex, setSelectedChordIndex] = useState<number | null>(null); // Index of user-selected chord
   const [timeSignature, setTimeSignature] = useState<number>(4);
   const [playbackPosition, setPlaybackPosition] = useState<number>(0); // Current playback position in beats
+  const [bpm, setBpm] = useState<number>(120);
+  const [metronomeEnabled, setMetronomeEnabled] = useState<boolean>(false);
 
   const handleAddChord = (chord: Chord) => {
     const newProgression = [...chordProgression, chord];
@@ -88,6 +90,8 @@ function App() {
             onPlayingIndexChange={handlePlayingIndexChange}
             onPlaybackPositionChange={handlePlaybackPositionChange}
             onTimeSignatureChange={setTimeSignature}
+            onBpmChange={setBpm}
+            onMetronomeChange={setMetronomeEnabled}
           />
           <ChordSequence
             chords={chordProgression}
@@ -105,6 +109,11 @@ function App() {
             chordProgression={chordProgression}
             currentChordIndex={currentChordIndex}
             playbackPosition={playbackPosition}
+            bpm={bpm}
+            metronomeEnabled={metronomeEnabled}
+            timeSignature={timeSignature}
+            onPlayingIndexChange={handlePlayingIndexChange}
+            onPlaybackPositionChange={handlePlaybackPositionChange}
           />
         </div>
       </main>
