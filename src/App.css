@@ -47,8 +47,9 @@
 .visualization-section {
   flex: 1;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
 }
 
 /* Responsive: Stack vertically on smaller screens */

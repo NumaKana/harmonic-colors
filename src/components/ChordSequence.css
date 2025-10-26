@@ -3,6 +3,8 @@
   background-color: #2a2a2a;
   border-radius: 8px;
   border: 1px solid #444;
+  width: 100%;
+  max-width: 800px;
 }
 
 .chord-sequence-title {
@@ -23,7 +25,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  max-height: 400px;
+  max-height: 300px;
   overflow-y: auto;
   overflow-x: hidden;
 }

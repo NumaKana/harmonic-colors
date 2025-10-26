@@ -93,14 +93,6 @@ function App() {
             onBpmChange={setBpm}
             onMetronomeChange={setMetronomeEnabled}
           />
-          <ChordSequence
-            chords={chordProgression}
-            onRemoveChord={handleRemoveChord}
-            onSelectChord={handleSelectChord}
-            currentIndex={currentChordIndex >= 0 ? currentChordIndex : undefined}
-            selectedIndex={selectedChordIndex !== null ? selectedChordIndex : undefined}
-            timeSignature={timeSignature}
-          />
         </div>
         <div className="visualization-section">
           <VisualizationCanvas
@@ -114,6 +106,14 @@ function App() {
             timeSignature={timeSignature}
             onPlayingIndexChange={handlePlayingIndexChange}
             onPlaybackPositionChange={handlePlaybackPositionChange}
+          />
+          <ChordSequence
+            chords={chordProgression}
+            onRemoveChord={handleRemoveChord}
+            onSelectChord={handleSelectChord}
+            currentIndex={currentChordIndex >= 0 ? currentChordIndex : undefined}
+            selectedIndex={selectedChordIndex !== null ? selectedChordIndex : undefined}
+            timeSignature={timeSignature}
           />
         </div>
       </main>
