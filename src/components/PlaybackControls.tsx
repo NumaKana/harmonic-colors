@@ -6,9 +6,10 @@ import './PlaybackControls.css';
 interface PlaybackControlsProps {
   chords: Chord[];
   onPlayingIndexChange: (index: number) => void;
+  onTimeSignatureChange?: (timeSignature: number) => void;
 }
 
-const PlaybackControls = ({ chords, onPlayingIndexChange }: PlaybackControlsProps) => {
+const PlaybackControls = ({ chords, onPlayingIndexChange, onTimeSignatureChange }: PlaybackControlsProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [bpm, setBpm] = useState(120);
   const [metronomeEnabled, setMetronomeEnabled] = useState(false);
@@ -65,6 +66,9 @@ const PlaybackControls = ({ chords, onPlayingIndexChange }: PlaybackControlsProp
     const value = parseInt(e.target.value, 10);
     setTimeSignature(value);
     audioEngine.setTimeSignature(value);
+    if (onTimeSignatureChange) {
+      onTimeSignatureChange(value);
+    }
   };
 
   return (

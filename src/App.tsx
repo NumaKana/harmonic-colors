@@ -15,6 +15,7 @@ function App() {
   });
   const [chordProgression, setChordProgression] = useState<Chord[]>([]);
   const [currentChordIndex, setCurrentChordIndex] = useState<number>(-1);
+  const [timeSignature, setTimeSignature] = useState<number>(4);
 
   const handleAddChord = (chord: Chord) => {
     setChordProgression([...chordProgression, chord]);
@@ -60,11 +61,13 @@ function App() {
           <PlaybackControls
             chords={chordProgression}
             onPlayingIndexChange={handlePlayingIndexChange}
+            onTimeSignatureChange={setTimeSignature}
           />
           <ChordSequence
             chords={chordProgression}
             onRemoveChord={handleRemoveChord}
             currentIndex={currentChordIndex >= 0 ? currentChordIndex : undefined}
+            timeSignature={timeSignature}
           />
         </div>
         <div className="visualization-section">
