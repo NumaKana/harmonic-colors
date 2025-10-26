@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Chord } from '../types';
 import { audioEngine } from '../utils/audioEngine';
 import './PlaybackControls.css';
@@ -6,14 +6,51 @@ import './PlaybackControls.css';
 interface PlaybackControlsProps {
   chords: Chord[];
   onPlayingIndexChange: (index: number) => void;
+  onPlaybackPositionChange?: (position: number) => void;
   onTimeSignatureChange?: (timeSignature: number) => void;
 }
 
-const PlaybackControls = ({ chords, onPlayingIndexChange, onTimeSignatureChange }: PlaybackControlsProps) => {
+const PlaybackControls = ({ chords, onPlayingIndexChange, onPlaybackPositionChange, onTimeSignatureChange }: PlaybackControlsProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [bpm, setBpm] = useState(120);
   const [metronomeEnabled, setMetronomeEnabled] = useState(false);
   const [timeSignature, setTimeSignature] = useState(4);
+
+  const startTimeRef = useRef<number>(0);
+  const currentIndexRef = useRef<number>(-1);
+  const animationFrameRef = useRef<number | null>(null);
+
+  // Animation loop to update playback position
+  useEffect(() => {
+    if (!isPlaying) {
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+      return;
+    }
+
+    const updatePosition = () => {
+      const now = performance.now();
+      const elapsedMs = now - startTimeRef.current;
+      const beatsPerMs = bpm / 60000; // Convert BPM to beats per millisecond
+      const currentBeat = elapsedMs * beatsPerMs;
+
+      if (onPlaybackPositionChange) {
+        onPlaybackPositionChange(currentBeat);
+      }
+
+      animationFrameRef.current = requestAnimationFrame(updatePosition);
+    };
+
+    animationFrameRef.current = requestAnimationFrame(updatePosition);
+
+    return () => {
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
+  }, [isPlaying, bpm, onPlaybackPositionChange]);
 
   const handlePlayProgression = async () => {
     if (chords.length === 0) {
@@ -24,21 +61,34 @@ const PlaybackControls = ({ chords, onPlayingIndexChange, onTimeSignatureChange 
       audioEngine.stopProgression();
       setIsPlaying(false);
       onPlayingIndexChange(-1);
+      if (onPlaybackPositionChange) {
+        onPlaybackPositionChange(0);
+      }
       return;
     }
 
     setIsPlaying(true);
+    startTimeRef.current = performance.now();
+    currentIndexRef.current = 0;
+
     try {
       await audioEngine.playProgression(chords, bpm, (index) => {
+        currentIndexRef.current = index;
         onPlayingIndexChange(index);
         if (index === -1) {
           setIsPlaying(false);
+          if (onPlaybackPositionChange) {
+            onPlaybackPositionChange(0);
+          }
         }
       });
     } catch (error) {
       console.error('Failed to play progression:', error);
       setIsPlaying(false);
       onPlayingIndexChange(-1);
+      if (onPlaybackPositionChange) {
+        onPlaybackPositionChange(0);
+      }
       alert('Failed to play audio. Please check your browser audio settings.');
     }
   };

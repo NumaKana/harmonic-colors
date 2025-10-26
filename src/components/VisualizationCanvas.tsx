@@ -5,21 +5,31 @@ import { generateKeyColor, generateChordColor, getMarbleRatio, hslToCSS } from '
 import { getChordDisplayName } from '../utils/diatonic';
 import { analyzeHarmonicFunction } from '../utils/harmonicAnalysis';
 import ColorGradientMesh from './ColorGradientMesh';
+import TimelineVisualization from './TimelineVisualization';
+import CameraReset from './CameraReset';
 import './VisualizationCanvas.css';
 
 interface VisualizationCanvasProps {
   selectedKey: Key;
   currentChord?: Chord;
   hueRotation?: number;
+  chordProgression?: Chord[];
+  currentChordIndex?: number;
+  playbackPosition?: number;
 }
 
 const VisualizationCanvas = ({
   selectedKey,
   currentChord,
-  hueRotation = 0
+  hueRotation = 0,
+  chordProgression = [],
+  currentChordIndex = -1,
+  playbackPosition = 0
 }: VisualizationCanvasProps) => {
   const fallbackCanvasRef = useRef<HTMLDivElement>(null);
   const [webGLSupported, setWebGLSupported] = useState(true);
+  const [visualizationMode, setVisualizationMode] = useState<'single' | 'timeline'>('single');
+  const [timelineMode, setTimelineMode] = useState<'playback' | 'preview'>('playback');
 
   // Generate colors
   const color1 = generateKeyColor(selectedKey, hueRotation);
@@ -58,8 +68,47 @@ const VisualizationCanvas = ({
 
   return (
     <div className="visualization-container">
+      {/* Mode Toggle Buttons */}
+      <div className="visualization-mode-controls">
+        <button
+          className={`mode-button ${visualizationMode === 'single' ? 'active' : ''}`}
+          onClick={() => setVisualizationMode('single')}
+        >
+          Single View
+        </button>
+        <button
+          className={`mode-button ${visualizationMode === 'timeline' ? 'active' : ''}`}
+          onClick={() => setVisualizationMode('timeline')}
+          disabled={chordProgression.length === 0}
+        >
+          Timeline View
+        </button>
+        {visualizationMode === 'timeline' && (
+          <>
+            <button
+              className={`mode-button ${timelineMode === 'playback' ? 'active' : ''}`}
+              onClick={() => setTimelineMode('playback')}
+            >
+              Playback
+            </button>
+            <button
+              className={`mode-button ${timelineMode === 'preview' ? 'active' : ''}`}
+              onClick={() => setTimelineMode('preview')}
+            >
+              Preview
+            </button>
+          </>
+        )}
+      </div>
+
       {webGLSupported ? (
-        <div className="visualization-canvas">
+        <div className="visualization-canvas-wrapper">
+          {visualizationMode === 'timeline' && timelineMode === 'preview' && (
+            <div className="timeline-hint">
+              💡 Drag to scroll horizontally
+            </div>
+          )}
+          <div className="visualization-canvas">
           <Canvas
             orthographic
             camera={{
@@ -74,12 +123,26 @@ const VisualizationCanvas = ({
             }}
             style={{ width: '100%', height: '100%' }}
           >
-            <ColorGradientMesh
-              color1={color1}
-              color2={color2}
-              marbleRatio={marbleRatio}
-            />
+            {visualizationMode === 'single' ? (
+              <>
+                <CameraReset />
+                <ColorGradientMesh
+                  color1={color1}
+                  color2={color2}
+                  marbleRatio={marbleRatio}
+                />
+              </>
+            ) : (
+              <TimelineVisualization
+                chords={chordProgression}
+                selectedKey={selectedKey}
+                currentIndex={currentChordIndex}
+                playbackPosition={playbackPosition}
+                mode={timelineMode}
+              />
+            )}
           </Canvas>
+          </div>
         </div>
       ) : (
         <div className="visualization-canvas" ref={fallbackCanvasRef}>
