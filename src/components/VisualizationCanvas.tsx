@@ -1,8 +1,10 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { Canvas } from '@react-three/fiber';
 import { Chord, Key } from '../types';
 import { generateKeyColor, generateChordColor, hslToCSS } from '../utils/colorGenerator';
 import { getChordDisplayName } from '../utils/diatonic';
 import { analyzeHarmonicFunction } from '../utils/harmonicAnalysis';
+import ColorGradientMesh from './ColorGradientMesh';
 import './VisualizationCanvas.css';
 
 interface VisualizationCanvasProps {
@@ -16,7 +18,8 @@ const VisualizationCanvas = ({
   currentChord,
   hueRotation = 0
 }: VisualizationCanvasProps) => {
-  const canvasRef = useRef<HTMLDivElement>(null);
+  const fallbackCanvasRef = useRef<HTMLDivElement>(null);
+  const [webGLSupported, setWebGLSupported] = useState(true);
 
   // Generate colors
   const color1 = generateKeyColor(selectedKey, hueRotation);
@@ -29,21 +32,51 @@ const VisualizationCanvas = ({
     ? analyzeHarmonicFunction(currentChord, selectedKey)
     : null;
 
+  // Check WebGL support
   useEffect(() => {
-    if (!canvasRef.current) return;
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if (!gl) {
+      console.warn('WebGL not supported, falling back to CSS gradient');
+      setWebGLSupported(false);
+    }
+  }, []);
 
-    // Apply gradient to canvas
-    const color1CSS = hslToCSS(color1);
-    const color2CSS = hslToCSS(color2);
-
-    canvasRef.current.style.background = `linear-gradient(180deg, ${color1CSS} 0%, ${color2CSS} 100%)`;
-  }, [color1, color2]);
+  // Fallback: Apply CSS gradient if WebGL is not supported
+  useEffect(() => {
+    if (!webGLSupported && fallbackCanvasRef.current) {
+      const color1CSS = hslToCSS(color1);
+      const color2CSS = hslToCSS(color2);
+      fallbackCanvasRef.current.style.background = `linear-gradient(180deg, ${color1CSS} 0%, ${color2CSS} 100%)`;
+    }
+  }, [webGLSupported, color1, color2]);
 
   return (
     <div className="visualization-container">
-      <div className="visualization-canvas" ref={canvasRef}>
-        {/* Canvas will be filled with gradient via CSS */}
-      </div>
+      {webGLSupported ? (
+        <div className="visualization-canvas">
+          <Canvas
+            orthographic
+            camera={{
+              zoom: 1,
+              position: [0, 0, 5],
+              left: -1,
+              right: 1,
+              top: 1,
+              bottom: -1,
+              near: 0.1,
+              far: 1000
+            }}
+            style={{ width: '100%', height: '100%' }}
+          >
+            <ColorGradientMesh color1={color1} color2={color2} />
+          </Canvas>
+        </div>
+      ) : (
+        <div className="visualization-canvas" ref={fallbackCanvasRef}>
+          {/* Fallback: CSS gradient for non-WebGL browsers */}
+        </div>
+      )}
 
       <div className="visualization-info">
         <div className="color-info">

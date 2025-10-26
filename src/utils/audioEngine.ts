@@ -43,7 +43,6 @@ class AudioEngine {
 
       // Create metronome with MetalSynth for click sound
       this.metronome = new Tone.MetalSynth({
-        frequency: 880,
         envelope: {
           attack: 0.001,
           decay: 0.05,
@@ -282,7 +281,7 @@ class AudioEngine {
   /**
    * Setup metronome loop with given BPM
    */
-  private setupMetronome(bpm: number): void {
+  private setupMetronome(_bpm: number): void {
     if (!this.metronome) {
       return;
     }
