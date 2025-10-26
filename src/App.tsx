@@ -14,11 +14,15 @@ function App() {
     mode: 'major',
   });
   const [chordProgression, setChordProgression] = useState<Chord[]>([]);
-  const [currentChordIndex, setCurrentChordIndex] = useState<number>(-1);
+  const [currentChordIndex, setCurrentChordIndex] = useState<number>(-1); // Index of currently playing chord
+  const [selectedChordIndex, setSelectedChordIndex] = useState<number | null>(null); // Index of user-selected chord
   const [timeSignature, setTimeSignature] = useState<number>(4);
 
   const handleAddChord = (chord: Chord) => {
-    setChordProgression([...chordProgression, chord]);
+    const newProgression = [...chordProgression, chord];
+    setChordProgression(newProgression);
+    // Auto-select the newly added chord
+    setSelectedChordIndex(newProgression.length - 1);
   };
 
   const handleRemoveChord = (index: number) => {
@@ -29,6 +33,16 @@ function App() {
     } else if (currentChordIndex >= 0 && index < currentChordIndex) {
       setCurrentChordIndex(currentChordIndex - 1);
     }
+    // Reset selected chord index if removed
+    if (selectedChordIndex === index) {
+      setSelectedChordIndex(null);
+    } else if (selectedChordIndex !== null && index < selectedChordIndex) {
+      setSelectedChordIndex(selectedChordIndex - 1);
+    }
+  };
+
+  const handleSelectChord = (index: number) => {
+    setSelectedChordIndex(index);
   };
 
   const handlePlayingIndexChange = (index: number) => {
@@ -36,8 +50,11 @@ function App() {
   };
 
   // Get current chord for visualization
+  // Priority: 1. Playing chord, 2. Selected chord, 3. Last chord
   const currentChord = currentChordIndex >= 0
     ? chordProgression[currentChordIndex]
+    : selectedChordIndex !== null && selectedChordIndex >= 0
+    ? chordProgression[selectedChordIndex]
     : chordProgression.length > 0
     ? chordProgression[chordProgression.length - 1]
     : undefined;
@@ -66,7 +83,9 @@ function App() {
           <ChordSequence
             chords={chordProgression}
             onRemoveChord={handleRemoveChord}
+            onSelectChord={handleSelectChord}
             currentIndex={currentChordIndex >= 0 ? currentChordIndex : undefined}
+            selectedIndex={selectedChordIndex !== null ? selectedChordIndex : undefined}
             timeSignature={timeSignature}
           />
         </div>
