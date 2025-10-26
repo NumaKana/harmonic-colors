@@ -91,6 +91,15 @@ const groupIntoMeasures = (chords: Chord[], beatsPerMeasure: number): Measure[] 
   return measures;
 };
 
+// Helper function to group measures into rows (4 measures per row)
+const groupMeasuresIntoRows = (measures: Measure[], measuresPerRow: number = 4): Measure[][] => {
+  const rows: Measure[][] = [];
+  for (let i = 0; i < measures.length; i += measuresPerRow) {
+    rows.push(measures.slice(i, i + measuresPerRow));
+  }
+  return rows;
+};
+
 const ChordSequence = ({ chords, onRemoveChord, onSelectChord, currentIndex, selectedIndex, timeSignature = 4 }: ChordSequenceProps) => {
   const handleChordClick = async (chord: Chord, index: number) => {
     // Select the chord
@@ -105,6 +114,7 @@ const ChordSequence = ({ chords, onRemoveChord, onSelectChord, currentIndex, sel
   };
 
   const measures = groupIntoMeasures(chords, timeSignature);
+  const rows = groupMeasuresIntoRows(measures, 4);
 
   if (chords.length === 0) {
     return (
@@ -122,44 +132,48 @@ const ChordSequence = ({ chords, onRemoveChord, onSelectChord, currentIndex, sel
       <h3 className="chord-sequence-title">
         Chord Progression ({chords.length} chord{chords.length !== 1 ? 's' : ''}, {measures.length} measure{measures.length !== 1 ? 's' : ''})
       </h3>
-      <div className="chord-sequence-measures">
-        {measures.map((measure) => (
-          <div key={measure.measureNumber} className="measure">
-            <div className="measure-number">{measure.measureNumber}</div>
-            <div className="measure-content">
-              {measure.chords.map(({ chord, originalIndex }) => {
-                const widthPercent = (chord.duration / timeSignature) * 100;
-                const isPlaying = currentIndex === originalIndex;
-                const isSelected = selectedIndex === originalIndex;
-                return (
-                  <div
-                    key={originalIndex}
-                    className={`measure-chord ${isPlaying ? 'measure-chord-current' : ''} ${isSelected ? 'measure-chord-selected' : ''}`}
-                    style={{ width: `${widthPercent}%` }}
-                    onClick={() => handleChordClick(chord, originalIndex)}
-                    title={`Click to select ${getChordDisplayName(chord)} (${chord.duration} beats)`}
-                  >
-                    <div className="measure-chord-content">
-                      <span className="measure-chord-name">{getChordDisplayName(chord)}</span>
-                      <span className="measure-chord-duration" title={`${chord.duration} beats`}>
-                        {getDurationSymbol(chord.duration)}
-                      </span>
-                    </div>
-                    <button
-                      className="measure-chord-remove"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onRemoveChord(originalIndex);
-                      }}
-                      title={`Remove ${getChordDisplayName(chord)} from progression`}
-                      aria-label={`Remove ${getChordDisplayName(chord)}`}
-                    >
-                      ×
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
+      <div className="chord-sequence-rows">
+        {rows.map((row, rowIndex) => (
+          <div key={rowIndex} className="measure-row">
+            {row.map((measure) => (
+              <div key={measure.measureNumber} className="measure">
+                <div className="measure-number">{measure.measureNumber}</div>
+                <div className="measure-content">
+                  {measure.chords.map(({ chord, originalIndex }) => {
+                    const widthPercent = (chord.duration / timeSignature) * 100;
+                    const isPlaying = currentIndex === originalIndex;
+                    const isSelected = selectedIndex === originalIndex;
+                    return (
+                      <div
+                        key={originalIndex}
+                        className={`measure-chord ${isPlaying ? 'measure-chord-current' : ''} ${isSelected ? 'measure-chord-selected' : ''}`}
+                        style={{ width: `${widthPercent}%` }}
+                        onClick={() => handleChordClick(chord, originalIndex)}
+                        title={`Click to select ${getChordDisplayName(chord)} (${chord.duration} beats)`}
+                      >
+                        <div className="measure-chord-content">
+                          <span className="measure-chord-name">{getChordDisplayName(chord)}</span>
+                          <span className="measure-chord-duration" title={`${chord.duration} beats`}>
+                            {getDurationSymbol(chord.duration)}
+                          </span>
+                        </div>
+                        <button
+                          className="measure-chord-remove"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onRemoveChord(originalIndex);
+                          }}
+                          title={`Remove ${getChordDisplayName(chord)} from progression`}
+                          aria-label={`Remove ${getChordDisplayName(chord)}`}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
         ))}
       </div>

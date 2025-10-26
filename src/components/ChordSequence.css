@@ -19,17 +19,27 @@
   font-style: italic;
 }
 
-.chord-sequence-measures {
+.chord-sequence-rows {
   display: flex;
   flex-direction: column;
+  gap: 0.75rem;
+  max-height: 400px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.measure-row {
+  display: flex;
   gap: 0.5rem;
-  overflow-x: auto;
+  flex-wrap: nowrap;
 }
 
 .measure {
   display: flex;
   align-items: stretch;
-  min-height: 80px;
+  min-height: 70px;
+  flex: 1;
+  min-width: 0;
   background-color: #2a2a2a;
   border: 2px solid #555;
   border-radius: 6px;
@@ -40,10 +50,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 40px;
+  min-width: 30px;
+  max-width: 30px;
   background-color: #1a1a1a;
   border-right: 2px solid #555;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   color: #888;
   font-weight: 600;
 }
