@@ -13,6 +13,10 @@
   padding: 2rem;
   text-align: center;
   border-bottom: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
 }
 
 .header h1 {
@@ -24,48 +28,43 @@
   background-clip: text;
 }
 
+.phase-tabs {
+  display: flex;
+  gap: 0.5rem;
+  background-color: #2a2a2a;
+  padding: 0.25rem;
+  border-radius: 8px;
+  border: 1px solid #444;
+}
+
+.phase-tab {
+  padding: 0.75rem 2rem;
+  background-color: transparent;
+  border: none;
+  border-radius: 6px;
+  color: #888;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.phase-tab:hover {
+  background-color: #333;
+  color: #aaa;
+}
+
+.phase-tab.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
 .main {
   flex: 1;
   display: flex;
-  flex-direction: row;
-  gap: 2rem;
-  padding: 2rem;
-  max-width: 1400px;
+  flex-direction: column;
   width: 100%;
-  margin: 0 auto;
-  align-items: flex-start;
-}
-
-.controls-section {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  flex: 0 0 400px;
-  min-width: 350px;
-}
-
-.visualization-section {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
   align-items: center;
-}
-
-/* Responsive: Stack vertically on smaller screens */
-@media (max-width: 1024px) {
-  .main {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .controls-section {
-    flex: 1;
-    width: 100%;
-    max-width: 800px;
-  }
-
-  .visualization-section {
-    width: 100%;
-  }
+  overflow-y: auto;
 }
