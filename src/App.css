@@ -27,21 +27,44 @@
 .main {
   flex: 1;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: 2rem;
   padding: 2rem;
-  max-width: 1200px;
+  max-width: 1400px;
   width: 100%;
   margin: 0 auto;
+  align-items: flex-start;
 }
 
 .controls-section {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  flex: 0 0 400px;
+  min-width: 350px;
 }
 
 .visualization-section {
+  flex: 1;
   display: flex;
   justify-content: center;
+  align-items: flex-start;
+}
+
+/* Responsive: Stack vertically on smaller screens */
+@media (max-width: 1024px) {
+  .main {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .controls-section {
+    flex: 1;
+    width: 100%;
+    max-width: 800px;
+  }
+
+  .visualization-section {
+    width: 100%;
+  }
 }
