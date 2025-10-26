@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
 import './App.css';
-import KeySelector from './components/KeySelector';
-import ChordPalette from './components/ChordPalette';
-import ChordSequence from './components/ChordSequence';
-import PlaybackControls from './components/PlaybackControls';
-import VisualizationCanvas from './components/VisualizationCanvas';
+import BuildPhase from './components/BuildPhase';
+import ConfirmPhase from './components/ConfirmPhase';
 import { Key, Chord } from './types';
 import { audioEngine } from './utils/audioEngine';
 
+type Phase = 'build' | 'confirm';
+
 function App() {
+  const [currentPhase, setCurrentPhase] = useState<Phase>('build');
   const [selectedKey, setSelectedKey] = useState<Key>({
     tonic: 'C',
     mode: 'major',
@@ -80,30 +80,41 @@ function App() {
     <div className="app">
       <header className="header">
         <h1>Harmonic Colors</h1>
+        <div className="phase-tabs">
+          <button
+            className={`phase-tab ${currentPhase === 'build' ? 'active' : ''}`}
+            onClick={() => setCurrentPhase('build')}
+          >
+            組み立て
+          </button>
+          <button
+            className={`phase-tab ${currentPhase === 'confirm' ? 'active' : ''}`}
+            onClick={() => setCurrentPhase('confirm')}
+          >
+            確認
+          </button>
+        </div>
       </header>
       <main className="main">
-        <div className="controls-section">
-          <KeySelector selectedKey={selectedKey} onKeyChange={setSelectedKey} />
-          <ChordPalette selectedKey={selectedKey} onChordSelect={handleAddChord} />
-          <PlaybackControls
+        {currentPhase === 'build' ? (
+          <BuildPhase
+            selectedKey={selectedKey}
+            onKeyChange={setSelectedKey}
             chords={chordProgression}
+            onChordSelect={handleAddChord}
+            onRemoveChord={handleRemoveChord}
+            onSelectChord={handleSelectChord}
+            currentIndex={currentChordIndex >= 0 ? currentChordIndex : undefined}
+            selectedIndex={selectedChordIndex !== null ? selectedChordIndex : undefined}
+            timeSignature={timeSignature}
             onPlayingIndexChange={handlePlayingIndexChange}
             onPlaybackPositionChange={handlePlaybackPositionChange}
             onTimeSignatureChange={setTimeSignature}
             onBpmChange={setBpm}
             onMetronomeChange={setMetronomeEnabled}
           />
-          <ChordSequence
-            chords={chordProgression}
-            onRemoveChord={handleRemoveChord}
-            onSelectChord={handleSelectChord}
-            currentIndex={currentChordIndex >= 0 ? currentChordIndex : undefined}
-            selectedIndex={selectedChordIndex !== null ? selectedChordIndex : undefined}
-            timeSignature={timeSignature}
-          />
-        </div>
-        <div className="visualization-section">
-          <VisualizationCanvas
+        ) : (
+          <ConfirmPhase
             selectedKey={selectedKey}
             currentChord={currentChord}
             chordProgression={chordProgression}
@@ -115,7 +126,7 @@ function App() {
             onPlayingIndexChange={handlePlayingIndexChange}
             onPlaybackPositionChange={handlePlaybackPositionChange}
           />
-        </div>
+        )}
       </main>
     </div>
   )
