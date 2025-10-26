@@ -19,22 +19,27 @@ class AudioEngine {
       return;
     }
 
-    await Tone.start();
+    try {
+      await Tone.start();
 
-    // Create a polyphonic synthesizer with a warm, pad-like sound
-    this.synth = new Tone.PolySynth(Tone.Synth, {
-      oscillator: {
-        type: 'sine',
-      },
-      envelope: {
-        attack: 0.1,
-        decay: 0.2,
-        sustain: 0.7,
-        release: 1.0,
-      },
-    }).toDestination();
+      // Create a polyphonic synthesizer with a warm, pad-like sound
+      this.synth = new Tone.PolySynth(Tone.Synth, {
+        oscillator: {
+          type: 'sine',
+        },
+        envelope: {
+          attack: 0.1,
+          decay: 0.2,
+          sustain: 0.7,
+          release: 1.0,
+        },
+      }).toDestination();
 
-    this.isInitialized = true;
+      this.isInitialized = true;
+    } catch (error) {
+      console.error('Failed to initialize audio engine:', error);
+      throw new Error('Audio initialization failed. Please check your browser audio settings.');
+    }
   }
 
   /**
