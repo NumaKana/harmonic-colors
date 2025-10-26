@@ -7,6 +7,17 @@ interface ChordSequenceProps {
   chords: Chord[];
   onRemoveChord: (index: number) => void;
   currentIndex?: number;
+  timeSignature?: number;
+}
+
+interface MeasureChord {
+  chord: Chord;
+  originalIndex: number;
+}
+
+interface Measure {
+  chords: MeasureChord[];
+  measureNumber: number;
 }
 
 // Helper function to get note symbol from duration
@@ -31,7 +42,54 @@ const getDurationSymbol = (duration: number): string => {
   }
 };
 
-const ChordSequence = ({ chords, onRemoveChord, currentIndex }: ChordSequenceProps) => {
+// Helper function to group chords into measures
+const groupIntoMeasures = (chords: Chord[], beatsPerMeasure: number): Measure[] => {
+  const measures: Measure[] = [];
+  let currentMeasure: MeasureChord[] = [];
+  let currentBeats = 0;
+  let measureNumber = 1;
+
+  chords.forEach((chord, index) => {
+    const remainingBeatsInMeasure = beatsPerMeasure - currentBeats;
+
+    if (chord.duration <= remainingBeatsInMeasure) {
+      // Chord fits in current measure
+      currentMeasure.push({ chord, originalIndex: index });
+      currentBeats += chord.duration;
+
+      // If measure is complete, start a new one
+      if (currentBeats === beatsPerMeasure) {
+        measures.push({ chords: currentMeasure, measureNumber });
+        currentMeasure = [];
+        currentBeats = 0;
+        measureNumber++;
+      }
+    } else {
+      // Chord spans multiple measures - for now, just start a new measure
+      if (currentMeasure.length > 0) {
+        measures.push({ chords: currentMeasure, measureNumber });
+        measureNumber++;
+      }
+      currentMeasure = [{ chord, originalIndex: index }];
+      currentBeats = chord.duration % beatsPerMeasure;
+
+      // Handle chords longer than a measure
+      const fullMeasures = Math.floor(chord.duration / beatsPerMeasure);
+      if (fullMeasures > 0 && currentBeats === 0) {
+        currentBeats = 0;
+      }
+    }
+  });
+
+  // Add remaining chords as final measure
+  if (currentMeasure.length > 0) {
+    measures.push({ chords: currentMeasure, measureNumber });
+  }
+
+  return measures;
+};
+
+const ChordSequence = ({ chords, onRemoveChord, currentIndex, timeSignature = 4 }: ChordSequenceProps) => {
   const handleChordClick = async (chord: Chord) => {
     try {
       await audioEngine.playChord(chord, 1);
@@ -39,6 +97,8 @@ const ChordSequence = ({ chords, onRemoveChord, currentIndex }: ChordSequencePro
       console.error('Failed to play chord preview:', error);
     }
   };
+
+  const measures = groupIntoMeasures(chords, timeSignature);
 
   if (chords.length === 0) {
     return (
@@ -54,34 +114,43 @@ const ChordSequence = ({ chords, onRemoveChord, currentIndex }: ChordSequencePro
   return (
     <div className="chord-sequence">
       <h3 className="chord-sequence-title">
-        Chord Progression ({chords.length} chord{chords.length !== 1 ? 's' : ''})
+        Chord Progression ({chords.length} chord{chords.length !== 1 ? 's' : ''}, {measures.length} measure{measures.length !== 1 ? 's' : ''})
       </h3>
-      <div className="chord-sequence-list">
-        {chords.map((chord, index) => (
-          <div
-            key={index}
-            className={`chord-item ${currentIndex === index ? 'chord-item-current' : ''}`}
-          >
-            <div
-              className="chord-item-content"
-              onClick={() => handleChordClick(chord)}
-              style={{ cursor: 'pointer' }}
-              title={`Click to preview ${getChordDisplayName(chord)} (${chord.duration} beats)`}
-            >
-              <span className="chord-item-index">{index + 1}</span>
-              <span className="chord-item-name">{getChordDisplayName(chord)}</span>
-              <span className="chord-item-duration" title={`${chord.duration} beats`}>
-                {getDurationSymbol(chord.duration)}
-              </span>
+      <div className="chord-sequence-measures">
+        {measures.map((measure) => (
+          <div key={measure.measureNumber} className="measure">
+            <div className="measure-number">{measure.measureNumber}</div>
+            <div className="measure-content">
+              {measure.chords.map(({ chord, originalIndex }) => {
+                const widthPercent = (chord.duration / timeSignature) * 100;
+                return (
+                  <div
+                    key={originalIndex}
+                    className={`measure-chord ${currentIndex === originalIndex ? 'measure-chord-current' : ''}`}
+                    style={{ width: `${widthPercent}%` }}
+                  >
+                    <div
+                      className="measure-chord-content"
+                      onClick={() => handleChordClick(chord)}
+                      title={`Click to preview ${getChordDisplayName(chord)} (${chord.duration} beats)`}
+                    >
+                      <span className="measure-chord-name">{getChordDisplayName(chord)}</span>
+                      <span className="measure-chord-duration" title={`${chord.duration} beats`}>
+                        {getDurationSymbol(chord.duration)}
+                      </span>
+                    </div>
+                    <button
+                      className="measure-chord-remove"
+                      onClick={() => onRemoveChord(originalIndex)}
+                      title={`Remove ${getChordDisplayName(chord)} from progression`}
+                      aria-label={`Remove ${getChordDisplayName(chord)}`}
+                    >
+                      ×
+                    </button>
+                  </div>
+                );
+              })}
             </div>
-            <button
-              className="chord-item-remove"
-              onClick={() => onRemoveChord(index)}
-              title={`Remove ${getChordDisplayName(chord)} from progression`}
-              aria-label={`Remove ${getChordDisplayName(chord)}`}
-            >
-              ×
-            </button>
           </div>
         ))}
       </div>
