@@ -17,6 +17,7 @@ function App() {
   const [currentChordIndex, setCurrentChordIndex] = useState<number>(-1); // Index of currently playing chord
   const [selectedChordIndex, setSelectedChordIndex] = useState<number | null>(null); // Index of user-selected chord
   const [timeSignature, setTimeSignature] = useState<number>(4);
+  const [playbackPosition, setPlaybackPosition] = useState<number>(0); // Current playback position in beats
 
   const handleAddChord = (chord: Chord) => {
     const newProgression = [...chordProgression, chord];
@@ -47,6 +48,13 @@ function App() {
 
   const handlePlayingIndexChange = (index: number) => {
     setCurrentChordIndex(index);
+    if (index === -1) {
+      setPlaybackPosition(0);
+    }
+  };
+
+  const handlePlaybackPositionChange = (position: number) => {
+    setPlaybackPosition(position);
   };
 
   // Get current chord for visualization
@@ -78,6 +86,7 @@ function App() {
           <PlaybackControls
             chords={chordProgression}
             onPlayingIndexChange={handlePlayingIndexChange}
+            onPlaybackPositionChange={handlePlaybackPositionChange}
             onTimeSignatureChange={setTimeSignature}
           />
           <ChordSequence
@@ -93,6 +102,9 @@ function App() {
           <VisualizationCanvas
             selectedKey={selectedKey}
             currentChord={currentChord}
+            chordProgression={chordProgression}
+            currentChordIndex={currentChordIndex}
+            playbackPosition={playbackPosition}
           />
         </div>
       </main>
