@@ -72,12 +72,12 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem;
+  padding: 0.25rem 0.35rem;
   background-color: #333;
   border-right: 1px solid #555;
   transition: all 0.2s;
   position: relative;
-  min-width: 60px;
+  min-width: 45px;
   cursor: pointer;
 }
 
@@ -108,31 +108,35 @@
 }
 
 .measure-chord-name {
-  font-size: 1rem;
+  font-size: 0.85rem;
   color: #fff;
   font-weight: 600;
   text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .measure-chord-duration {
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   color: #aaa;
 }
 
 .measure-chord-remove {
   position: absolute;
-  top: 4px;
-  right: 4px;
+  top: 2px;
+  right: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   background-color: rgba(0, 0, 0, 0.5);
   border: none;
   border-radius: 50%;
   color: #888;
-  font-size: 1.2rem;
+  font-size: 1rem;
   cursor: pointer;
   transition: all 0.2s;
   line-height: 1;
