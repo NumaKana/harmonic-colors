@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Key, Chord } from '../types';
 import { getDiatonicChords, getRomanNumeral, getChordDisplayName } from '../utils/diatonic';
 import { audioEngine } from '../utils/audioEngine';
+import ChordColorPreview from './ChordColorPreview';
 import './ChordPalette.css';
 
 interface ChordPaletteProps {
@@ -71,15 +72,17 @@ const ChordPalette = ({ selectedKey, onChordSelect }: ChordPaletteProps) => {
       </div>
       <div className="chord-buttons">
         {diatonicChords.map((chord, index) => (
-          <button
-            key={index}
-            className="chord-button"
-            onClick={() => handleChordClick(chord)}
-            title={`${getRomanNumeral(selectedKey, index)} - ${getChordDisplayName(chord)}`}
-          >
-            <div className="chord-button-roman">{getRomanNumeral(selectedKey, index)}</div>
-            <div className="chord-button-name">{getChordDisplayName(chord)}</div>
-          </button>
+          <div key={index} className="chord-button-container">
+            <button
+              className="chord-button"
+              onClick={() => handleChordClick(chord)}
+              title={`${getRomanNumeral(selectedKey, index)} - ${getChordDisplayName(chord)}`}
+            >
+              <div className="chord-button-roman">{getRomanNumeral(selectedKey, index)}</div>
+              <div className="chord-button-name">{getChordDisplayName(chord)}</div>
+            </button>
+            <ChordColorPreview selectedKey={selectedKey} chord={chord} />
+          </div>
         ))}
       </div>
     </div>
