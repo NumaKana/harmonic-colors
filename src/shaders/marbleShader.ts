@@ -1,9 +1,15 @@
 /**
  * GLSL Shader for marble pattern visualization
  *
- * This shader creates an organic marble effect by blending two colors
- * using Perlin noise. The marble ratio is determined by the harmonic
- * function of the current chord.
+ * This shader creates a fluid marbling effect using domain warping technique.
+ * The pattern mimics traditional marbling art where paint is dropped on water
+ * and swirled to create organic, flowing patterns.
+ *
+ * Technique: Domain Warping (multi-layered FBM distortion)
+ * - Layer 1: Initial noise distortion field (q)
+ * - Layer 2: Warp coordinates using layer 1 (r)
+ * - Layer 3: Final pattern using warped coordinates
+ * - Result: Fluid, swirling marble patterns with veins and depth
  */
 
 import { noiseGLSL } from './noiseUtils.glsl';
@@ -68,33 +74,48 @@ export const fragmentShader = `
     vec3 color1 = hsl2rgb(uColor1HSL);
     vec3 color2 = hsl2rgb(uColor2HSL);
 
-    // Generate noise pattern
-    // Combine UV coordinates with time for animated marble
-    vec2 noiseCoord = vUv * uNoiseScale + uTime * 0.1;
+    // === Domain Warping for Fluid Marbling Effect ===
+    // Start with base UV coordinates (reduce scale for larger patterns)
+    vec2 uv = vUv * uNoiseScale * 0.5;
 
-    // Use FBM for richer, more organic patterns
-    float noise = fbm(noiseCoord, uOctaves);
+    // Layer 1: Create initial distortion field
+    vec2 q = vec2(
+      fbm(uv + uTime * 0.05, uOctaves),
+      fbm(uv + vec2(5.2, 1.3) + uTime * 0.05, uOctaves)
+    );
 
-    // Normalize noise from [-1, 1] to [0, 1]
-    noise = noise * 0.5 + 0.5;
+    // Layer 2: Warp the coordinates using the first distortion (increase warp strength)
+    vec2 r = vec2(
+      fbm(uv + q * 3.0 + vec2(1.7, 9.2) + uTime * 0.08, uOctaves),
+      fbm(uv + q * 3.0 + vec2(8.3, 2.8) + uTime * 0.08, uOctaves)
+    );
 
-    // Calculate threshold based on marble ratio
-    // Areas where noise > threshold show color1
-    // Areas where noise <= threshold show color2
-    float threshold = 1.0 - uMarbleRatio;
+    // Layer 3: Final pattern using twice-warped coordinates (increase warp strength)
+    float pattern = fbm(uv + r * 2.0 + uTime * 0.03, uOctaves);
 
-    // Add slight variation to threshold for more organic edges
-    float variationNoise = cnoise(vUv * uNoiseScale * 0.5) * 0.5 + 0.5;
-    threshold += (variationNoise - 0.5) * uNoiseStrength;
+    // Normalize pattern from [-1, 1] to [0, 1]
+    pattern = pattern * 0.5 + 0.5;
 
-    // Use smoothstep for slightly softer edges between colors
-    // This creates a more natural marble look
-    // Wider range = smoother transitions between colors
-    float colorMix = smoothstep(threshold - 0.15, threshold + 0.15, noise);
+    // Apply marble ratio with smooth gradient
+    // Create flowing veins effect
+    float veinPattern = abs(sin(pattern * 10.0 + r.x * 5.0));
+    veinPattern = smoothstep(0.3, 0.7, veinPattern);
 
-    // Select color based on threshold
-    // Higher marble ratio = more color1 regions
-    vec3 finalColor = mix(color2, color1, colorMix);
+    // Combine pattern with marble ratio
+    float mixFactor = pattern * (1.0 - uMarbleRatio) + uMarbleRatio;
+
+    // Add vein details for more realistic marble
+    mixFactor = mix(mixFactor, veinPattern, uNoiseStrength * 0.3);
+
+    // Smooth the transition between colors
+    mixFactor = smoothstep(0.0, 1.0, mixFactor);
+
+    // Mix colors with the warped pattern
+    vec3 finalColor = mix(color2, color1, mixFactor);
+
+    // Add subtle color variation for depth
+    float colorVariation = fbm(uv * 0.5 + r * 2.0, 2) * 0.1;
+    finalColor += colorVariation;
 
     gl_FragColor = vec4(finalColor, 1.0);
   }
