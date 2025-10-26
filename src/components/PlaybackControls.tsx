@@ -11,6 +11,8 @@ interface PlaybackControlsProps {
 const PlaybackControls = ({ chords, onPlayingIndexChange }: PlaybackControlsProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [bpm, setBpm] = useState(120);
+  const [metronomeEnabled, setMetronomeEnabled] = useState(false);
+  const [timeSignature, setTimeSignature] = useState(4);
 
   const handlePlayProgression = async () => {
     if (chords.length === 0) {
@@ -53,6 +55,18 @@ const PlaybackControls = ({ chords, onPlayingIndexChange }: PlaybackControlsProp
     if (bpm > 240) setBpm(240);
   };
 
+  const handleMetronomeToggle = () => {
+    const newValue = !metronomeEnabled;
+    setMetronomeEnabled(newValue);
+    audioEngine.setMetronomeEnabled(newValue);
+  };
+
+  const handleTimeSignatureChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = parseInt(e.target.value, 10);
+    setTimeSignature(value);
+    audioEngine.setTimeSignature(value);
+  };
+
   return (
     <div className="playback-controls">
       <div className="playback-controls-section">
@@ -89,6 +103,43 @@ const PlaybackControls = ({ chords, onPlayingIndexChange }: PlaybackControlsProp
           title={isPlaying ? 'Cannot change BPM during playback' : 'Set playback tempo (40-240 BPM)'}
           aria-label="Beats per minute"
         />
+      </div>
+
+      <div className="playback-controls-section">
+        <label htmlFor="metronome-toggle" className="metronome-label">
+          <input
+            id="metronome-toggle"
+            type="checkbox"
+            className="metronome-checkbox"
+            checked={metronomeEnabled}
+            onChange={handleMetronomeToggle}
+            title="Enable metronome click during playback"
+            aria-label="Metronome toggle"
+          />
+          Metronome
+        </label>
+      </div>
+
+      <div className="playback-controls-section">
+        <label htmlFor="time-signature-select" className="time-signature-label">
+          Time:
+        </label>
+        <select
+          id="time-signature-select"
+          className="time-signature-select"
+          value={timeSignature}
+          onChange={handleTimeSignatureChange}
+          disabled={isPlaying}
+          title={isPlaying ? 'Cannot change time signature during playback' : 'Set time signature'}
+          aria-label="Time signature"
+        >
+          <option value={2}>2/4</option>
+          <option value={3}>3/4</option>
+          <option value={4}>4/4</option>
+          <option value={5}>5/4</option>
+          <option value={6}>6/8</option>
+          <option value={7}>7/8</option>
+        </select>
       </div>
     </div>
   );

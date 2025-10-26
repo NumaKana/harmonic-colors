@@ -10,6 +10,12 @@ class AudioEngine {
   private isPlaying = false;
   private currentSequence: Tone.Part | null = null;
 
+  // Metronome
+  private metronome: Tone.MetalSynth | null = null;
+  private metronomeLoop: Tone.Loop | null = null;
+  private metronomeEnabled = false;
+  private timeSignature = 4; // Beats per measure
+
   /**
    * Initialize the audio engine
    * Must be called after user interaction due to browser autoplay policies
@@ -33,6 +39,17 @@ class AudioEngine {
           sustain: 0.7,
           release: 1.0,
         },
+      }).toDestination();
+
+      // Create metronome with MetalSynth for click sound
+      this.metronome = new Tone.MetalSynth({
+        frequency: 880,
+        envelope: {
+          attack: 0.001,
+          decay: 0.05,
+          release: 0.01,
+        },
+        volume: -10,
       }).toDestination();
 
       this.isInitialized = true;
@@ -168,6 +185,9 @@ class AudioEngine {
     // Set the BPM
     Tone.getTransport().bpm.value = bpm;
 
+    // Setup metronome with the current BPM
+    this.setupMetronome(bpm);
+
     // Create events for each chord
     const events: Array<{ time: number; chord: Chord; index: number }> = [];
     let currentTime = 0;
@@ -237,6 +257,9 @@ class AudioEngine {
       this.synth.releaseAll();
     }
 
+    // Stop metronome
+    this.stopMetronome();
+
     this.isPlaying = false;
   }
 
@@ -257,15 +280,101 @@ class AudioEngine {
   }
 
   /**
+   * Setup metronome loop with given BPM
+   */
+  private setupMetronome(bpm: number): void {
+    if (!this.metronome) {
+      return;
+    }
+
+    // Clean up existing loop
+    if (this.metronomeLoop) {
+      this.metronomeLoop.dispose();
+      this.metronomeLoop = null;
+    }
+
+    let beatCount = 0;
+
+    // Create loop that runs every quarter note
+    this.metronomeLoop = new Tone.Loop((time) => {
+      if (!this.metronomeEnabled || !this.metronome) {
+        return;
+      }
+
+      // First beat of measure (1拍目) - higher pitch and volume
+      const isDownbeat = beatCount % this.timeSignature === 0;
+
+      // Set frequency: 1200 Hz for downbeat, 800 Hz for other beats
+      this.metronome.frequency.setValueAtTime(isDownbeat ? 1200 : 800, time);
+
+      // Set volume: louder for downbeat
+      this.metronome.volume.setValueAtTime(isDownbeat ? -5 : -12, time);
+
+      // Trigger the click
+      this.metronome.triggerAttackRelease('16n', time);
+
+      beatCount++;
+    }, '4n'); // Repeat every quarter note
+
+    this.metronomeLoop.start(0);
+  }
+
+  /**
+   * Enable or disable metronome
+   */
+  setMetronomeEnabled(enabled: boolean): void {
+    this.metronomeEnabled = enabled;
+  }
+
+  /**
+   * Get metronome enabled state
+   */
+  getMetronomeEnabled(): boolean {
+    return this.metronomeEnabled;
+  }
+
+  /**
+   * Set time signature (beats per measure)
+   */
+  setTimeSignature(beatsPerMeasure: number): void {
+    this.timeSignature = beatsPerMeasure;
+  }
+
+  /**
+   * Get time signature
+   */
+  getTimeSignature(): number {
+    return this.timeSignature;
+  }
+
+  /**
+   * Stop metronome
+   */
+  private stopMetronome(): void {
+    if (this.metronomeLoop) {
+      this.metronomeLoop.stop();
+      this.metronomeLoop.dispose();
+      this.metronomeLoop = null;
+    }
+  }
+
+  /**
    * Clean up resources
    */
   dispose(): void {
     this.stopProgression();
+    this.stopMetronome();
 
     if (this.synth) {
       this.synth.dispose();
       this.synth = null;
     }
+
+    if (this.metronome) {
+      this.metronome.dispose();
+      this.metronome = null;
+    }
+
     this.isInitialized = false;
   }
 }
