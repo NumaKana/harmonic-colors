@@ -2,6 +2,32 @@ import { Key, Chord, ColorHSL, Note } from '../types';
 import { getHarmonicFunctionType } from './harmonicAnalysis';
 
 /**
+ * Calculate the scale degree of a chord within a key
+ * Returns 1-7 for diatonic chords, or null for non-diatonic
+ */
+function getScaleDegree(chord: Chord, key: Key): number | null {
+  const noteOrder: Note[] = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+  const tonicIndex = noteOrder.indexOf(key.tonic);
+  const rootIndex = noteOrder.indexOf(chord.root);
+
+  // Calculate semitone distance from tonic
+  let semitones = (rootIndex - tonicIndex + 12) % 12;
+
+  // Map semitones to scale degree
+  const semitoneToScaleDegree: Record<number, number> = {
+    0: 1,  // I
+    2: 2,  // ii
+    4: 3,  // iii
+    5: 4,  // IV
+    7: 5,  // V
+    9: 6,  // vi
+    11: 7  // vii
+  };
+
+  return semitoneToScaleDegree[semitones] ?? null;
+}
+
+/**
  * Map notes to hue values (0-360 degrees)
  * C = 0, C# = 30, D = 60, etc.
  */
@@ -68,8 +94,64 @@ export function generateChordColor(
       break;
   }
 
+  // Apply micro-adjustment based on scale degree within harmonic function
+  const scaleDegree = getScaleDegree(chord, key);
+  let microHueAdjustment = 0;
+  let microSaturationAdjustment = 0;
+  let microLightnessAdjustment = 0;
+
+  if (scaleDegree !== null) {
+    // Apply different adjustments for different scale degrees within the same harmonic function
+    // Focus on saturation and lightness differences for better perceptibility
+    if (harmonicFunction === 'tonic') {
+      // I, iii, vi
+      if (scaleDegree === 1) {
+        // I: no adjustment (neutral reference)
+        microHueAdjustment = 0;
+        microSaturationAdjustment = 0;
+        microLightnessAdjustment = 0;
+      } else if (scaleDegree === 3) {
+        // iii: significantly darker and less saturated
+        microHueAdjustment = -8;
+        microSaturationAdjustment = -15;
+        microLightnessAdjustment = -15;
+      } else if (scaleDegree === 6) {
+        // vi: significantly brighter and more saturated
+        microHueAdjustment = 8;
+        microSaturationAdjustment = 15;
+        microLightnessAdjustment = 15;
+      }
+    } else if (harmonicFunction === 'subdominant') {
+      // ii, IV
+      if (scaleDegree === 2) {
+        // ii: darker and less saturated
+        microHueAdjustment = -5;
+        microSaturationAdjustment = -12;
+        microLightnessAdjustment = -12;
+      } else if (scaleDegree === 4) {
+        // IV: brighter and more saturated
+        microHueAdjustment = 5;
+        microSaturationAdjustment = 12;
+        microLightnessAdjustment = 12;
+      }
+    } else if (harmonicFunction === 'dominant') {
+      // V, vii
+      if (scaleDegree === 5) {
+        // V: no adjustment (neutral reference)
+        microHueAdjustment = 0;
+        microSaturationAdjustment = 0;
+        microLightnessAdjustment = 0;
+      } else if (scaleDegree === 7) {
+        // vii: significantly darker and less saturated
+        microHueAdjustment = -8;
+        microSaturationAdjustment = -15;
+        microLightnessAdjustment = -15;
+      }
+    }
+  }
+
   // Apply hue adjustment (keep within ±30 degree range for diatonic chords)
-  const hue = (baseColor.hue + hueAdjustment) % 360;
+  const hue = (baseColor.hue + hueAdjustment + microHueAdjustment) % 360;
 
   // Calculate lightness adjustment based on chord quality and function
   let lightnessAdjustment = 0;
@@ -102,8 +184,8 @@ export function generateChordColor(
     lightnessAdjustment = -15;
   }
 
-  // Apply lightness adjustment with bounds (20-80%)
-  const lightness = Math.max(20, Math.min(80, baseColor.lightness + lightnessAdjustment));
+  // Apply lightness adjustment with micro-adjustment and bounds (20-80%)
+  const lightness = Math.max(20, Math.min(80, baseColor.lightness + lightnessAdjustment + microLightnessAdjustment));
 
   // Calculate saturation (will be used for tensions in future)
   let saturation = 75;
@@ -112,6 +194,9 @@ export function generateChordColor(
   if (chord.seventh) {
     saturation += 5;
   }
+
+  // Apply micro-saturation adjustment
+  saturation += microSaturationAdjustment;
 
   // Apply bounds (0-100%)
   saturation = Math.max(0, Math.min(100, saturation));
