@@ -73,17 +73,28 @@ npm run preview
 
 ### コンポーネント構造
 
-アプリはReactの状態管理を使用したシングルページアーキテクチャです：
+アプリはReactの状態管理を使用した**2フェーズ構造**のシングルページアーキテクチャです：
 
 **App.tsx**: ルートコンポーネント
-- グローバル状態を管理: `selectedKey`、`chordProgression`、`currentChordIndex`
+- グローバル状態を管理: `selectedKey`、`chordProgression`、`currentChordIndex`、`currentPhase`
+- フェーズタブによる表示切り替え
 - 入力コントロールと視覚化の間のデータフローを調整
 
-**主要コンポーネント**:
-- `KeySelector`: 音楽のキー（メジャー/マイナー）を選択するドロップダウン
-- `ChordPalette`: 選択したキーのダイアトニックコードを表示、進行への追加が可能
-- `ChordSequence`: 現在のコード進行を表示、削除が可能
-- `VisualizationCanvas`: Three.js/React Three Fiberを使用して視覚表現をレンダリング
+**組み立てフェーズ（BuildPhase）**:
+コード進行の構築・編集を行う画面
+- `KeySelector`: 音楽のキー（メジャー/マイナー）を選択
+- `ChordPalette`: ダイアトニックコードを選択、各コードの下に色プレビュー表示
+- `ChordSequence`: コード進行を4小節/行の譜面的レイアウトで表示・編集
+- `PlaybackControls`: 再生/停止、BPM、拍子、メトロノーム設定
+- `VisualizationPreview`: 小さなマーブルパターンプレビュー
+- 色情報・和声機能表示（Color 1、Color 2、ローマ数字、機能など）
+
+**確認フェーズ（ConfirmPhase）**:
+コード進行全体を視覚化・確認する画面
+- `ChordNameBar`: 現在のコード名をスクロール表示
+- `VisualizationCanvas`: Timeline Viewによるコード進行の視覚化
+  - Playbackモード: 再生位置に追従
+  - Previewモード: ドラッグで横スクロール
 
 ### 型システム
 
@@ -171,12 +182,21 @@ src/
     colorGenerator.ts      # 色1、色2、マーブル比率の生成
     harmonicAnalysis.ts    # 和声機能分析（I、IV、Vなど）
     diatonic.ts           # キーのダイアトニックコード生成
+    audioEngine.ts        # Web Audio API音声生成・再生
   components/
-    App.tsx               # メインアプリコンテナ
+    App.tsx               # メインアプリコンテナ（フェーズ切り替え）
+    BuildPhase.tsx        # 組み立てフェーズコンテナ
+    ConfirmPhase.tsx      # 確認フェーズコンテナ
     KeySelector.tsx       # キー選択UI
     ChordPalette.tsx      # ダイアトニックコードパレット
-    ChordSequence.tsx     # コード進行表示
-    VisualizationCanvas.tsx  # Three.js視覚化
+    ChordColorPreview.tsx # コードボタン下の色プレビュー
+    ChordSequence.tsx     # コード進行表示（4小節/行）
+    PlaybackControls.tsx  # 再生制御UI
+    VisualizationPreview.tsx  # 小さなマーブルプレビュー
+    VisualizationCanvas.tsx   # Timeline View（確認フェーズ用）
+    ChordNameBar.tsx      # コード名スクロール表示
+    TimelineVisualization.tsx # タイムライン描画
+    ColorGradientMesh.tsx # マーブルシェーダーメッシュ
 
 docs/
   specification.md        # 完全な技術仕様（日本語）

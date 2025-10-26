@@ -57,7 +57,7 @@
 
 .chord-buttons {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  grid-template-columns: repeat(7, 1fr);
   gap: 0.75rem;
 }
 
