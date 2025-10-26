@@ -72,6 +72,15 @@
   font-weight: 600;
 }
 
+.chord-item-duration {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: #aaa;
+  margin-left: 0.25rem;
+}
+
 .chord-item-remove {
   display: flex;
   align-items: center;
