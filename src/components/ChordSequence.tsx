@@ -6,7 +6,9 @@ import './ChordSequence.css';
 interface ChordSequenceProps {
   chords: Chord[];
   onRemoveChord: (index: number) => void;
+  onSelectChord: (index: number) => void;
   currentIndex?: number;
+  selectedIndex?: number;
   timeSignature?: number;
 }
 
@@ -89,8 +91,12 @@ const groupIntoMeasures = (chords: Chord[], beatsPerMeasure: number): Measure[] 
   return measures;
 };
 
-const ChordSequence = ({ chords, onRemoveChord, currentIndex, timeSignature = 4 }: ChordSequenceProps) => {
-  const handleChordClick = async (chord: Chord) => {
+const ChordSequence = ({ chords, onRemoveChord, onSelectChord, currentIndex, selectedIndex, timeSignature = 4 }: ChordSequenceProps) => {
+  const handleChordClick = async (chord: Chord, index: number) => {
+    // Select the chord
+    onSelectChord(index);
+
+    // Play preview
     try {
       await audioEngine.playChord(chord, 1);
     } catch (error) {
@@ -123,17 +129,17 @@ const ChordSequence = ({ chords, onRemoveChord, currentIndex, timeSignature = 4 
             <div className="measure-content">
               {measure.chords.map(({ chord, originalIndex }) => {
                 const widthPercent = (chord.duration / timeSignature) * 100;
+                const isPlaying = currentIndex === originalIndex;
+                const isSelected = selectedIndex === originalIndex;
                 return (
                   <div
                     key={originalIndex}
-                    className={`measure-chord ${currentIndex === originalIndex ? 'measure-chord-current' : ''}`}
+                    className={`measure-chord ${isPlaying ? 'measure-chord-current' : ''} ${isSelected ? 'measure-chord-selected' : ''}`}
                     style={{ width: `${widthPercent}%` }}
+                    onClick={() => handleChordClick(chord, originalIndex)}
+                    title={`Click to select ${getChordDisplayName(chord)} (${chord.duration} beats)`}
                   >
-                    <div
-                      className="measure-chord-content"
-                      onClick={() => handleChordClick(chord)}
-                      title={`Click to preview ${getChordDisplayName(chord)} (${chord.duration} beats)`}
-                    >
+                    <div className="measure-chord-content">
                       <span className="measure-chord-name">{getChordDisplayName(chord)}</span>
                       <span className="measure-chord-duration" title={`${chord.duration} beats`}>
                         {getDurationSymbol(chord.duration)}
@@ -141,7 +147,10 @@ const ChordSequence = ({ chords, onRemoveChord, currentIndex, timeSignature = 4 
                     </div>
                     <button
                       className="measure-chord-remove"
-                      onClick={() => onRemoveChord(originalIndex)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onRemoveChord(originalIndex);
+                      }}
                       title={`Remove ${getChordDisplayName(chord)} from progression`}
                       aria-label={`Remove ${getChordDisplayName(chord)}`}
                     >
