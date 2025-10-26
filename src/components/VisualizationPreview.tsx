@@ -1,7 +1,7 @@
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
 import { Key, Chord } from '../types';
-import ColorSphere from './ColorSphere';
+import ColorGradientMesh from './ColorGradientMesh';
+import { generateChordColor } from '../utils/colorGenerator';
 import './VisualizationPreview.css';
 
 interface VisualizationPreviewProps {
@@ -10,13 +10,22 @@ interface VisualizationPreviewProps {
 }
 
 const VisualizationPreview = ({ selectedKey, currentChord }: VisualizationPreviewProps) => {
+  // Generate color for current chord or key
+  const chordColor = currentChord
+    ? generateChordColor(currentChord, selectedKey)
+    : { baseColor: { hue: 0, saturation: 0, lightness: 20 }, chordColor: { hue: 0, saturation: 0, lightness: 20 }, marbleRatio: 0.5 };
+
   return (
     <div className="visualization-preview">
-      <Canvas camera={{ position: [0, 0, 5], fov: 50 }}>
-        <ambientLight intensity={0.5} />
-        <pointLight position={[10, 10, 10]} intensity={1} />
-        <ColorSphere selectedKey={selectedKey} currentChord={currentChord} />
-        <OrbitControls enableZoom={false} enablePan={false} />
+      <Canvas camera={{ position: [0, 0, 5], fov: 50 }} orthographic>
+        <ColorGradientMesh
+          color1={chordColor.baseColor}
+          color2={chordColor.chordColor}
+          marbleRatio={chordColor.marbleRatio}
+          noiseScale={3.0}
+          noiseStrength={0.3}
+          octaves={4}
+        />
       </Canvas>
     </div>
   );
