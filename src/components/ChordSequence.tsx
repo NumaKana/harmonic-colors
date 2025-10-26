@@ -9,6 +9,28 @@ interface ChordSequenceProps {
   currentIndex?: number;
 }
 
+// Helper function to get note symbol from duration
+const getDurationSymbol = (duration: number): string => {
+  switch (duration) {
+    case 4:
+      return '𝅝'; // Whole note
+    case 3:
+      return '𝅗𝅥.'; // Dotted half note
+    case 2:
+      return '𝅗𝅥'; // Half note
+    case 1.5:
+      return '♩.'; // Dotted quarter note
+    case 1:
+      return '♩'; // Quarter note
+    case 0.75:
+      return '♪.'; // Dotted eighth note
+    case 0.5:
+      return '♪'; // Eighth note
+    default:
+      return `${duration}♩`; // Fallback: show duration + quarter note
+  }
+};
+
 const ChordSequence = ({ chords, onRemoveChord, currentIndex }: ChordSequenceProps) => {
   const handleChordClick = async (chord: Chord) => {
     try {
@@ -44,10 +66,13 @@ const ChordSequence = ({ chords, onRemoveChord, currentIndex }: ChordSequencePro
               className="chord-item-content"
               onClick={() => handleChordClick(chord)}
               style={{ cursor: 'pointer' }}
-              title={`Click to preview ${getChordDisplayName(chord)}`}
+              title={`Click to preview ${getChordDisplayName(chord)} (${chord.duration} beats)`}
             >
               <span className="chord-item-index">{index + 1}</span>
               <span className="chord-item-name">{getChordDisplayName(chord)}</span>
+              <span className="chord-item-duration" title={`${chord.duration} beats`}>
+                {getDurationSymbol(chord.duration)}
+              </span>
             </div>
             <button
               className="chord-item-remove"
