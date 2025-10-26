@@ -19,7 +19,7 @@ const VisualizationPreview = ({ selectedKey, currentChord }: VisualizationPrevie
 
   return (
     <div className="visualization-preview">
-      <Canvas camera={{ position: [0, 0, 5], fov: 50 }} orthographic>
+      <Canvas camera={{ position: [0, 0, 5], fov: 75 }}>
         <ColorGradientMesh
           color1={keyColor}
           color2={chordColor}
