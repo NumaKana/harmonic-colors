@@ -225,7 +225,7 @@ export function getMarbleRatio(chord: Chord, key: Key): number {
 
   switch (harmonicFunction) {
     case 'tonic':
-      return 0.8; // 80% color1, 20% color2
+      return 0.7; // 70% color1, 30% color2
     case 'subdominant':
       return 0.65; // 65% color1, 35% color2
     case 'dominant':
