@@ -33,6 +33,9 @@ const ChordPalette = ({ selectedKey, onChordSelect }: ChordPaletteProps) => {
     };
 
     try {
+      // Stop any currently playing preview sounds
+      audioEngine.stop();
+
       // Play the chord sound
       await audioEngine.playChord(chordWithDuration, 2);
     } catch (error) {
