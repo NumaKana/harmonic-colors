@@ -2,10 +2,13 @@ import { useState, useEffect } from 'react';
 import './App.css';
 import BuildPhase from './components/BuildPhase';
 import ConfirmPhase from './components/ConfirmPhase';
+import SettingsSidebar from './components/SettingsSidebar';
 import { Key, Chord } from './types';
 import { audioEngine } from './utils/audioEngine';
 
 type Phase = 'build' | 'confirm';
+
+const HUE_ROTATION_STORAGE_KEY = 'harmonic-colors-hue-rotation';
 
 function App() {
   const [currentPhase, setCurrentPhase] = useState<Phase>('build');
@@ -20,6 +23,15 @@ function App() {
   const [playbackPosition, setPlaybackPosition] = useState<number>(0); // Current playback position in beats
   const [bpm, setBpm] = useState<number>(120);
   const [metronomeEnabled, setMetronomeEnabled] = useState<boolean>(false);
+
+  // Load hueRotation from LocalStorage
+  const [hueRotation, setHueRotation] = useState<number>(() => {
+    const saved = localStorage.getItem(HUE_ROTATION_STORAGE_KEY);
+    return saved !== null ? Number(saved) : 0;
+  });
+
+  // Settings sidebar state
+  const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
 
   const handleAddChord = (chord: Chord) => {
     const newProgression = [...chordProgression, chord];
@@ -59,6 +71,11 @@ function App() {
     setPlaybackPosition(position);
   };
 
+  const handleHueRotationChange = (rotation: number) => {
+    setHueRotation(rotation);
+    localStorage.setItem(HUE_ROTATION_STORAGE_KEY, String(rotation));
+  };
+
   // Get current chord for visualization
   // Priority: 1. Playing chord, 2. Selected chord, 3. Last chord
   const currentChord = currentChordIndex >= 0
@@ -94,6 +111,13 @@ function App() {
             確認
           </button>
         </div>
+        <button
+          className="settings-button"
+          onClick={() => setIsSettingsOpen(true)}
+          title="Open settings"
+        >
+          ⚙
+        </button>
       </header>
       <main className="main">
         {currentPhase === 'build' ? (
@@ -112,6 +136,7 @@ function App() {
             onTimeSignatureChange={setTimeSignature}
             onBpmChange={setBpm}
             onMetronomeChange={setMetronomeEnabled}
+            hueRotation={hueRotation}
           />
         ) : (
           <ConfirmPhase
@@ -125,9 +150,19 @@ function App() {
             timeSignature={timeSignature}
             onPlayingIndexChange={handlePlayingIndexChange}
             onPlaybackPositionChange={handlePlaybackPositionChange}
+            hueRotation={hueRotation}
           />
         )}
       </main>
+
+      {/* Settings Sidebar */}
+      <SettingsSidebar
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        hueRotation={hueRotation}
+        onHueRotationChange={handleHueRotationChange}
+        selectedKey={selectedKey}
+      />
     </div>
   )
 }

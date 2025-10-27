@@ -24,6 +24,7 @@ interface BuildPhaseProps {
   onTimeSignatureChange: (timeSignature: number) => void;
   onBpmChange: (bpm: number) => void;
   onMetronomeChange: (enabled: boolean) => void;
+  hueRotation: number;
 }
 
 const BuildPhase = ({
@@ -40,7 +41,8 @@ const BuildPhase = ({
   onPlaybackPositionChange,
   onTimeSignatureChange,
   onBpmChange,
-  onMetronomeChange
+  onMetronomeChange,
+  hueRotation
 }: BuildPhaseProps) => {
   // Get current chord for preview
   const currentChord = selectedIndex !== undefined && selectedIndex >= 0
@@ -50,7 +52,7 @@ const BuildPhase = ({
     : undefined;
 
   // Generate colors for info display
-  const color1 = generateKeyColor(selectedKey);
+  const color1 = generateKeyColor(selectedKey, hueRotation);
   const color2 = currentChord ? generateChordColor(currentChord, selectedKey, color1) : color1;
 
   // Get harmonic function info
@@ -59,7 +61,7 @@ const BuildPhase = ({
   return (
     <div className="build-phase">
       <KeySelector selectedKey={selectedKey} onKeyChange={onKeyChange} />
-      <ChordPalette selectedKey={selectedKey} onChordSelect={onChordSelect} />
+      <ChordPalette selectedKey={selectedKey} onChordSelect={onChordSelect} hueRotation={hueRotation} />
       <ChordSequence
         chords={chords}
         onRemoveChord={onRemoveChord}
@@ -76,9 +78,11 @@ const BuildPhase = ({
         onBpmChange={onBpmChange}
         onMetronomeChange={onMetronomeChange}
       />
+
       <VisualizationPreview
         selectedKey={selectedKey}
         currentChord={currentChord}
+        hueRotation={hueRotation}
       />
 
       <div className="visualization-info">

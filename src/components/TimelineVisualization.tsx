@@ -16,6 +16,7 @@ interface TimelineVisualizationProps {
   currentIndex: number;
   playbackPosition: number;
   mode: 'playback' | 'preview';
+  hueRotation?: number;
 }
 
 const TimelineVisualization = ({
@@ -23,7 +24,8 @@ const TimelineVisualization = ({
   selectedKey,
   currentIndex,
   playbackPosition,
-  mode
+  mode,
+  hueRotation = 0
 }: TimelineVisualizationProps) => {
   const { camera, gl } = useThree();
   const cameraRef = useRef<OrthographicCamera>(camera as OrthographicCamera);
@@ -37,7 +39,7 @@ const TimelineVisualization = ({
 
   // Generate color data for all chords
   const segmentData = useMemo(() => {
-    const keyColor = generateKeyColor(selectedKey);
+    const keyColor = generateKeyColor(selectedKey, hueRotation);
     let currentX = 0;
 
     return chords.map((chord) => {
@@ -57,7 +59,7 @@ const TimelineVisualization = ({
       currentX += width;
       return segment;
     });
-  }, [chords, selectedKey]);
+  }, [chords, selectedKey, hueRotation]);
 
   // Calculate total width
   const totalWidth = useMemo(() => {

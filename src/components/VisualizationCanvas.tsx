@@ -103,6 +103,7 @@ const VisualizationCanvas = ({
               currentIndex={currentChordIndex}
               playbackPosition={playbackPosition}
               mode={timelineMode}
+              hueRotation={hueRotation}
             />
           </Canvas>
           </div>
