@@ -8,11 +8,12 @@ import './VisualizationPreview.css';
 interface VisualizationPreviewProps {
   selectedKey: Key;
   currentChord?: Chord;
+  hueRotation?: number;
 }
 
-const VisualizationPreview = ({ selectedKey, currentChord }: VisualizationPreviewProps) => {
+const VisualizationPreview = ({ selectedKey, currentChord, hueRotation = 0 }: VisualizationPreviewProps) => {
   // Generate key color (base color)
-  const keyColor = generateKeyColor(selectedKey);
+  const keyColor = generateKeyColor(selectedKey, hueRotation);
 
   // Generate chord color and marble ratio if chord exists
   const chordColor = currentChord ? generateChordColor(currentChord, selectedKey, keyColor) : keyColor;

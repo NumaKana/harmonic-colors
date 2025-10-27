@@ -14,6 +14,7 @@ interface ConfirmPhaseProps {
   timeSignature: number;
   onPlayingIndexChange: (index: number) => void;
   onPlaybackPositionChange: (position: number) => void;
+  hueRotation: number;
 }
 
 const ConfirmPhase = ({
@@ -26,7 +27,8 @@ const ConfirmPhase = ({
   metronomeEnabled,
   timeSignature,
   onPlayingIndexChange,
-  onPlaybackPositionChange
+  onPlaybackPositionChange,
+  hueRotation
 }: ConfirmPhaseProps) => {
   return (
     <div className="confirm-phase">
@@ -46,6 +48,7 @@ const ConfirmPhase = ({
         timeSignature={timeSignature}
         onPlayingIndexChange={onPlayingIndexChange}
         onPlaybackPositionChange={onPlaybackPositionChange}
+        hueRotation={hueRotation}
       />
     </div>
   );

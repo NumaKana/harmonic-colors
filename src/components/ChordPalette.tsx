@@ -8,6 +8,7 @@ import './ChordPalette.css';
 interface ChordPaletteProps {
   selectedKey: Key;
   onChordSelect: (chord: Chord) => void;
+  hueRotation?: number;
 }
 
 type NoteDuration = 4 | 3 | 2 | 1.5 | 1 | 0.75 | 0.5;
@@ -22,7 +23,7 @@ const DURATION_OPTIONS: { value: NoteDuration; label: string; symbol: string }[]
   { value: 0.5, label: 'Eighth Note', symbol: '♪' },
 ];
 
-const ChordPalette = ({ selectedKey, onChordSelect }: ChordPaletteProps) => {
+const ChordPalette = ({ selectedKey, onChordSelect, hueRotation = 0 }: ChordPaletteProps) => {
   const diatonicChords = getDiatonicChords(selectedKey);
   const [selectedDuration, setSelectedDuration] = useState<NoteDuration>(4);
 
@@ -81,7 +82,7 @@ const ChordPalette = ({ selectedKey, onChordSelect }: ChordPaletteProps) => {
               <div className="chord-button-roman">{getRomanNumeral(selectedKey, index)}</div>
               <div className="chord-button-name">{getChordDisplayName(chord)}</div>
             </button>
-            <ChordColorPreview selectedKey={selectedKey} chord={chord} />
+            <ChordColorPreview selectedKey={selectedKey} chord={chord} hueRotation={hueRotation} />
           </div>
         ))}
       </div>
