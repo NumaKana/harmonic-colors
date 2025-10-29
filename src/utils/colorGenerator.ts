@@ -184,18 +184,51 @@ export function generateChordColor(
     lightnessAdjustment = -15;
   }
 
-  // Apply lightness adjustment with micro-adjustment and bounds (20-80%)
-  const lightness = Math.max(20, Math.min(80, baseColor.lightness + lightnessAdjustment + microLightnessAdjustment));
+  // Seventh chord adjustments (lightness and saturation)
+  let seventhLightnessAdjustment = 0;
+  let seventhSaturationAdjustment = 0;
 
-  // Calculate saturation (will be used for tensions in future)
-  let saturation = 75;
-
-  // For now, just base saturation (tensions will be added later)
   if (chord.seventh) {
-    saturation += 5;
+    switch (chord.seventh) {
+      case 'maj7':
+        // Major 7th: bright and refined
+        seventhLightnessAdjustment = 8;
+        seventhSaturationAdjustment = 10;
+        break;
+      case '7':
+        // Dominant 7th: vibrant with tension
+        seventhLightnessAdjustment = -3;
+        seventhSaturationAdjustment = 15;
+        break;
+      case 'm7':
+        // Minor 7th: darker, softer
+        seventhLightnessAdjustment = -5;
+        seventhSaturationAdjustment = 8;
+        break;
+      case 'm7b5':
+        // Half-diminished: dark and unstable
+        seventhLightnessAdjustment = -10;
+        seventhSaturationAdjustment = 5;
+        break;
+      case 'dim7':
+        // Diminished 7th: darkest, muted (dissonance)
+        seventhLightnessAdjustment = -12;
+        seventhSaturationAdjustment = -5;
+        break;
+      case 'aug7':
+        // Augmented 7th: floating tension
+        seventhLightnessAdjustment = -2;
+        seventhSaturationAdjustment = 12;
+        break;
+    }
   }
 
-  // Apply micro-saturation adjustment
+  // Apply lightness adjustment with seventh and micro-adjustments, bounded (20-80%)
+  const lightness = Math.max(20, Math.min(80, baseColor.lightness + lightnessAdjustment + microLightnessAdjustment + seventhLightnessAdjustment));
+
+  // Calculate saturation with seventh adjustment
+  let saturation = 75;
+  saturation += seventhSaturationAdjustment;
   saturation += microSaturationAdjustment;
 
   // Apply bounds (0-100%)
