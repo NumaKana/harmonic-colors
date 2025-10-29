@@ -72,19 +72,32 @@ const ChordEditor = ({ root, quality, onChordCreate, onCancel }: ChordEditorProp
   const getChordName = () => {
     let name = root;
 
-    // Quality
-    if (quality === 'minor') name += 'm';
-    else if (quality === 'diminished') name += 'dim';
-    else if (quality === 'augmented') name += 'aug';
-
-    // Seventh
+    // Seventh determines the full chord type
     if (seventh) {
-      if (seventh === '7') name += '7';
-      else if (seventh === 'maj7') name += 'maj7';
-      else if (seventh === 'm7') name += 'm7';
-      else if (seventh === 'm7b5') name += 'm7♭5';
-      else if (seventh === 'dim7') name += 'dim7';
-      else if (seventh === 'aug7') name += 'aug7';
+      if (seventh === '7') {
+        // Dominant 7th: C7
+        name += '7';
+      } else if (seventh === 'maj7') {
+        // Major 7th: Cmaj7
+        name += 'maj7';
+      } else if (seventh === 'm7') {
+        // Minor 7th: Cm7
+        name += 'm7';
+      } else if (seventh === 'm7b5') {
+        // Half-diminished: Cm7♭5
+        name += 'm7♭5';
+      } else if (seventh === 'dim7') {
+        // Diminished 7th: Cdim7
+        name += 'dim7';
+      } else if (seventh === 'aug7') {
+        // Augmented 7th: Caug7
+        name += 'aug7';
+      }
+    } else {
+      // No seventh - use quality
+      if (quality === 'minor') name += 'm';
+      else if (quality === 'diminished') name += 'dim';
+      else if (quality === 'augmented') name += 'aug';
     }
 
     // Tensions

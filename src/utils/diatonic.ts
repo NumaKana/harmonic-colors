@@ -72,30 +72,35 @@ export function getChordDisplayName(chord: Chord): string {
 
   let name = root;
 
-  // Add quality
-  if (quality === 'minor') {
-    name += 'm';
-  } else if (quality === 'diminished') {
-    name += 'dim';
-  } else if (quality === 'augmented') {
-    name += 'aug';
-  }
-
-  // Add seventh
+  // Seventh determines the full chord type (takes precedence over quality)
   if (seventh) {
     if (seventh === '7') {
+      // Dominant 7th: C7
       name += '7';
     } else if (seventh === 'maj7') {
+      // Major 7th: Cmaj7
       name += 'maj7';
     } else if (seventh === 'm7') {
-      // For minor seventh, just add 7 (Cm7 is standard notation)
-      name += '7';
+      // Minor 7th: Cm7
+      name += 'm7';
     } else if (seventh === 'm7b5') {
+      // Half-diminished: Cm7♭5
       name += 'm7♭5';
     } else if (seventh === 'dim7') {
+      // Diminished 7th: Cdim7
       name += 'dim7';
     } else if (seventh === 'aug7') {
+      // Augmented 7th: Caug7
       name += 'aug7';
+    }
+  } else {
+    // No seventh - use quality
+    if (quality === 'minor') {
+      name += 'm';
+    } else if (quality === 'diminished') {
+      name += 'dim';
+    } else if (quality === 'augmented') {
+      name += 'aug';
     }
   }
 
