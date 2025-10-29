@@ -2,7 +2,8 @@ import { Canvas } from '@react-three/fiber';
 import { Key, Chord } from '../types';
 import ColorGradientMesh from './ColorGradientMesh';
 import CameraReset from './CameraReset';
-import { generateKeyColor, generateChordColor, getMarbleRatio } from '../utils/colorGenerator';
+import ParticleSystem from './ParticleSystem';
+import { generateKeyColor, generateChordColor, getMarbleRatio, generateParticles } from '../utils/colorGenerator';
 import './VisualizationPreview.css';
 
 interface VisualizationPreviewProps {
@@ -18,6 +19,7 @@ const VisualizationPreview = ({ selectedKey, currentChord, hueRotation = 0 }: Vi
   // Generate chord color and marble ratio if chord exists
   const chordColor = currentChord ? generateChordColor(currentChord, selectedKey, keyColor) : keyColor;
   const marbleRatio = currentChord ? getMarbleRatio(currentChord, selectedKey) : 0.7;
+  const particles = currentChord ? generateParticles(currentChord) : [];
 
   return (
     <div className="visualization-preview">
@@ -41,6 +43,15 @@ const VisualizationPreview = ({ selectedKey, currentChord, hueRotation = 0 }: Vi
           color2={chordColor}
           marbleRatio={marbleRatio}
         />
+        {/* Render particles if tensions/alterations exist */}
+        {particles.length > 0 && (
+          <ParticleSystem
+            particles={particles}
+            position={[0, 0, 0.05]}
+            width={2.0}
+            height={2.0}
+          />
+        )}
       </Canvas>
     </div>
   );

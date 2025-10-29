@@ -7,8 +7,9 @@ import { useRef, useMemo, useEffect, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { OrthographicCamera } from 'three';
 import { Chord, Key } from '../types';
-import { generateKeyColor, generateChordColor, getMarbleRatio } from '../utils/colorGenerator';
+import { generateKeyColor, generateChordColor, getMarbleRatio, generateParticles } from '../utils/colorGenerator';
 import TimelineSegment from './TimelineSegment';
+import ParticleSystem from './ParticleSystem';
 
 interface TimelineVisualizationProps {
   chords: Chord[];
@@ -45,6 +46,7 @@ const TimelineVisualization = ({
     return chords.map((chord) => {
       const chordColor = generateChordColor(chord, selectedKey, keyColor);
       const marbleRatio = getMarbleRatio(chord, selectedKey);
+      const particles = generateParticles(chord); // Generate particles for tensions
       const width = chord.duration * 0.5; // Scale duration to visual width
 
       const segment = {
@@ -52,6 +54,7 @@ const TimelineVisualization = ({
         color1: keyColor,
         color2: chordColor,
         marbleRatio,
+        particles,
         width,
         x: currentX + width / 2 // Center position
       };
@@ -187,17 +190,27 @@ const TimelineVisualization = ({
         const nextSegment = index < segmentData.length - 1 ? segmentData[index + 1] : null;
 
         return (
-          <TimelineSegment
-            key={index}
-            color1={segment.color1}
-            color2={segment.color2}
-            marbleRatio={segment.marbleRatio}
-            width={segment.width}
-            position={[segment.x, 0, 0]}
-            nextColor1={nextSegment?.color1}
-            nextColor2={nextSegment?.color2}
-            blendWidth={0.3}
-          />
+          <group key={index}>
+            <TimelineSegment
+              color1={segment.color1}
+              color2={segment.color2}
+              marbleRatio={segment.marbleRatio}
+              width={segment.width}
+              position={[segment.x, 0, 0]}
+              nextColor1={nextSegment?.color1}
+              nextColor2={nextSegment?.color2}
+              blendWidth={0.3}
+            />
+            {/* Render particles if tensions/alterations exist */}
+            {segment.particles.length > 0 && (
+              <ParticleSystem
+                particles={segment.particles}
+                position={[segment.x, 0, 0.05]}
+                width={segment.width}
+                height={2.0}
+              />
+            )}
+          </group>
         );
       })}
 

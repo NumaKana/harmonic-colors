@@ -1,4 +1,4 @@
-import { Key, Chord, ColorHSL, Note } from '../types';
+import { Key, Chord, ColorHSL, Note, ParticleConfig } from '../types';
 import { getHarmonicFunctionType } from './harmonicAnalysis';
 
 /**
@@ -233,4 +233,86 @@ export function getMarbleRatio(chord: Chord, key: Key): number {
     default:
       return 0.65;
   }
+}
+
+/**
+ * Generate particle configurations for a chord's tensions and alterations
+ * Each tension/alteration type has specific color, density, and size
+ */
+export function generateParticles(chord: Chord): ParticleConfig[] {
+  const particles: ParticleConfig[] = [];
+
+  // Note: Seventh is NOT included in particles as it's a core chord tone
+  // that should be represented in the color system, not as decorative particles.
+  // Only tensions (9th, 11th, 13th) and alterations are visualized as particles.
+
+  // Tension particles (9th, 11th, 13th)
+  chord.tensions.forEach(tension => {
+    switch (tension) {
+      case 9:
+        particles.push({
+          color: 'hsl(0, 0%, 75%)', // Silver color
+          count: 30,
+          size: 3,
+          type: '9th'
+        });
+        break;
+      case 11:
+        particles.push({
+          color: 'hsl(210, 70%, 60%)', // Blue color
+          count: 30,
+          size: 3,
+          type: '11th'
+        });
+        break;
+      case 13:
+        particles.push({
+          color: 'hsl(55, 80%, 65%)', // Yellow color
+          count: 30,
+          size: 3,
+          type: '13th'
+        });
+        break;
+    }
+  });
+
+  // Alteration particles (high density ~70, larger size 5-8px)
+  chord.alterations.forEach(alteration => {
+    switch (alteration) {
+      case 'b9':
+        particles.push({
+          color: 'hsl(0, 75%, 55%)', // Reddish color
+          count: 70,
+          size: 6, // Larger for altered tensions
+          type: 'b9'
+        });
+        break;
+      case '#9':
+        particles.push({
+          color: 'hsl(10, 75%, 55%)', // Reddish color (slightly different hue)
+          count: 70,
+          size: 6,
+          type: '#9'
+        });
+        break;
+      case '#11':
+        particles.push({
+          color: 'hsl(200, 85%, 70%)', // Bright blue
+          count: 70,
+          size: 6,
+          type: '#11'
+        });
+        break;
+      case 'b13':
+        particles.push({
+          color: 'hsl(30, 85%, 60%)', // Orange color
+          count: 70,
+          size: 6,
+          type: 'b13'
+        });
+        break;
+    }
+  });
+
+  return particles;
 }
