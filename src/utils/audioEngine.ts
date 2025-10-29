@@ -9,6 +9,8 @@ class AudioEngine {
   private isInitialized = false;
   private isPlaying = false;
   private currentSequence: Tone.Part | null = null;
+  private limiter: Tone.Limiter | null = null;
+  private compressor: Tone.Compressor | null = null;
 
   // Metronome
   private metronome: Tone.MetalSynth | null = null;
@@ -28,18 +30,31 @@ class AudioEngine {
     try {
       await Tone.start();
 
+      // Create compressor to smooth out dynamics and prevent clipping
+      this.compressor = new Tone.Compressor({
+        threshold: -24,
+        ratio: 4,
+        attack: 0.003,
+        release: 0.1,
+      });
+
+      // Create limiter as final safety to prevent clipping (peak limiting at -1dB)
+      this.limiter = new Tone.Limiter(-1);
+
       // Create a polyphonic synthesizer with a warm, pad-like sound
+      // Use lower volume and dynamic volume scaling to prevent clipping
       this.synth = new Tone.PolySynth(Tone.Synth, {
         oscillator: {
           type: 'sine',
         },
         envelope: {
           attack: 0.1,
-          decay: 0.2,
-          sustain: 0.7,
-          release: 1.0,
+          decay: 0.3,
+          sustain: 0.5,
+          release: 1.2,
         },
-      }).toDestination();
+        volume: -8, // Reduce overall volume to prevent clipping
+      }).chain(this.compressor, this.limiter, Tone.getDestination());
 
       // Create metronome with MetalSynth for click sound
       this.metronome = new Tone.MetalSynth({
@@ -67,16 +82,38 @@ class AudioEngine {
     // Add root note
     notes.push(`${chord.root}${octave}`);
 
-    // Add third (major 3rd or minor 3rd)
-    const thirdInterval = chord.quality === 'major' || chord.quality === 'augmented' ? 4 : 3;
+    // Determine third interval based on quality and seventh
+    let thirdInterval = 4; // Major 3rd (default)
+
+    // Handle seventh types that override quality
+    if (chord.seventh === 'm7' || chord.seventh === 'm7b5') {
+      thirdInterval = 3; // Minor 3rd
+    } else if (chord.seventh === 'dim7') {
+      thirdInterval = 3; // Minor 3rd
+    } else if (chord.seventh === 'aug7') {
+      thirdInterval = 4; // Major 3rd
+    } else {
+      // Use quality if no seventh or seventh is '7' or 'maj7'
+      thirdInterval = chord.quality === 'major' || chord.quality === 'augmented' ? 4 : 3;
+    }
     notes.push(this.transposeNote(chord.root, thirdInterval, octave));
 
-    // Add fifth
-    let fifthInterval = 7; // Perfect fifth
-    if (chord.quality === 'diminished') {
+    // Determine fifth interval based on seventh (overrides quality if specified)
+    let fifthInterval = 7; // Perfect fifth (default)
+
+    if (chord.seventh === 'm7b5') {
+      fifthInterval = 6; // Diminished fifth (♭5)
+    } else if (chord.seventh === 'dim7') {
       fifthInterval = 6; // Diminished fifth
-    } else if (chord.quality === 'augmented') {
+    } else if (chord.seventh === 'aug7') {
       fifthInterval = 8; // Augmented fifth
+    } else {
+      // Use quality if no specific seventh override
+      if (chord.quality === 'diminished') {
+        fifthInterval = 6; // Diminished fifth
+      } else if (chord.quality === 'augmented') {
+        fifthInterval = 8; // Augmented fifth
+      }
     }
     notes.push(this.transposeNote(chord.root, fifthInterval, octave));
 
@@ -115,6 +152,26 @@ class AudioEngine {
           break;
         case 13:
           interval = 21; // 13th = octave + 9 semitones
+          break;
+      }
+      notes.push(this.transposeNote(chord.root, interval, octave));
+    });
+
+    // Add alterations (♭9, ♯9, ♯11, ♭13)
+    chord.alterations.forEach((alteration) => {
+      let interval = 0;
+      switch (alteration) {
+        case 'b9':
+          interval = 13; // ♭9 = octave + 1 semitone
+          break;
+        case '#9':
+          interval = 15; // ♯9 = octave + 3 semitones
+          break;
+        case '#11':
+          interval = 18; // ♯11 = octave + 6 semitones
+          break;
+        case 'b13':
+          interval = 20; // ♭13 = octave + 8 semitones
           break;
       }
       notes.push(this.transposeNote(chord.root, interval, octave));
@@ -372,6 +429,16 @@ class AudioEngine {
     if (this.metronome) {
       this.metronome.dispose();
       this.metronome = null;
+    }
+
+    if (this.compressor) {
+      this.compressor.dispose();
+      this.compressor = null;
+    }
+
+    if (this.limiter) {
+      this.limiter.dispose();
+      this.limiter = null;
     }
 
     this.isInitialized = false;
