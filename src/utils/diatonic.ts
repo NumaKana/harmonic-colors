@@ -83,24 +83,31 @@ export function getChordDisplayName(chord: Chord): string {
 
   // Add seventh
   if (seventh) {
-    if (seventh === 'maj7') {
+    if (seventh === '7') {
+      name += '7';
+    } else if (seventh === 'maj7') {
       name += 'maj7';
     } else if (seventh === 'm7') {
-      name += '7'; // For minor chords, m7 is common notation
-    } else {
-      name += seventh;
+      // For minor seventh, just add 7 (Cm7 is standard notation)
+      name += '7';
+    } else if (seventh === 'm7b5') {
+      name += 'm7♭5';
+    } else if (seventh === 'dim7') {
+      name += 'dim7';
+    } else if (seventh === 'aug7') {
+      name += 'aug7';
     }
   }
 
-  // Add tensions
-  tensions.forEach(tension => {
-    name += `(${tension})`;
-  });
+  // Add tensions (in parentheses if present)
+  if (tensions.length > 0) {
+    name += '(' + tensions.join(',') + ')';
+  }
 
-  // Add alterations
-  alterations.forEach(alt => {
-    name += `(${alt})`;
-  });
+  // Add alterations (in parentheses if present)
+  if (alterations.length > 0) {
+    name += '(' + alterations.join(',') + ')';
+  }
 
   return name;
 }

@@ -3,6 +3,7 @@ import { Key, Chord } from '../types';
 import { getDiatonicChords, getRomanNumeral, getChordDisplayName } from '../utils/diatonic';
 import { audioEngine } from '../utils/audioEngine';
 import ChordColorPreview from './ChordColorPreview';
+import ChordEditor from './ChordEditor';
 import './ChordPalette.css';
 
 interface ChordPaletteProps {
@@ -26,6 +27,7 @@ const DURATION_OPTIONS: { value: NoteDuration; label: string; symbol: string }[]
 const ChordPalette = ({ selectedKey, onChordSelect, hueRotation = 0 }: ChordPaletteProps) => {
   const diatonicChords = getDiatonicChords(selectedKey);
   const [selectedDuration, setSelectedDuration] = useState<NoteDuration>(4);
+  const [editingChord, setEditingChord] = useState<Chord | null>(null);
 
   const handleChordClick = async (chord: Chord) => {
     // Create a new chord with the selected duration
@@ -46,6 +48,31 @@ const ChordPalette = ({ selectedKey, onChordSelect, hueRotation = 0 }: ChordPale
     }
     // Add to progression
     onChordSelect(chordWithDuration);
+  };
+
+  const handleEditChord = (chord: Chord) => {
+    setEditingChord(chord);
+  };
+
+  const handleChordCreate = async (chord: Chord, duration: number) => {
+    const chordWithDuration: Chord = {
+      ...chord,
+      duration,
+    };
+
+    try {
+      audioEngine.stop();
+      await audioEngine.playChord(chordWithDuration, 2);
+    } catch (error) {
+      console.error('Failed to play chord:', error);
+    }
+
+    onChordSelect(chordWithDuration);
+    setEditingChord(null);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingChord(null);
   };
 
   return (
@@ -74,18 +101,37 @@ const ChordPalette = ({ selectedKey, onChordSelect, hueRotation = 0 }: ChordPale
       <div className="chord-buttons">
         {diatonicChords.map((chord, index) => (
           <div key={index} className="chord-button-container">
-            <button
-              className="chord-button"
-              onClick={() => handleChordClick(chord)}
-              title={`${getRomanNumeral(selectedKey, index)} - ${getChordDisplayName(chord)}`}
-            >
-              <div className="chord-button-roman">{getRomanNumeral(selectedKey, index)}</div>
-              <div className="chord-button-name">{getChordDisplayName(chord)}</div>
-            </button>
+            <div className="chord-button-wrapper">
+              <button
+                className="chord-button"
+                onClick={() => handleChordClick(chord)}
+                title={`${getRomanNumeral(selectedKey, index)} - ${getChordDisplayName(chord)}`}
+              >
+                <div className="chord-button-roman">{getRomanNumeral(selectedKey, index)}</div>
+                <div className="chord-button-name">{getChordDisplayName(chord)}</div>
+              </button>
+              <button
+                className="edit-chord-button"
+                onClick={() => handleEditChord(chord)}
+                title="Edit chord with tensions"
+              >
+                ✏️
+              </button>
+            </div>
             <ChordColorPreview selectedKey={selectedKey} chord={chord} hueRotation={hueRotation} />
           </div>
         ))}
       </div>
+
+      {/* Chord Editor Modal */}
+      {editingChord && (
+        <ChordEditor
+          root={editingChord.root}
+          quality={editingChord.quality}
+          onChordCreate={handleChordCreate}
+          onCancel={handleCancelEdit}
+        />
+      )}
     </div>
   );
 };
