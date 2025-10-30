@@ -144,6 +144,7 @@ const ChordPalette = ({ selectedKey, onChordSelect, hueRotation = 0 }: ChordPale
         <ChordEditor
           initialRoot={editingChord.root}
           initialQuality={editingChord.quality}
+          initialDuration={selectedDuration}
           onChordCreate={handleChordCreate}
           onCancel={handleCancelEdit}
         />
@@ -152,6 +153,7 @@ const ChordPalette = ({ selectedKey, onChordSelect, hueRotation = 0 }: ChordPale
       {/* New Chord Creator Modal */}
       {isCreatingNew && (
         <ChordEditor
+          initialDuration={selectedDuration}
           onChordCreate={handleChordCreate}
           onCancel={handleCancelEdit}
         />

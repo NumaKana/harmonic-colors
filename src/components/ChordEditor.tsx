@@ -5,6 +5,7 @@ import './ChordEditor.css';
 interface ChordEditorProps {
   initialRoot?: Note;
   initialQuality?: ChordQuality;
+  initialDuration?: number;
   onChordCreate: (chord: Chord, duration: number) => void;
   onCancel: () => void;
 }
@@ -37,13 +38,13 @@ const ALTERATION_OPTIONS: Alteration[] = ['b9', '#9', '#11', 'b13'];
 const ALL_NOTES: Note[] = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 const ALL_QUALITIES: ChordQuality[] = ['major', 'minor', 'diminished', 'augmented'];
 
-const ChordEditor = ({ initialRoot, initialQuality, onChordCreate, onCancel }: ChordEditorProps) => {
+const ChordEditor = ({ initialRoot, initialQuality, initialDuration, onChordCreate, onCancel }: ChordEditorProps) => {
   const [root, setRoot] = useState<Note>(initialRoot || 'C');
   const [quality, setQuality] = useState<ChordQuality>(initialQuality || 'major');
   const [seventh, setSeventh] = useState<SeventhType | null>(null);
   const [tensions, setTensions] = useState<Tension[]>([]);
   const [alterations, setAlterations] = useState<Alteration[]>([]);
-  const [duration, setDuration] = useState<NoteDuration>(4);
+  const [duration, setDuration] = useState<NoteDuration>((initialDuration as NoteDuration) || 4);
 
   const toggleTension = (tension: Tension) => {
     setTensions((prev) =>
