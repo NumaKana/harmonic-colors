@@ -70,6 +70,7 @@ const ChordPalette = ({ selectedKey, onChordSelect, hueRotation = 0 }: ChordPale
 
     onChordSelect(chordWithDuration);
     setEditingChord(null);
+    setIsCreatingNew(false);
   };
 
   const handleCancelEdit = () => {
