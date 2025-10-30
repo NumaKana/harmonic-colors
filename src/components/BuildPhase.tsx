@@ -84,7 +84,8 @@ const BuildPhase = ({
       />
       <ChordPalette selectedKey={selectedKey} onChordSelect={onChordSelect} hueRotation={hueRotation} />
       <ChordSequence
-        chords={chords}
+        sections={sections}
+        currentSectionId={currentSectionId}
         onRemoveChord={onRemoveChord}
         onSelectChord={onSelectChord}
         currentIndex={currentIndex}
