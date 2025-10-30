@@ -6,7 +6,7 @@ export type Note = 'C' | 'C#' | 'D' | 'D#' | 'E' | 'F' | 'F#' | 'G' | 'G#' | 'A'
 
 export type ChordQuality = 'major' | 'minor' | 'diminished' | 'augmented';
 
-export type SeventhType = '7' | 'maj7' | 'm7' | 'm7b5' | 'dim7' | 'aug7';
+export type SeventhType = '7' | 'maj7' | 'm7' | 'mMaj7' | 'm7b5' | 'dim7' | 'aug7' | 'augMaj7';
 
 export type Tension = 9 | 11 | 13;
 
