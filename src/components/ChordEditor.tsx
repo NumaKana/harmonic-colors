@@ -3,8 +3,8 @@ import { Chord, Note, ChordQuality, SeventhType, Tension, Alteration } from '../
 import './ChordEditor.css';
 
 interface ChordEditorProps {
-  root: Note;
-  quality: ChordQuality;
+  initialRoot?: Note;
+  initialQuality?: ChordQuality;
   onChordCreate: (chord: Chord, duration: number) => void;
   onCancel: () => void;
 }
@@ -34,7 +34,12 @@ const SEVENTH_OPTIONS: { value: SeventhType | null; label: string }[] = [
 const TENSION_OPTIONS: Tension[] = [9, 11, 13];
 const ALTERATION_OPTIONS: Alteration[] = ['b9', '#9', '#11', 'b13'];
 
-const ChordEditor = ({ root, quality, onChordCreate, onCancel }: ChordEditorProps) => {
+const ALL_NOTES: Note[] = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const ALL_QUALITIES: ChordQuality[] = ['major', 'minor', 'diminished', 'augmented'];
+
+const ChordEditor = ({ initialRoot, initialQuality, onChordCreate, onCancel }: ChordEditorProps) => {
+  const [root, setRoot] = useState<Note>(initialRoot || 'C');
+  const [quality, setQuality] = useState<ChordQuality>(initialQuality || 'major');
   const [seventh, setSeventh] = useState<SeventhType | null>(null);
   const [tensions, setTensions] = useState<Tension[]>([]);
   const [alterations, setAlterations] = useState<Alteration[]>([]);
@@ -128,6 +133,38 @@ const ChordEditor = ({ root, quality, onChordCreate, onCancel }: ChordEditorProp
           <div className="chord-preview">
             <div className="chord-preview-label">Chord:</div>
             <div className="chord-preview-name">{getChordName()}</div>
+          </div>
+
+          {/* Root Selection */}
+          <div className="editor-section">
+            <h4 className="section-title">Root</h4>
+            <div className="button-group">
+              {ALL_NOTES.map((note) => (
+                <button
+                  key={note}
+                  className={`option-button ${root === note ? 'active' : ''}`}
+                  onClick={() => setRoot(note)}
+                >
+                  {note}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Quality Selection */}
+          <div className="editor-section">
+            <h4 className="section-title">Quality</h4>
+            <div className="button-group">
+              {ALL_QUALITIES.map((q) => (
+                <button
+                  key={q}
+                  className={`option-button ${quality === q ? 'active' : ''}`}
+                  onClick={() => setQuality(q)}
+                >
+                  {q === 'major' ? 'Major' : q === 'minor' ? 'Minor' : q === 'diminished' ? 'Dim' : 'Aug'}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Seventh Selection */}

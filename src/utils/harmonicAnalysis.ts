@@ -19,11 +19,120 @@ function getIntervalFromTonic(tonic: Note, chordRoot: Note): number {
 }
 
 /**
+ * Detect if a chord is a secondary dominant (V7/X)
+ * Returns the target chord degree if it's a secondary dominant, null otherwise
+ */
+function detectSecondaryDominant(chord: Chord, key: Key): number | null {
+  // Secondary dominants are typically major or dominant 7th chords
+  if (chord.quality !== 'major' && chord.seventh !== '7') {
+    return null;
+  }
+
+  const interval = getIntervalFromTonic(key.tonic, chord.root);
+
+  // Check if this chord resolves to a diatonic chord (V7 relationship)
+  // For example, in C major:
+  // D7 (interval 2) resolves to G (interval 7) -> V7/V
+  // A7 (interval 9) resolves to D (interval 2) -> V7/ii
+  // E7 (interval 4) resolves to A (interval 9) -> V7/vi
+  // B7 (interval 11) resolves to E (interval 4) -> V7/iii
+
+  const targetInterval = (interval + 7) % 12; // Perfect 5th up
+
+  // Check if target is a diatonic degree in this key
+  const diatonicDegrees = key.mode === 'major'
+    ? [0, 2, 4, 5, 7, 9, 11] // I, ii, iii, IV, V, vi, vii
+    : [0, 2, 3, 5, 7, 8, 10]; // i, ii°, III, iv, v, VI, VII
+
+  if (diatonicDegrees.includes(targetInterval)) {
+    return targetInterval;
+  }
+
+  return null;
+}
+
+/**
+ * Detect borrowed chords (modal interchange)
+ * Returns the source mode if it's a borrowed chord, null otherwise
+ */
+function detectBorrowedChord(chord: Chord, key: Key): string | null {
+  const interval = getIntervalFromTonic(key.tonic, chord.root);
+
+  if (key.mode === 'major') {
+    // Common borrowed chords from parallel minor
+    switch (interval) {
+      case 3: // ♭III (borrowed from minor)
+        if (chord.quality === 'major') return 'minor';
+        break;
+      case 5: // iv (borrowed from minor)
+        if (chord.quality === 'minor') return 'minor';
+        break;
+      case 8: // ♭VI (borrowed from minor)
+        if (chord.quality === 'major') return 'minor';
+        break;
+      case 10: // ♭VII (borrowed from minor)
+        if (chord.quality === 'major') return 'minor';
+        break;
+    }
+  } else {
+    // Common borrowed chords from parallel major (less common)
+    switch (interval) {
+      case 4: // III (borrowed from major - natural iii in minor is ♭III)
+        if (chord.quality === 'minor') return 'major';
+        break;
+      case 9: // vi (borrowed from major)
+        if (chord.quality === 'minor') return 'major';
+        break;
+    }
+  }
+
+  return null;
+}
+
+/**
  * Analyze the harmonic function of a chord in a given key
  */
 export function analyzeHarmonicFunction(chord: Chord, key: Key): HarmonicFunction {
   const interval = getIntervalFromTonic(key.tonic, chord.root);
   const { mode } = key;
+
+  // Check for secondary dominants first
+  const secondaryTarget = detectSecondaryDominant(chord, key);
+  if (secondaryTarget !== null) {
+    // This is a secondary dominant
+    const targetRomanMap: Record<number, string> = key.mode === 'major'
+      ? { 0: 'I', 2: 'ii', 4: 'iii', 5: 'IV', 7: 'V', 9: 'vi', 11: 'vii°' }
+      : { 0: 'i', 2: 'ii°', 3: 'III', 5: 'iv', 7: 'V', 8: 'VI', 10: 'VII' };
+
+    return {
+      romanNumeral: `V7/${targetRomanMap[secondaryTarget] || '?'}`,
+      function: 'dominant',
+      isDiatonic: false,
+    };
+  }
+
+  // Check for borrowed chords
+  const borrowedFrom = detectBorrowedChord(chord, key);
+  if (borrowedFrom) {
+    // Determine the borrowed chord's Roman numeral based on interval
+    let romanNumeral = `${chord.root}`;
+    let harmonicFunction: HarmonicFunctionType = 'tonic';
+
+    if (key.mode === 'major' && borrowedFrom === 'minor') {
+      switch (interval) {
+        case 3: romanNumeral = '♭III'; harmonicFunction = 'tonic'; break;
+        case 5: romanNumeral = 'iv'; harmonicFunction = 'subdominant'; break;
+        case 8: romanNumeral = '♭VI'; harmonicFunction = 'subdominant'; break;
+        case 10: romanNumeral = '♭VII'; harmonicFunction = 'subdominant'; break;
+      }
+    }
+
+    return {
+      romanNumeral,
+      function: harmonicFunction,
+      isDiatonic: false,
+    };
+  }
 
   // Define harmonic functions based on scale degree and mode
   if (mode === 'major') {

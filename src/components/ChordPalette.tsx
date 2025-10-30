@@ -28,6 +28,7 @@ const ChordPalette = ({ selectedKey, onChordSelect, hueRotation = 0 }: ChordPale
   const diatonicChords = getDiatonicChords(selectedKey);
   const [selectedDuration, setSelectedDuration] = useState<NoteDuration>(4);
   const [editingChord, setEditingChord] = useState<Chord | null>(null);
+  const [isCreatingNew, setIsCreatingNew] = useState<boolean>(false);
 
   const handleChordClick = async (chord: Chord) => {
     // Create a new chord with the selected duration
@@ -73,31 +74,46 @@ const ChordPalette = ({ selectedKey, onChordSelect, hueRotation = 0 }: ChordPale
 
   const handleCancelEdit = () => {
     setEditingChord(null);
+    setIsCreatingNew(false);
+  };
+
+  const handleNewChord = () => {
+    setIsCreatingNew(true);
   };
 
   return (
     <div className="chord-palette">
       <div className="chord-palette-header">
-        <h3 className="chord-palette-title">Diatonic Chords</h3>
-        <div className="duration-selector">
-          <label htmlFor="duration-select" className="duration-label">
-            Duration:
-          </label>
-          <select
-            id="duration-select"
-            className="duration-select"
-            value={selectedDuration}
-            onChange={(e) => setSelectedDuration(Number(e.target.value) as NoteDuration)}
-            title="Select note duration for added chords"
+        <h3 className="chord-palette-title">Chord Palette</h3>
+        <div className="chord-palette-controls">
+          <button
+            className="new-chord-button"
+            onClick={handleNewChord}
+            title="Create custom chord"
           >
-            {DURATION_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.symbol} {option.label} ({option.value} beats)
-              </option>
-            ))}
-          </select>
+            + New Chord
+          </button>
+          <div className="duration-selector">
+            <label htmlFor="duration-select" className="duration-label">
+              Duration:
+            </label>
+            <select
+              id="duration-select"
+              className="duration-select"
+              value={selectedDuration}
+              onChange={(e) => setSelectedDuration(Number(e.target.value) as NoteDuration)}
+              title="Select note duration for added chords"
+            >
+              {DURATION_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.symbol} {option.label} ({option.value} beats)
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
+      <h4 className="diatonic-section-title">Diatonic Chords</h4>
       <div className="chord-buttons">
         {diatonicChords.map((chord, index) => (
           <div key={index} className="chord-button-container">
@@ -126,8 +142,16 @@ const ChordPalette = ({ selectedKey, onChordSelect, hueRotation = 0 }: ChordPale
       {/* Chord Editor Modal */}
       {editingChord && (
         <ChordEditor
-          root={editingChord.root}
-          quality={editingChord.quality}
+          initialRoot={editingChord.root}
+          initialQuality={editingChord.quality}
+          onChordCreate={handleChordCreate}
+          onCancel={handleCancelEdit}
+        />
+      )}
+
+      {/* New Chord Creator Modal */}
+      {isCreatingNew && (
+        <ChordEditor
           onChordCreate={handleChordCreate}
           onCancel={handleCancelEdit}
         />

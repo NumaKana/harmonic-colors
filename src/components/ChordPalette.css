@@ -21,6 +21,42 @@
   font-weight: 500;
 }
 
+.chord-palette-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.new-chord-button {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.new-chord-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+}
+
+.new-chord-button:active {
+  transform: translateY(0);
+}
+
+.diatonic-section-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+  color: #888;
+  font-weight: 500;
+}
+
 .duration-selector {
   display: flex;
   align-items: center;
