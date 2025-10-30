@@ -83,6 +83,9 @@ export function getChordDisplayName(chord: Chord): string {
     } else if (seventh === 'm7') {
       // Minor 7th: Cm7
       name += 'm7';
+    } else if (seventh === 'mMaj7') {
+      // Minor major 7th: CmMaj7
+      name += 'mMaj7';
     } else if (seventh === 'm7b5') {
       // Half-diminished: Cm7♭5
       name += 'm7♭5';
@@ -92,6 +95,9 @@ export function getChordDisplayName(chord: Chord): string {
     } else if (seventh === 'aug7') {
       // Augmented 7th: Caug7
       name += 'aug7';
+    } else if (seventh === 'augMaj7') {
+      // Augmented major 7th: CaugMaj7
+      name += 'augMaj7';
     }
   } else {
     // No seventh - use quality
