@@ -41,6 +41,28 @@
   flex-direction: column;
   gap: 0.5rem;
   margin-bottom: 1rem;
+  max-height: 200px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 4px;
+}
+
+.section-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.section-list::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 3px;
+}
+
+.section-list::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 3px;
+}
+
+.section-list::-webkit-scrollbar-thumb:hover {
+  background: #777;
 }
 
 .section-item {

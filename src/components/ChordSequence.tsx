@@ -8,6 +8,8 @@ interface ChordSequenceProps {
   currentSectionId: string;
   onRemoveChord: (index: number) => void;
   onSelectChord: (index: number) => void;
+  onSectionSelect: (id: string) => void;
+  onSectionAdd: () => void;
   currentIndex?: number;
   selectedIndex?: number;
   timeSignature?: number;
@@ -116,7 +118,7 @@ const groupMeasuresIntoRows = (measures: Measure[], measuresPerRow: number = 4):
   return rows;
 };
 
-const ChordSequence = ({ sections, currentSectionId, onRemoveChord, onSelectChord, currentIndex, selectedIndex, timeSignature = 4 }: ChordSequenceProps) => {
+const ChordSequence = ({ sections, currentSectionId, onRemoveChord, onSelectChord, onSectionSelect, onSectionAdd, currentIndex, selectedIndex, timeSignature = 4 }: ChordSequenceProps) => {
   const handleChordClick = async (chord: Chord, index: number) => {
     // Select the chord
     onSelectChord(index);
@@ -145,53 +147,55 @@ const ChordSequence = ({ sections, currentSectionId, onRemoveChord, onSelectChor
     );
   }
 
-  // Calculate section brackets (which measures belong to which section)
-  const sectionBrackets: Array<{ sectionId: string; startMeasure: number; endMeasure: number; rowIndex: number; startCol: number; endCol: number }> = [];
-  let currentSectionInRow = '';
-  let startMeasure = 0;
-  let startCol = 0;
+  // Calculate section brackets for each row
+  const sectionBracketsByRow: Array<Array<{ sectionId: string; startCol: number; endCol: number }>> = [];
 
-  rows.forEach((row, rowIndex) => {
+  rows.forEach((row) => {
+    const rowBrackets: Array<{ sectionId: string; startCol: number; endCol: number }> = [];
+    let currentSectionInRow = '';
+    let startCol = 0;
+
     row.forEach((measure, colIndex) => {
       if (measure.sectionId !== currentSectionInRow) {
         // Section changed
         if (currentSectionInRow) {
-          sectionBrackets.push({
+          rowBrackets.push({
             sectionId: currentSectionInRow,
-            startMeasure,
-            endMeasure: measure.measureNumber - 1,
-            rowIndex: rowIndex - (colIndex === 0 ? 1 : 0),
             startCol,
-            endCol: colIndex === 0 ? row.length : colIndex
+            endCol: colIndex
           });
         }
         currentSectionInRow = measure.sectionId;
-        startMeasure = measure.measureNumber;
         startCol = colIndex;
       }
     });
+
+    // Add final bracket for this row
+    if (currentSectionInRow) {
+      rowBrackets.push({
+        sectionId: currentSectionInRow,
+        startCol,
+        endCol: row.length
+      });
+    }
+
+    sectionBracketsByRow.push(rowBrackets);
   });
-  // Add final bracket
-  if (currentSectionInRow) {
-    sectionBrackets.push({
-      sectionId: currentSectionInRow,
-      startMeasure,
-      endMeasure: measures[measures.length - 1].measureNumber,
-      rowIndex: rows.length - 1,
-      startCol,
-      endCol: rows[rows.length - 1].length
-    });
-  }
 
   return (
     <div className="chord-sequence">
-      <h3 className="chord-sequence-title">
-        Chord Progression ({totalChords} chord{totalChords !== 1 ? 's' : ''}, {measures.length} measure{measures.length !== 1 ? 's' : ''})
-      </h3>
+      <div className="chord-sequence-header">
+        <h3 className="chord-sequence-title">
+          Chord Progression ({totalChords} chord{totalChords !== 1 ? 's' : ''}, {measures.length} measure{measures.length !== 1 ? 's' : ''})
+        </h3>
+        <button className="add-key-button" onClick={onSectionAdd} title="Add new section with different key">
+          + Add Key
+        </button>
+      </div>
       <div className="chord-sequence-rows">
         {rows.map((row, rowIndex) => {
           // Find brackets for this row
-          const rowBrackets = sectionBrackets.filter(b => b.rowIndex === rowIndex);
+          const rowBrackets = sectionBracketsByRow[rowIndex] || [];
 
           return (
             <div key={rowIndex} className="measure-row-container">
@@ -212,6 +216,8 @@ const ChordSequence = ({ sections, currentSectionId, onRemoveChord, onSelectChor
                         left: `${leftPercent}%`,
                         width: `${widthPercent}%`
                       }}
+                      onClick={() => onSectionSelect(section.id)}
+                      title={`Click to edit ${section.name}`}
                     >
                       <div className="section-bracket-label">
                         {section.name}: {section.key.tonic} {section.key.mode === 'major' ? 'Major' : 'Minor'}
