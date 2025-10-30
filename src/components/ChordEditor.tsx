@@ -8,6 +8,7 @@ interface ChordEditorProps {
   initialDuration?: number;
   onChordCreate: (chord: Chord, duration: number) => void;
   onCancel: () => void;
+  isDiatonicEdit?: boolean; // True when editing a diatonic chord from palette
 }
 
 type NoteDuration = 4 | 3 | 2 | 1.5 | 1 | 0.75 | 0.5;
@@ -52,13 +53,27 @@ const ALTERATION_OPTIONS: Alteration[] = ['b9', '#9', '#11', 'b13'];
 const ALL_NOTES: Note[] = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 const ALL_QUALITIES: ChordQuality[] = ['major', 'minor', 'diminished', 'augmented'];
 
-const ChordEditor = ({ initialRoot, initialQuality, initialDuration, onChordCreate, onCancel }: ChordEditorProps) => {
+// Diatonic quality variations: For each diatonic quality, what alternatives are musically valid?
+// For example, I can be major or augmented, ii can be minor or diminished, etc.
+const DIATONIC_QUALITY_VARIATIONS: Record<ChordQuality, ChordQuality[]> = {
+  major: ['major', 'augmented'], // I can be I or Iaug
+  minor: ['minor', 'diminished'], // ii, iii, vi can have variations
+  diminished: ['diminished', 'minor'], // vii° can be vii° or viim
+  augmented: ['augmented', 'major'], // rare, but allow both
+};
+
+const ChordEditor = ({ initialRoot, initialQuality, initialDuration, onChordCreate, onCancel, isDiatonicEdit = false }: ChordEditorProps) => {
   const [root, setRoot] = useState<Note>(initialRoot || 'C');
   const [quality, setQuality] = useState<ChordQuality>(initialQuality || 'major');
   const [seventh, setSeventh] = useState<SeventhType | null>(null);
   const [tensions, setTensions] = useState<Tension[]>([]);
   const [alterations, setAlterations] = useState<Alteration[]>([]);
   const [duration, setDuration] = useState<NoteDuration>((initialDuration as NoteDuration) || 4);
+
+  // Get available qualities based on mode
+  const availableQualities = isDiatonicEdit && initialQuality
+    ? DIATONIC_QUALITY_VARIATIONS[initialQuality]
+    : ALL_QUALITIES;
 
   // Get available seventh options based on current quality
   const availableSeventhOptions = SEVENTH_OPTIONS_BY_QUALITY[quality];
@@ -169,27 +184,39 @@ const ChordEditor = ({ initialRoot, initialQuality, initialDuration, onChordCrea
             <div className="chord-preview-name">{getChordName()}</div>
           </div>
 
-          {/* Root Selection */}
-          <div className="editor-section">
-            <h4 className="section-title">Root</h4>
-            <div className="button-group">
-              {ALL_NOTES.map((note) => (
-                <button
-                  key={note}
-                  className={`option-button ${root === note ? 'active' : ''}`}
-                  onClick={() => setRoot(note)}
-                >
-                  {note}
-                </button>
-              ))}
+          {/* Root Selection - Only show if not editing diatonic chord */}
+          {!isDiatonicEdit && (
+            <div className="editor-section">
+              <h4 className="section-title">Root</h4>
+              <div className="button-group">
+                {ALL_NOTES.map((note) => (
+                  <button
+                    key={note}
+                    className={`option-button ${root === note ? 'active' : ''}`}
+                    onClick={() => setRoot(note)}
+                  >
+                    {note}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* Root Display - Show fixed root when editing diatonic chord */}
+          {isDiatonicEdit && (
+            <div className="editor-section">
+              <h4 className="section-title">Root</h4>
+              <div className="chord-preview-name" style={{ fontSize: '1.5rem', padding: '0.5rem' }}>
+                {root}
+              </div>
+            </div>
+          )}
 
           {/* Quality Selection */}
           <div className="editor-section">
             <h4 className="section-title">Quality</h4>
             <div className="button-group">
-              {ALL_QUALITIES.map((q) => (
+              {availableQualities.map((q) => (
                 <button
                   key={q}
                   className={`option-button ${quality === q ? 'active' : ''}`}

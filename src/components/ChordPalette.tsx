@@ -148,6 +148,7 @@ const ChordPalette = ({ selectedKey, onChordSelect, hueRotation = 0 }: ChordPale
           initialDuration={selectedDuration}
           onChordCreate={handleChordCreate}
           onCancel={handleCancelEdit}
+          isDiatonicEdit={true}
         />
       )}
 
