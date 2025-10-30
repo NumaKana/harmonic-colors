@@ -1,0 +1,129 @@
+.section-manager {
+  background: #2a2a2a;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.section-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #fff;
+}
+
+.add-section-button {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.add-section-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.section-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.section-item {
+  background: #1a1a1a;
+  border: 2px solid #333;
+  border-radius: 6px;
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.section-item:hover {
+  border-color: #555;
+  background: #222;
+}
+
+.section-item.active {
+  border-color: #667eea;
+  background: #252540;
+}
+
+.section-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.section-name-input {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  outline: none;
+  flex: 1;
+  padding: 0.25rem;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.section-name-input:focus {
+  border-bottom-color: #667eea;
+}
+
+.section-name-input::placeholder {
+  color: #666;
+}
+
+.remove-section-button {
+  background: #d32f2f;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  font-size: 1.5rem;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  line-height: 1;
+  padding: 0;
+}
+
+.remove-section-button:hover {
+  background: #b71c1c;
+}
+
+.section-key-info {
+  font-size: 0.85rem;
+  color: #999;
+}
+
+.current-section-controls {
+  border-top: 1px solid #333;
+  padding-top: 1rem;
+  margin-top: 1rem;
+}
+
+.current-section-controls h4 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  color: #fff;
+}

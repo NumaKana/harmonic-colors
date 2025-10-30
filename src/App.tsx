@@ -3,7 +3,7 @@ import './App.css';
 import BuildPhase from './components/BuildPhase';
 import ConfirmPhase from './components/ConfirmPhase';
 import SettingsSidebar from './components/SettingsSidebar';
-import { Key, Chord } from './types';
+import { Key, Chord, Section } from './types';
 import { audioEngine } from './utils/audioEngine';
 
 type Phase = 'build' | 'confirm';
@@ -12,17 +12,27 @@ const HUE_ROTATION_STORAGE_KEY = 'harmonic-colors-hue-rotation';
 
 function App() {
   const [currentPhase, setCurrentPhase] = useState<Phase>('build');
-  const [selectedKey, setSelectedKey] = useState<Key>({
-    tonic: 'C',
-    mode: 'major',
-  });
-  const [chordProgression, setChordProgression] = useState<Chord[]>([]);
+
+  // Section-based data structure (Phase 4)
+  const [sections, setSections] = useState<Section[]>([{
+    id: '1',
+    name: 'Section 1',
+    key: { tonic: 'C', mode: 'major' },
+    chords: []
+  }]);
+  const [currentSectionId, setCurrentSectionId] = useState<string>('1');
+
   const [currentChordIndex, setCurrentChordIndex] = useState<number>(-1); // Index of currently playing chord
   const [selectedChordIndex, setSelectedChordIndex] = useState<number | null>(null); // Index of user-selected chord
   const [timeSignature, setTimeSignature] = useState<number>(4);
   const [playbackPosition, setPlaybackPosition] = useState<number>(0); // Current playback position in beats
   const [bpm, setBpm] = useState<number>(120);
   const [metronomeEnabled, setMetronomeEnabled] = useState<boolean>(false);
+
+  // Derived values for backward compatibility
+  const currentSection = sections.find(s => s.id === currentSectionId) || sections[0];
+  const selectedKey = currentSection.key;
+  const chordProgression = currentSection.chords;
 
   // Load hueRotation from LocalStorage
   const [hueRotation, setHueRotation] = useState<number>(() => {
@@ -34,14 +44,28 @@ function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
 
   const handleAddChord = (chord: Chord) => {
-    const newProgression = [...chordProgression, chord];
-    setChordProgression(newProgression);
-    // Auto-select the newly added chord
-    setSelectedChordIndex(newProgression.length - 1);
+    setSections(sections.map(section => {
+      if (section.id === currentSectionId) {
+        const newChords = [...section.chords, chord];
+        // Auto-select the newly added chord
+        setSelectedChordIndex(newChords.length - 1);
+        return { ...section, chords: newChords };
+      }
+      return section;
+    }));
   };
 
   const handleRemoveChord = (index: number) => {
-    setChordProgression(chordProgression.filter((_, i) => i !== index));
+    setSections(sections.map(section => {
+      if (section.id === currentSectionId) {
+        return {
+          ...section,
+          chords: section.chords.filter((_, i) => i !== index)
+        };
+      }
+      return section;
+    }));
+
     // Reset current chord index if removed
     if (currentChordIndex === index) {
       setCurrentChordIndex(-1);
@@ -60,6 +84,15 @@ function App() {
     setSelectedChordIndex(index);
   };
 
+  const handleKeyChange = (newKey: Key) => {
+    setSections(sections.map(section => {
+      if (section.id === currentSectionId) {
+        return { ...section, key: newKey };
+      }
+      return section;
+    }));
+  };
+
   const handlePlayingIndexChange = (index: number) => {
     setCurrentChordIndex(index);
     if (index === -1) {
@@ -74,6 +107,40 @@ function App() {
   const handleHueRotationChange = (rotation: number) => {
     setHueRotation(rotation);
     localStorage.setItem(HUE_ROTATION_STORAGE_KEY, String(rotation));
+  };
+
+  // Section management handlers
+  const handleSectionAdd = () => {
+    const newId = String(Date.now());
+    const newSection: Section = {
+      id: newId,
+      name: `Section ${sections.length + 1}`,
+      key: { tonic: 'C', mode: 'major' },
+      chords: []
+    };
+    setSections([...sections, newSection]);
+    setCurrentSectionId(newId);
+  };
+
+  const handleSectionRemove = (id: string) => {
+    if (sections.length <= 1) return; // Don't remove the last section
+    const newSections = sections.filter(s => s.id !== id);
+    setSections(newSections);
+    if (currentSectionId === id) {
+      setCurrentSectionId(newSections[0].id);
+    }
+  };
+
+  const handleSectionNameChange = (id: string, name: string) => {
+    setSections(sections.map(section =>
+      section.id === id ? { ...section, name } : section
+    ));
+  };
+
+  const handleSectionKeyChange = (id: string, key: Key) => {
+    setSections(sections.map(section =>
+      section.id === id ? { ...section, key } : section
+    ));
   };
 
   // Get current chord for visualization
@@ -123,7 +190,6 @@ function App() {
         {currentPhase === 'build' ? (
           <BuildPhase
             selectedKey={selectedKey}
-            onKeyChange={setSelectedKey}
             chords={chordProgression}
             onChordSelect={handleAddChord}
             onRemoveChord={handleRemoveChord}
@@ -137,6 +203,13 @@ function App() {
             onBpmChange={setBpm}
             onMetronomeChange={setMetronomeEnabled}
             hueRotation={hueRotation}
+            sections={sections}
+            currentSectionId={currentSectionId}
+            onSectionSelect={setCurrentSectionId}
+            onSectionAdd={handleSectionAdd}
+            onSectionRemove={handleSectionRemove}
+            onSectionNameChange={handleSectionNameChange}
+            onSectionKeyChange={handleSectionKeyChange}
           />
         ) : (
           <ConfirmPhase

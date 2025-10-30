@@ -1,18 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git cherry-pick:*)",
-      "Bash(gh issue list:*)",
-      "Bash(gh issue create:*)",
-      "Bash(git fetch:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
-      "Bash(git push:*)",
-      "Bash(gh pr create:*)",
       "Bash(gh issue view:*)",
       "Bash(git checkout:*)",
       "Bash(git pull:*)",
-      "Bash(npm run lint)"
+      "Bash(git stash:*)"
     ],
     "deny": [],
     "ask": []
