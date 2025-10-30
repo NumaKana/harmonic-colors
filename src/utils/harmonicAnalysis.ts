@@ -40,8 +40,16 @@ function detectSecondaryDominant(chord: Chord, key: Key): number | null {
     // Exception: Check if it should be a different quality for this scale degree
     // For example, in C major, a C major chord is diatonic (I), not V7/IV
     const expectedQuality = getExpectedQuality(interval, key.mode);
-    if (chord.quality === expectedQuality && !chord.seventh) {
-      return null; // It's a diatonic chord
+    if (chord.quality === expectedQuality) {
+      // If the quality matches, check if the seventh (if present) is diatonic
+      if (!chord.seventh) {
+        return null; // Plain triad is diatonic
+      }
+      // Seventh chords: only '7' (dominant 7th) suggests secondary dominant function
+      // maj7, m7, m7b5, dim7 are all diatonic seventh extensions
+      if (chord.seventh !== '7') {
+        return null; // Diatonic seventh chord (Imaj7, iim7, etc.)
+      }
     }
   }
 
