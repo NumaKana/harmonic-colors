@@ -21,7 +21,6 @@ interface VisualizationCanvasProps {
 
 const VisualizationCanvas = ({
   selectedKey,
-  currentChord,
   hueRotation = 0,
   chordProgression = [],
   currentChordIndex = -1,

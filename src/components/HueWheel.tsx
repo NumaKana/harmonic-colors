@@ -20,12 +20,6 @@ const HueWheel = ({ rotation, onChange, currentKey }: HueWheelProps) => {
     return index * 30; // 360 / 12 = 30度ずつ
   };
 
-  // Calculate marker position based on rotation
-  // Rotation is clockwise from top (0° = red at top)
-  const angle = (rotation - 90) * (Math.PI / 180); // -90 to start from top
-  const markerX = center + radius * Math.cos(angle);
-  const markerY = center + radius * Math.sin(angle);
-
   // Handle click on wheel to set rotation
   const handleWheelClick = (e: React.MouseEvent<SVGElement>) => {
     const svg = e.currentTarget;
@@ -38,19 +32,6 @@ const HueWheel = ({ rotation, onChange, currentKey }: HueWheelProps) => {
     if (newAngle < 0) newAngle += 360;
 
     onChange(Math.round(newAngle % 360));
-  };
-
-  // Generate conic gradient stops for hue wheel
-  const generateGradientStops = () => {
-    const stops = [];
-    const steps = 12; // 12 colors around the wheel
-    for (let i = 0; i <= steps; i++) {
-      const hue = (i * 360) / steps;
-      stops.push(
-        <stop key={i} offset={`${(i * 100) / steps}%`} stopColor={`hsl(${hue}, 100%, 50%)`} />
-      );
-    }
-    return stops;
   };
 
   return (

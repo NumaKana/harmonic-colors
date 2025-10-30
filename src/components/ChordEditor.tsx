@@ -3,10 +3,12 @@ import { Chord, Note, ChordQuality, SeventhType, Tension, Alteration } from '../
 import './ChordEditor.css';
 
 interface ChordEditorProps {
-  root: Note;
-  quality: ChordQuality;
+  initialRoot?: Note;
+  initialQuality?: ChordQuality;
+  initialDuration?: number;
   onChordCreate: (chord: Chord, duration: number) => void;
   onCancel: () => void;
+  isDiatonicEdit?: boolean; // True when editing a diatonic chord from palette
 }
 
 type NoteDuration = 4 | 3 | 2 | 1.5 | 1 | 0.75 | 0.5;
@@ -21,24 +23,70 @@ const DURATION_OPTIONS: { value: NoteDuration; label: string; symbol: string }[]
   { value: 0.5, label: 'Eighth Note', symbol: '♪' },
 ];
 
-const SEVENTH_OPTIONS: { value: SeventhType | null; label: string }[] = [
-  { value: null, label: 'None' },
-  { value: '7', label: 'Dom7' },
-  { value: 'maj7', label: 'Maj7' },
-  { value: 'm7', label: 'm7' },
-  { value: 'm7b5', label: 'm7♭5' },
-  { value: 'dim7', label: 'dim7' },
-  { value: 'aug7', label: 'aug7' },
-];
+// Seventh options based on quality
+const SEVENTH_OPTIONS_BY_QUALITY: Record<ChordQuality, { value: SeventhType | null; label: string }[]> = {
+  major: [
+    { value: null, label: 'None' },
+    { value: '7', label: 'Dom7' },
+    { value: 'maj7', label: 'Maj7' },
+  ],
+  minor: [
+    { value: null, label: 'None' },
+    { value: 'm7', label: 'm7' },
+    { value: 'mMaj7', label: 'mMaj7' },
+  ],
+  diminished: [
+    { value: null, label: 'None' },
+    { value: 'm7b5', label: 'm7♭5' },
+    { value: 'dim7', label: 'dim7' },
+  ],
+  augmented: [
+    { value: null, label: 'None' },
+    { value: 'aug7', label: 'aug7' },
+    { value: 'augMaj7', label: 'augMaj7' },
+  ],
+};
 
 const TENSION_OPTIONS: Tension[] = [9, 11, 13];
 const ALTERATION_OPTIONS: Alteration[] = ['b9', '#9', '#11', 'b13'];
 
-const ChordEditor = ({ root, quality, onChordCreate, onCancel }: ChordEditorProps) => {
+const ALL_NOTES: Note[] = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+const ALL_QUALITIES: ChordQuality[] = ['major', 'minor', 'diminished', 'augmented'];
+
+// Diatonic quality variations: For each diatonic quality, what alternatives are musically valid?
+// For example, I can be major or augmented, ii can be minor or diminished, etc.
+const DIATONIC_QUALITY_VARIATIONS: Record<ChordQuality, ChordQuality[]> = {
+  major: ['major', 'augmented'], // I can be I or Iaug
+  minor: ['minor', 'diminished'], // ii, iii, vi can have variations
+  diminished: ['diminished', 'minor'], // vii° can be vii° or viim
+  augmented: ['augmented', 'major'], // rare, but allow both
+};
+
+const ChordEditor = ({ initialRoot, initialQuality, initialDuration, onChordCreate, onCancel, isDiatonicEdit = false }: ChordEditorProps) => {
+  const [root, setRoot] = useState<Note>(initialRoot || 'C');
+  const [quality, setQuality] = useState<ChordQuality>(initialQuality || 'major');
   const [seventh, setSeventh] = useState<SeventhType | null>(null);
   const [tensions, setTensions] = useState<Tension[]>([]);
   const [alterations, setAlterations] = useState<Alteration[]>([]);
-  const [duration, setDuration] = useState<NoteDuration>(4);
+  const [duration, setDuration] = useState<NoteDuration>((initialDuration as NoteDuration) || 4);
+
+  // Get available qualities based on mode
+  const availableQualities = isDiatonicEdit && initialQuality
+    ? DIATONIC_QUALITY_VARIATIONS[initialQuality]
+    : ALL_QUALITIES;
+
+  // Get available seventh options based on current quality
+  const availableSeventhOptions = SEVENTH_OPTIONS_BY_QUALITY[quality];
+
+  // Reset seventh if it's not available for the new quality
+  const handleQualityChange = (newQuality: ChordQuality) => {
+    setQuality(newQuality);
+    const newAvailableOptions = SEVENTH_OPTIONS_BY_QUALITY[newQuality];
+    const isSeventhAvailable = newAvailableOptions.some(opt => opt.value === seventh);
+    if (!isSeventhAvailable) {
+      setSeventh(null);
+    }
+  };
 
   const toggleTension = (tension: Tension) => {
     setTensions((prev) =>
@@ -83,6 +131,9 @@ const ChordEditor = ({ root, quality, onChordCreate, onCancel }: ChordEditorProp
       } else if (seventh === 'm7') {
         // Minor 7th: Cm7
         name += 'm7';
+      } else if (seventh === 'mMaj7') {
+        // Minor major 7th: CmMaj7
+        name += 'mMaj7';
       } else if (seventh === 'm7b5') {
         // Half-diminished: Cm7♭5
         name += 'm7♭5';
@@ -92,6 +143,9 @@ const ChordEditor = ({ root, quality, onChordCreate, onCancel }: ChordEditorProp
       } else if (seventh === 'aug7') {
         // Augmented 7th: Caug7
         name += 'aug7';
+      } else if (seventh === 'augMaj7') {
+        // Augmented major 7th: CaugMaj7
+        name += 'augMaj7';
       }
     } else {
       // No seventh - use quality
@@ -130,11 +184,55 @@ const ChordEditor = ({ root, quality, onChordCreate, onCancel }: ChordEditorProp
             <div className="chord-preview-name">{getChordName()}</div>
           </div>
 
+          {/* Root Selection - Only show if not editing diatonic chord */}
+          {!isDiatonicEdit && (
+            <div className="editor-section">
+              <h4 className="section-title">Root</h4>
+              <div className="button-group">
+                {ALL_NOTES.map((note) => (
+                  <button
+                    key={note}
+                    className={`option-button ${root === note ? 'active' : ''}`}
+                    onClick={() => setRoot(note)}
+                  >
+                    {note}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Root Display - Show fixed root when editing diatonic chord */}
+          {isDiatonicEdit && (
+            <div className="editor-section">
+              <h4 className="section-title">Root</h4>
+              <div className="chord-preview-name" style={{ fontSize: '1.5rem', padding: '0.5rem' }}>
+                {root}
+              </div>
+            </div>
+          )}
+
+          {/* Quality Selection */}
+          <div className="editor-section">
+            <h4 className="section-title">Quality</h4>
+            <div className="button-group">
+              {availableQualities.map((q) => (
+                <button
+                  key={q}
+                  className={`option-button ${quality === q ? 'active' : ''}`}
+                  onClick={() => handleQualityChange(q)}
+                >
+                  {q === 'major' ? 'Major' : q === 'minor' ? 'Minor' : q === 'diminished' ? 'Dim' : 'Aug'}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Seventh Selection */}
           <div className="editor-section">
             <h4 className="section-title">Seventh</h4>
             <div className="button-group">
-              {SEVENTH_OPTIONS.map((option) => (
+              {availableSeventhOptions.map((option) => (
                 <button
                   key={option.label}
                   className={`option-button ${seventh === option.value ? 'active' : ''}`}

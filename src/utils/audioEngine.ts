@@ -86,11 +86,11 @@ class AudioEngine {
     let thirdInterval = 4; // Major 3rd (default)
 
     // Handle seventh types that override quality
-    if (chord.seventh === 'm7' || chord.seventh === 'm7b5') {
+    if (chord.seventh === 'm7' || chord.seventh === 'mMaj7' || chord.seventh === 'm7b5') {
       thirdInterval = 3; // Minor 3rd
     } else if (chord.seventh === 'dim7') {
       thirdInterval = 3; // Minor 3rd
-    } else if (chord.seventh === 'aug7') {
+    } else if (chord.seventh === 'aug7' || chord.seventh === 'augMaj7') {
       thirdInterval = 4; // Major 3rd
     } else {
       // Use quality if no seventh or seventh is '7' or 'maj7'
@@ -105,7 +105,7 @@ class AudioEngine {
       fifthInterval = 6; // Diminished fifth (♭5)
     } else if (chord.seventh === 'dim7') {
       fifthInterval = 6; // Diminished fifth
-    } else if (chord.seventh === 'aug7') {
+    } else if (chord.seventh === 'aug7' || chord.seventh === 'augMaj7') {
       fifthInterval = 8; // Augmented fifth
     } else {
       // Use quality if no specific seventh override
@@ -123,6 +123,8 @@ class AudioEngine {
 
       switch (chord.seventh) {
         case 'maj7':
+        case 'mMaj7':
+        case 'augMaj7':
           seventhInterval = 11; // Major 7th
           break;
         case 'm7':
