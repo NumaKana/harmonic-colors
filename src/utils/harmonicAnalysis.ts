@@ -1,4 +1,4 @@
-import { Chord, Key, Note, HarmonicFunction, HarmonicFunctionType } from '../types';
+import { Chord, Key, Note, ChordQuality, HarmonicFunction, HarmonicFunctionType } from '../types';
 
 const NOTES: Note[] = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
@@ -23,12 +23,27 @@ function getIntervalFromTonic(tonic: Note, chordRoot: Note): number {
  * Returns the target chord degree if it's a secondary dominant, null otherwise
  */
 function detectSecondaryDominant(chord: Chord, key: Key): number | null {
-  // Secondary dominants are typically major or dominant 7th chords
+  // Secondary dominants must be major or have a dominant 7th
   if (chord.quality !== 'major' && chord.seventh !== '7') {
     return null;
   }
 
   const interval = getIntervalFromTonic(key.tonic, chord.root);
+
+  // Diatonic degrees in this key
+  const diatonicDegrees = key.mode === 'major'
+    ? [0, 2, 4, 5, 7, 9, 11] // I, ii, iii, IV, V, vi, vii
+    : [0, 2, 3, 5, 7, 8, 10]; // i, ii°, III, iv, v, VI, VII
+
+  // If the chord itself is diatonic, it's not a secondary dominant
+  if (diatonicDegrees.includes(interval)) {
+    // Exception: Check if it should be a different quality for this scale degree
+    // For example, in C major, a C major chord is diatonic (I), not V7/IV
+    const expectedQuality = getExpectedQuality(interval, key.mode);
+    if (chord.quality === expectedQuality && !chord.seventh) {
+      return null; // It's a diatonic chord
+    }
+  }
 
   // Check if this chord resolves to a diatonic chord (V7 relationship)
   // For example, in C major:
@@ -39,16 +54,41 @@ function detectSecondaryDominant(chord: Chord, key: Key): number | null {
 
   const targetInterval = (interval + 7) % 12; // Perfect 5th up
 
-  // Check if target is a diatonic degree in this key
-  const diatonicDegrees = key.mode === 'major'
-    ? [0, 2, 4, 5, 7, 9, 11] // I, ii, iii, IV, V, vi, vii
-    : [0, 2, 3, 5, 7, 8, 10]; // i, ii°, III, iv, v, VI, VII
-
-  if (diatonicDegrees.includes(targetInterval)) {
+  // The target must be diatonic, and the chord itself should not be the primary dominant
+  if (diatonicDegrees.includes(targetInterval) && targetInterval !== interval) {
     return targetInterval;
   }
 
   return null;
+}
+
+/**
+ * Get the expected quality for a scale degree in a given mode
+ */
+function getExpectedQuality(interval: number, mode: 'major' | 'minor'): ChordQuality {
+  if (mode === 'major') {
+    switch (interval) {
+      case 0: return 'major';    // I
+      case 2: return 'minor';    // ii
+      case 4: return 'minor';    // iii
+      case 5: return 'major';    // IV
+      case 7: return 'major';    // V
+      case 9: return 'minor';    // vi
+      case 11: return 'diminished'; // vii°
+      default: return 'major';
+    }
+  } else {
+    switch (interval) {
+      case 0: return 'minor';    // i
+      case 2: return 'diminished'; // ii°
+      case 3: return 'major';    // III
+      case 5: return 'minor';    // iv
+      case 7: return 'minor';    // v
+      case 8: return 'major';    // VI
+      case 10: return 'major';   // VII
+      default: return 'minor';
+    }
+  }
 }
 
 /**
