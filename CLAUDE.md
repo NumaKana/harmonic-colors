@@ -58,7 +58,27 @@ npm run preview
 - ドミナント: 色1が30%、色2が70%
 - 実装: `src/utils/colorGenerator.ts:getMarbleRatio()`
 
-**テンションパーティクル**（計画中）: テンション音（9th、11th、13th、オルタード）を表現する視覚的粒子
+**テンションパーティクル**: テンション音（9th、11th、13th）とオルタレーション（♭9、♯9、♯11、♭13）を表現する視覚的粒子
+- GPU最適化レンダリング（Three.js Points使用）
+- テンションタイプ別の色・密度・サイズ
+  - 9th: 銀色、密度30
+  - 11th: 青色、密度30
+  - 13th: 黄色、密度30
+  - ♭9/♯9: 赤みがかった色、密度70、サイズ大
+  - ♯11: 明るい青、密度70、サイズ大
+  - ♭13: オレンジ、密度70、サイズ大
+- 緩やかな浮遊アニメーション
+- 実装: `src/components/ParticleSystem.tsx`、`src/utils/colorGenerator.ts:generateParticles()`
+- **重要**: セブンスはパーティクルに含まれず、色彩システムで表現
+
+**セブンスコードの色彩表現**: セブンスタイプごとに明度と彩度を調整
+- maj7: 明度+8、彩度+10（明るく洗練）
+- 7（ドミナント）: 明度-3、彩度+15（鮮やかで緊張）
+- m7: 明度-5、彩度+8（やや暗く柔らか）
+- m7♭5: 明度-10、彩度+5（暗く不安定）
+- dim7: 明度-12、彩度-5（最も暗くくすんだ）
+- aug7: 明度-2、彩度+12（浮遊感）
+- 実装: `src/utils/colorGenerator.ts:generateChordColor()`
 
 ### 和声分析システム
 
@@ -128,12 +148,12 @@ ChordColor: { baseColor, chordColor, marbleRatio, particles[] }
 
 プロジェクトは段階的な開発ロードマップに従っています：
 
-**フェーズ1（MVP）**: 基本的な色表示とコード再生
-**フェーズ2**: マーブルパターン実装とアニメーション
-**フェーズ3**: テンション用のカラースプレーパーティクルシステム
-**フェーズ4**: ノンダイアトニックコード対応（現在はダイアトニックコードのみ対応）
+**フェーズ1（MVP）**: ✅ 完了 - 基本的な色表示とコード再生
+**フェーズ2**: ✅ 完了 - マーブルパターン実装とアニメーション
+**フェーズ3**: ✅ 完了 - テンション視覚化（パーティクルシステム）とセブンス色彩表現
+**フェーズ4**: 計画中 - ノンダイアトニックコード対応、転調対応など
 
-現在のステータス: **フェーズ1-2**（基本的な視覚化が実装済み）
+現在のステータス: **フェーズ3完了**（コア機能実装済み、磨き上げ機能はissue #58-61として記録）
 
 ## 設計思想
 
@@ -144,6 +164,7 @@ ChordColor: { baseColor, chordColor, marbleRatio, particles[] }
 3. **視覚的階層**:
    - キー（色1）= 基盤/背景
    - 和声機能（色2 + マーブル比率）= アクティブ要素
+   - セブンス（明度・彩度調整）= コードの本質的性格
    - テンション（パーティクル）= 装飾的追加要素
 
 4. **転調の明確性**: キー変化は視覚的に劇的（色相シフト）、一方でキー内のコード変化はより微妙（明度/比率シフト）
@@ -189,19 +210,25 @@ src/
     ConfirmPhase.tsx      # 確認フェーズコンテナ
     KeySelector.tsx       # キー選択UI
     ChordPalette.tsx      # ダイアトニックコードパレット
+    ChordEditor.tsx       # テンション入力モーダル（Phase 3）
     ChordColorPreview.tsx # コードボタン下の色プレビュー
     ChordSequence.tsx     # コード進行表示（4小節/行）
     PlaybackControls.tsx  # 再生制御UI
+    CompactPlayButton.tsx # 小型再生ボタン（Phase 3）
     VisualizationPreview.tsx  # 小さなマーブルプレビュー
     VisualizationCanvas.tsx   # Timeline View（確認フェーズ用）
     ChordNameBar.tsx      # コード名スクロール表示
     TimelineVisualization.tsx # タイムライン描画
     ColorGradientMesh.tsx # マーブルシェーダーメッシュ
+    ParticleSystem.tsx    # パーティクルシステム（Phase 3）
+    SettingsSidebar.tsx   # 設定サイドバー（Phase 3）
+    HueWheel.tsx          # 色相環UI（Phase 3）
 
 docs/
   specification.md        # 完全な技術仕様（日本語）
   design-discussion.md    # 設計根拠（日本語）
   development-roadmap.md  # 開発フェーズ
+  phase3-completion-report.md  # Phase 3完了報告書
 ```
 
 ## 開発時の注意事項
