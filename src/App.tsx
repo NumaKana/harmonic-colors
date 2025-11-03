@@ -34,6 +34,9 @@ function App() {
   const selectedKey = currentSection.key;
   const chordProgression = currentSection.chords;
 
+  // All chords from all sections for full playback
+  const allChords = sections.flatMap(section => section.chords);
+
   // Load hueRotation from LocalStorage
   const [hueRotation, setHueRotation] = useState<number>(() => {
     const saved = localStorage.getItem(HUE_ROTATION_STORAGE_KEY);
@@ -55,27 +58,44 @@ function App() {
     }));
   };
 
-  const handleRemoveChord = (index: number) => {
+  const handleRemoveChord = (globalIndex: number) => {
+    // Find which section contains the chord at this global index
+    let currentGlobalIndex = 0;
+    let targetSectionId: string | null = null;
+    let localIndex = -1;
+
+    for (const section of sections) {
+      if (globalIndex < currentGlobalIndex + section.chords.length) {
+        targetSectionId = section.id;
+        localIndex = globalIndex - currentGlobalIndex;
+        break;
+      }
+      currentGlobalIndex += section.chords.length;
+    }
+
+    if (targetSectionId === null) return; // Invalid index
+
+    // Remove chord from the target section
     setSections(sections.map(section => {
-      if (section.id === currentSectionId) {
+      if (section.id === targetSectionId) {
         return {
           ...section,
-          chords: section.chords.filter((_, i) => i !== index)
+          chords: section.chords.filter((_, i) => i !== localIndex)
         };
       }
       return section;
     }));
 
-    // Reset current chord index if removed
-    if (currentChordIndex === index) {
+    // Reset current chord index if removed (using global index)
+    if (currentChordIndex === globalIndex) {
       setCurrentChordIndex(-1);
-    } else if (currentChordIndex >= 0 && index < currentChordIndex) {
+    } else if (currentChordIndex >= 0 && globalIndex < currentChordIndex) {
       setCurrentChordIndex(currentChordIndex - 1);
     }
-    // Reset selected chord index if removed
-    if (selectedChordIndex === index) {
+    // Reset selected chord index if removed (using global index)
+    if (selectedChordIndex === globalIndex) {
       setSelectedChordIndex(null);
-    } else if (selectedChordIndex !== null && index < selectedChordIndex) {
+    } else if (selectedChordIndex !== null && globalIndex < selectedChordIndex) {
       setSelectedChordIndex(selectedChordIndex - 1);
     }
   };
@@ -191,6 +211,7 @@ function App() {
           <BuildPhase
             selectedKey={selectedKey}
             chords={chordProgression}
+            allChords={allChords}
             onChordSelect={handleAddChord}
             onRemoveChord={handleRemoveChord}
             onSelectChord={handleSelectChord}
@@ -216,6 +237,7 @@ function App() {
             selectedKey={selectedKey}
             currentChord={currentChord}
             chordProgression={chordProgression}
+            allChords={allChords}
             currentChordIndex={currentChordIndex}
             playbackPosition={playbackPosition}
             bpm={bpm}

@@ -7,6 +7,7 @@ interface ConfirmPhaseProps {
   selectedKey: Key;
   currentChord?: Chord;
   chordProgression: Chord[];
+  allChords: Chord[]; // All chords from all sections for playback
   currentChordIndex: number;
   playbackPosition: number;
   bpm: number;
@@ -21,6 +22,7 @@ const ConfirmPhase = ({
   selectedKey,
   currentChord,
   chordProgression,
+  allChords,
   currentChordIndex,
   playbackPosition,
   bpm,
@@ -33,14 +35,14 @@ const ConfirmPhase = ({
   return (
     <div className="confirm-phase">
       <ChordNameBar
-        chords={chordProgression}
+        chords={allChords}
         playbackPosition={playbackPosition}
         bpm={bpm}
       />
       <VisualizationCanvas
         selectedKey={selectedKey}
         currentChord={currentChord}
-        chordProgression={chordProgression}
+        chordProgression={allChords}
         currentChordIndex={currentChordIndex}
         playbackPosition={playbackPosition}
         bpm={bpm}

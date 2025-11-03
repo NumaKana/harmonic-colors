@@ -21,6 +21,12 @@
   font-weight: 500;
 }
 
+.chord-sequence-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .add-key-button {
   padding: 0.4rem 0.8rem;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -107,6 +113,40 @@
   color: #ffd700;
 }
 
+.section-bracket-remove {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  background-color: rgba(0, 0, 0, 0.5);
+  border: none;
+  border-radius: 50%;
+  color: #888;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  line-height: 1;
+  padding: 0;
+  opacity: 0;
+}
+
+.section-bracket:hover .section-bracket-remove {
+  opacity: 1;
+}
+
+.section-bracket-remove:hover {
+  background-color: #e74c3c;
+  color: #fff;
+}
+
+.section-bracket-remove:active {
+  transform: scale(0.9);
+}
+
 .measure-row {
   display: flex;
   gap: 0.5rem;
@@ -117,12 +157,13 @@
   display: flex;
   align-items: stretch;
   min-height: 70px;
-  flex: 1;
+  /* width set inline to 25% (1/4 of row) */
   min-width: 0;
   background-color: #2a2a2a;
   border: 2px solid #555;
   border-radius: 6px;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
 .measure-number {
@@ -139,9 +180,11 @@
 }
 
 .measure-content {
-  display: flex;
+  display: grid;
+  /* grid-template-columns set inline based on timeSignature */
   flex: 1;
   align-items: stretch;
+  gap: 0;
 }
 
 .measure-chord {
@@ -154,8 +197,9 @@
   border-right: 1px solid #555;
   transition: all 0.2s;
   position: relative;
-  min-width: 45px;
   cursor: pointer;
+  box-sizing: border-box;
+  min-width: 0;
 }
 
 .measure-chord:last-child {

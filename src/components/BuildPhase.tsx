@@ -3,7 +3,6 @@ import ChordPalette from './ChordPalette';
 import ChordSequence from './ChordSequence';
 import PlaybackControls from './PlaybackControls';
 import VisualizationPreview from './VisualizationPreview';
-import SectionManager from './SectionManager';
 import { generateKeyColor, generateChordColor, hslToCSS } from '../utils/colorGenerator';
 import { getChordDisplayName } from '../utils/diatonic';
 import { analyzeHarmonicFunction } from '../utils/harmonicAnalysis';
@@ -12,6 +11,7 @@ import './BuildPhase.css';
 interface BuildPhaseProps {
   selectedKey: Key;
   chords: Chord[];
+  allChords: Chord[]; // All chords from all sections for playback
   onChordSelect: (chord: Chord) => void;
   onRemoveChord: (index: number) => void;
   onSelectChord: (index: number) => void;
@@ -37,6 +37,7 @@ interface BuildPhaseProps {
 const BuildPhase = ({
   selectedKey,
   chords,
+  allChords,
   onChordSelect,
   onRemoveChord,
   onSelectChord,
@@ -73,29 +74,23 @@ const BuildPhase = ({
 
   return (
     <div className="build-phase">
-      <SectionManager
-        sections={sections}
-        currentSectionId={currentSectionId}
-        onSectionSelect={onSectionSelect}
-        onSectionAdd={onSectionAdd}
-        onSectionRemove={onSectionRemove}
-        onSectionNameChange={onSectionNameChange}
-        onSectionKeyChange={onSectionKeyChange}
-      />
       <ChordPalette selectedKey={selectedKey} onChordSelect={onChordSelect} hueRotation={hueRotation} />
       <ChordSequence
         sections={sections}
         currentSectionId={currentSectionId}
+        currentSectionKey={selectedKey}
         onRemoveChord={onRemoveChord}
         onSelectChord={onSelectChord}
         onSectionSelect={onSectionSelect}
         onSectionAdd={onSectionAdd}
+        onSectionRemove={onSectionRemove}
+        onSectionKeyChange={onSectionKeyChange}
         currentIndex={currentIndex}
         selectedIndex={selectedIndex}
         timeSignature={timeSignature}
       />
       <PlaybackControls
-        chords={chords}
+        chords={allChords}
         onPlayingIndexChange={onPlayingIndexChange}
         onPlaybackPositionChange={onPlaybackPositionChange}
         onTimeSignatureChange={onTimeSignatureChange}

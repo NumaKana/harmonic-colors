@@ -4,11 +4,12 @@ import './KeySelector.css';
 interface KeySelectorProps {
   selectedKey: Key;
   onKeyChange: (key: Key) => void;
+  compact?: boolean;
 }
 
 const NOTES: Note[] = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
-const KeySelector = ({ selectedKey, onKeyChange }: KeySelectorProps) => {
+const KeySelector = ({ selectedKey, onKeyChange, compact = false }: KeySelectorProps) => {
   const handleTonicChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newKey: Key = {
       tonic: e.target.value as Note,
@@ -26,9 +27,9 @@ const KeySelector = ({ selectedKey, onKeyChange }: KeySelectorProps) => {
   };
 
   return (
-    <div className="key-selector">
+    <div className={`key-selector ${compact ? 'key-selector-compact' : ''}`}>
       <div className="key-selector-group">
-        <label htmlFor="tonic-select">Key:</label>
+        {!compact && <label htmlFor="tonic-select">Key:</label>}
         <select
           id="tonic-select"
           value={selectedKey.tonic}
