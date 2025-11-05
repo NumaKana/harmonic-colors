@@ -1,0 +1,83 @@
+.editable-chord-info {
+  background-color: #1e1e1e;
+  border: 2px solid #667eea;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.edit-section-title {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  color: #667eea;
+  font-weight: 600;
+}
+
+.edit-section {
+  margin-bottom: 1rem;
+}
+
+.edit-section:last-child {
+  margin-bottom: 0;
+}
+
+.edit-label {
+  display: block;
+  font-size: 0.9rem;
+  color: #aaa;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.edit-button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.edit-button {
+  padding: 0.4rem 0.8rem;
+  background-color: #2a2a2a;
+  border: 2px solid #444;
+  border-radius: 6px;
+  color: #ccc;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 40px;
+}
+
+.edit-button:hover {
+  background-color: #333;
+  border-color: #667eea;
+}
+
+.edit-button.active {
+  background-color: #667eea;
+  border-color: #667eea;
+  color: #fff;
+  font-weight: 600;
+}
+
+.edit-duration-select {
+  width: 100%;
+  padding: 0.5rem;
+  background-color: #2a2a2a;
+  border: 2px solid #444;
+  border-radius: 6px;
+  color: #ccc;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.edit-duration-select:hover {
+  border-color: #667eea;
+}
+
+.edit-duration-select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
