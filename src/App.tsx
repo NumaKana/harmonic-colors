@@ -49,7 +49,9 @@ function App() {
   const handleAddChord = (chord: Chord) => {
     setSections(sections.map(section => {
       if (section.id === currentSectionId) {
-        const newChords = [...section.chords, chord];
+        // Add sectionId to the chord
+        const chordWithSection = { ...chord, sectionId: section.id };
+        const newChords = [...section.chords, chordWithSection];
         // Auto-select the newly added chord
         setSelectedChordIndex(newChords.length - 1);
         return { ...section, chords: newChords };
@@ -109,7 +111,9 @@ function App() {
       if (section.id === currentSectionId) {
         return {
           ...section,
-          chords: section.chords.map((chord, i) => i === index ? updatedChord : chord)
+          chords: section.chords.map((chord, i) =>
+            i === index ? { ...updatedChord, sectionId: section.id } : chord
+          )
         };
       }
       return section;
@@ -251,6 +255,7 @@ function App() {
             currentChord={currentChord}
             chordProgression={chordProgression}
             allChords={allChords}
+            sections={sections}
             currentChordIndex={currentChordIndex}
             playbackPosition={playbackPosition}
             bpm={bpm}

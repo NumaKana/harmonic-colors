@@ -19,6 +19,7 @@ export interface Chord {
   tensions: Tension[];
   alterations: Alteration[];
   duration: number; // in beats
+  sectionId?: string; // ID of the section this chord belongs to (for multi-section progressions)
 }
 
 export interface Key {

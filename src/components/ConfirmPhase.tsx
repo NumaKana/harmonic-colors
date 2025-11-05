@@ -1,4 +1,4 @@
-import { Key, Chord } from '../types';
+import { Key, Chord, Section } from '../types';
 import VisualizationCanvas from './VisualizationCanvas';
 import ChordNameBar from './ChordNameBar';
 import './ConfirmPhase.css';
@@ -8,6 +8,7 @@ interface ConfirmPhaseProps {
   currentChord?: Chord;
   chordProgression: Chord[];
   allChords: Chord[]; // All chords from all sections for playback
+  sections: Section[]; // All sections for key lookup
   currentChordIndex: number;
   playbackPosition: number;
   bpm: number;
@@ -23,6 +24,7 @@ const ConfirmPhase = ({
   currentChord,
   chordProgression,
   allChords,
+  sections,
   currentChordIndex,
   playbackPosition,
   bpm,
@@ -43,6 +45,7 @@ const ConfirmPhase = ({
         selectedKey={selectedKey}
         currentChord={currentChord}
         chordProgression={allChords}
+        sections={sections}
         currentChordIndex={currentChordIndex}
         playbackPosition={playbackPosition}
         bpm={bpm}
