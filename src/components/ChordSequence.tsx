@@ -267,7 +267,7 @@ const ChordSequence = ({ sections, currentSectionId, currentSectionKey, onRemove
 
               {/* Measures */}
               <div className="measure-row">
-                {row.map((measure, colIndex) => {
+                {row.map((measure) => {
                   // Calculate measure width: each measure takes 1/4 of the row (25%)
                   const measureWidthPercent = (1 / 4) * 100;
 
