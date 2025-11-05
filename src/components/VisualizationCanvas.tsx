@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Chord, Key } from '../types';
+import { Chord, Key, Section } from '../types';
 import TimelineVisualization from './TimelineVisualization';
 import CompactPlayButton from './CompactPlayButton';
 import './VisualizationCanvas.css';
@@ -10,6 +10,7 @@ interface VisualizationCanvasProps {
   currentChord?: Chord;
   hueRotation?: number;
   chordProgression?: Chord[];
+  sections?: Section[]; // All sections for key lookup
   currentChordIndex?: number;
   playbackPosition?: number;
   bpm?: number;
@@ -23,6 +24,7 @@ const VisualizationCanvas = ({
   selectedKey,
   hueRotation = 0,
   chordProgression = [],
+  sections = [],
   currentChordIndex = -1,
   playbackPosition = 0,
   bpm = 120,
@@ -99,6 +101,7 @@ const VisualizationCanvas = ({
             <TimelineVisualization
               chords={chordProgression}
               selectedKey={selectedKey}
+              sections={sections}
               currentIndex={currentChordIndex}
               playbackPosition={playbackPosition}
               mode={timelineMode}

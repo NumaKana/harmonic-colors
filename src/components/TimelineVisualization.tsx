@@ -6,7 +6,7 @@
 import { useRef, useMemo, useEffect, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { OrthographicCamera } from 'three';
-import { Chord, Key } from '../types';
+import { Chord, Key, Section } from '../types';
 import { generateKeyColor, generateChordColor, getMarbleRatio, generateParticles } from '../utils/colorGenerator';
 import TimelineSegment from './TimelineSegment';
 import ParticleSystem from './ParticleSystem';
@@ -14,6 +14,7 @@ import ParticleSystem from './ParticleSystem';
 interface TimelineVisualizationProps {
   chords: Chord[];
   selectedKey: Key;
+  sections?: Section[]; // All sections for key lookup
   currentIndex: number;
   playbackPosition: number;
   mode: 'playback' | 'preview';
@@ -23,6 +24,7 @@ interface TimelineVisualizationProps {
 const TimelineVisualization = ({
   chords,
   selectedKey,
+  sections = [],
   currentIndex,
   playbackPosition,
   mode,
@@ -40,12 +42,18 @@ const TimelineVisualization = ({
 
   // Generate color data for all chords
   const segmentData = useMemo(() => {
-    const keyColor = generateKeyColor(selectedKey, hueRotation);
     let currentX = 0;
 
     return chords.map((chord) => {
-      const chordColor = generateChordColor(chord, selectedKey, keyColor);
-      const marbleRatio = getMarbleRatio(chord, selectedKey);
+      // Find the section key for this chord
+      const chordKey = chord.sectionId && sections.length > 0
+        ? sections.find(s => s.id === chord.sectionId)?.key || selectedKey
+        : selectedKey;
+
+      // Generate colors using the chord's section key
+      const keyColor = generateKeyColor(chordKey, hueRotation);
+      const chordColor = generateChordColor(chord, chordKey, keyColor);
+      const marbleRatio = getMarbleRatio(chord, chordKey);
       const particles = generateParticles(chord); // Generate particles for tensions
       const width = chord.duration * 0.5; // Scale duration to visual width
 
@@ -62,7 +70,7 @@ const TimelineVisualization = ({
       currentX += width;
       return segment;
     });
-  }, [chords, selectedKey, hueRotation]);
+  }, [chords, selectedKey, sections, hueRotation]);
 
   // Calculate total width
   const totalWidth = useMemo(() => {
