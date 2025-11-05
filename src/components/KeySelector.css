@@ -50,3 +50,17 @@
   font-weight: 600;
   font-size: 1rem;
 }
+
+/* Compact mode for inline use */
+.key-selector-compact {
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  gap: 0.5rem;
+}
+
+.key-selector-compact .key-select {
+  padding: 0.35rem 0.5rem;
+  font-size: 0.85rem;
+  min-width: 70px;
+}

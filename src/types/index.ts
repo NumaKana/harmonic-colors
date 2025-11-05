@@ -59,3 +59,10 @@ export interface HarmonicFunction {
   function: HarmonicFunctionType;
   isDiatonic: boolean;
 }
+
+export interface Section {
+  id: string;
+  name: string; // "Intro", "Verse", "Chorus", etc.
+  key: Key;
+  chords: Chord[];
+}

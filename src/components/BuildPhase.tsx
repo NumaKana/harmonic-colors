@@ -1,5 +1,4 @@
-import { Key, Chord } from '../types';
-import KeySelector from './KeySelector';
+import { Key, Chord, Section } from '../types';
 import ChordPalette from './ChordPalette';
 import ChordSequence from './ChordSequence';
 import PlaybackControls from './PlaybackControls';
@@ -11,8 +10,8 @@ import './BuildPhase.css';
 
 interface BuildPhaseProps {
   selectedKey: Key;
-  onKeyChange: (key: Key) => void;
   chords: Chord[];
+  allChords: Chord[]; // All chords from all sections for playback
   onChordSelect: (chord: Chord) => void;
   onRemoveChord: (index: number) => void;
   onSelectChord: (index: number) => void;
@@ -25,12 +24,20 @@ interface BuildPhaseProps {
   onBpmChange: (bpm: number) => void;
   onMetronomeChange: (enabled: boolean) => void;
   hueRotation: number;
+  // Section management
+  sections: Section[];
+  currentSectionId: string;
+  onSectionSelect: (id: string) => void;
+  onSectionAdd: () => void;
+  onSectionRemove: (id: string) => void;
+  onSectionNameChange: (id: string, name: string) => void;
+  onSectionKeyChange: (id: string, key: Key) => void;
 }
 
 const BuildPhase = ({
   selectedKey,
-  onKeyChange,
   chords,
+  allChords,
   onChordSelect,
   onRemoveChord,
   onSelectChord,
@@ -42,7 +49,14 @@ const BuildPhase = ({
   onTimeSignatureChange,
   onBpmChange,
   onMetronomeChange,
-  hueRotation
+  hueRotation,
+  sections,
+  currentSectionId,
+  onSectionSelect,
+  onSectionAdd,
+  onSectionRemove,
+  onSectionNameChange,
+  onSectionKeyChange
 }: BuildPhaseProps) => {
   // Get current chord for preview
   const currentChord = selectedIndex !== undefined && selectedIndex >= 0
@@ -60,18 +74,23 @@ const BuildPhase = ({
 
   return (
     <div className="build-phase">
-      <KeySelector selectedKey={selectedKey} onKeyChange={onKeyChange} />
       <ChordPalette selectedKey={selectedKey} onChordSelect={onChordSelect} hueRotation={hueRotation} />
       <ChordSequence
-        chords={chords}
+        sections={sections}
+        currentSectionId={currentSectionId}
+        currentSectionKey={selectedKey}
         onRemoveChord={onRemoveChord}
         onSelectChord={onSelectChord}
+        onSectionSelect={onSectionSelect}
+        onSectionAdd={onSectionAdd}
+        onSectionRemove={onSectionRemove}
+        onSectionKeyChange={onSectionKeyChange}
         currentIndex={currentIndex}
         selectedIndex={selectedIndex}
         timeSignature={timeSignature}
       />
       <PlaybackControls
-        chords={chords}
+        chords={allChords}
         onPlayingIndexChange={onPlayingIndexChange}
         onPlaybackPositionChange={onPlaybackPositionChange}
         onTimeSignatureChange={onTimeSignatureChange}
