@@ -58,7 +58,7 @@ const BuildPhase = ({
   onSectionSelect,
   onSectionAdd,
   onSectionRemove,
-  onSectionNameChange,
+  onSectionNameChange: _onSectionNameChange,
   onSectionKeyChange
 }: BuildPhaseProps) => {
   // Get current chord for preview

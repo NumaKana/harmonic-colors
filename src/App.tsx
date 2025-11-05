@@ -120,15 +120,6 @@ function App() {
     }));
   };
 
-  const handleKeyChange = (newKey: Key) => {
-    setSections(sections.map(section => {
-      if (section.id === currentSectionId) {
-        return { ...section, key: newKey };
-      }
-      return section;
-    }));
-  };
-
   const handlePlayingIndexChange = (index: number) => {
     setCurrentChordIndex(index);
     if (index === -1) {

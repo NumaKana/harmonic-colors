@@ -22,7 +22,7 @@ interface ConfirmPhaseProps {
 const ConfirmPhase = ({
   selectedKey,
   currentChord,
-  chordProgression,
+  chordProgression: _chordProgression,
   allChords,
   sections,
   currentChordIndex,
