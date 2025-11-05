@@ -3,6 +3,7 @@ import ChordPalette from './ChordPalette';
 import ChordSequence from './ChordSequence';
 import PlaybackControls from './PlaybackControls';
 import VisualizationPreview from './VisualizationPreview';
+import EditableChordInfo from './EditableChordInfo';
 import { generateKeyColor, generateChordColor, hslToCSS } from '../utils/colorGenerator';
 import { getChordDisplayName } from '../utils/diatonic';
 import { analyzeHarmonicFunction } from '../utils/harmonicAnalysis';
@@ -15,6 +16,7 @@ interface BuildPhaseProps {
   onChordSelect: (chord: Chord) => void;
   onRemoveChord: (index: number) => void;
   onSelectChord: (index: number) => void;
+  onUpdateChord: (index: number, chord: Chord) => void;
   currentIndex?: number;
   selectedIndex?: number;
   timeSignature: number;
@@ -41,6 +43,7 @@ const BuildPhase = ({
   onChordSelect,
   onRemoveChord,
   onSelectChord,
+  onUpdateChord,
   currentIndex,
   selectedIndex,
   timeSignature,
@@ -159,6 +162,15 @@ const BuildPhase = ({
           </div>
         )}
       </div>
+
+      {/* Editable chord info when a chord is selected */}
+      {selectedIndex !== undefined && selectedIndex >= 0 && currentChord && (
+        <EditableChordInfo
+          chord={currentChord}
+          chordIndex={selectedIndex}
+          onUpdate={onUpdateChord}
+        />
+      )}
     </div>
   );
 };

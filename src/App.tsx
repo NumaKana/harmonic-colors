@@ -104,6 +104,18 @@ function App() {
     setSelectedChordIndex(index);
   };
 
+  const handleUpdateChord = (index: number, updatedChord: Chord) => {
+    setSections(sections.map(section => {
+      if (section.id === currentSectionId) {
+        return {
+          ...section,
+          chords: section.chords.map((chord, i) => i === index ? updatedChord : chord)
+        };
+      }
+      return section;
+    }));
+  };
+
   const handleKeyChange = (newKey: Key) => {
     setSections(sections.map(section => {
       if (section.id === currentSectionId) {
@@ -215,6 +227,7 @@ function App() {
             onChordSelect={handleAddChord}
             onRemoveChord={handleRemoveChord}
             onSelectChord={handleSelectChord}
+            onUpdateChord={handleUpdateChord}
             currentIndex={currentChordIndex >= 0 ? currentChordIndex : undefined}
             selectedIndex={selectedChordIndex !== null ? selectedChordIndex : undefined}
             timeSignature={timeSignature}
