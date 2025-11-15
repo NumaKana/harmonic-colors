@@ -18,7 +18,8 @@ interface BuildPhaseProps {
   onSelectChord: (index: number) => void;
   onUpdateChord: (index: number, chord: Chord) => void;
   currentIndex?: number;
-  selectedIndex?: number;
+  selectedIndex?: number; // Global index of selected chord
+  localSelectedIndex?: number; // Local index within current section
   timeSignature: number;
   onPlayingIndexChange: (index: number) => void;
   onPlaybackPositionChange: (position: number) => void;
@@ -48,6 +49,7 @@ const BuildPhase = ({
   onUpdateChord,
   currentIndex,
   selectedIndex,
+  localSelectedIndex,
   timeSignature,
   onPlayingIndexChange,
   onPlaybackPositionChange,
@@ -65,9 +67,9 @@ const BuildPhase = ({
   onSectionNameChange: _onSectionNameChange,
   onSectionKeyChange
 }: BuildPhaseProps) => {
-  // Get current chord for preview
-  const currentChord = selectedIndex !== undefined && selectedIndex >= 0
-    ? chords[selectedIndex]
+  // Get current chord for preview using local index
+  const currentChord = localSelectedIndex !== undefined && localSelectedIndex >= 0
+    ? chords[localSelectedIndex]
     : chords.length > 0
     ? chords[chords.length - 1]
     : undefined;
@@ -169,7 +171,7 @@ const BuildPhase = ({
       </div>
 
       {/* Editable chord info when a chord is selected */}
-      {selectedIndex !== undefined && selectedIndex >= 0 && currentChord && (
+      {selectedIndex !== undefined && selectedIndex >= 0 && localSelectedIndex !== undefined && currentChord && (
         <EditableChordInfo
           chord={currentChord}
           chordIndex={selectedIndex}
