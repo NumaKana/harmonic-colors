@@ -20,6 +20,8 @@ interface TimelineVisualizationProps {
   mode: 'playback' | 'preview';
   hueRotation?: number;
   visualizationStyle?: VisualizationStyle;
+  onScrollInfoChange?: (info: { progress: number; totalWidth: number; viewWidth: number }) => void;
+  onSetCameraPosition?: (handler: (progress: number) => void) => void;
 }
 
 const TimelineVisualization = ({
@@ -30,7 +32,9 @@ const TimelineVisualization = ({
   playbackPosition,
   mode,
   hueRotation = 0,
-  visualizationStyle = 'marble'
+  visualizationStyle = 'marble',
+  onScrollInfoChange,
+  onSetCameraPosition
 }: TimelineVisualizationProps) => {
   const { camera, gl } = useThree();
   const cameraRef = useRef<OrthographicCamera>(camera as OrthographicCamera);
@@ -91,8 +95,8 @@ const TimelineVisualization = ({
 
     if (mode === 'preview') {
       // Preview mode: Fixed viewport width, scrollable content
-      // 1 beat = 0.5 units, show about 8 beats at once
-      const viewWidth = 4.0; // Show 8 beats worth of content (8 * 0.5 = 4.0 units)
+      // 1 beat = 0.5 units, show about 16 beats at once (increased from 8)
+      const viewWidth = 8.0; // Show 16 beats worth of content (16 * 0.5 = 8.0 units)
 
       cam.left = -viewWidth / 2;
       cam.right = viewWidth / 2;
@@ -105,7 +109,7 @@ const TimelineVisualization = ({
       // Set camera to follow playback position (keeps bar at center)
       targetCameraX.current = playbackPosition * 0.5;
 
-      // Show a window of ~4 beats width
+      // Show a window of ~5 beats width (increased from 2.5)
       const viewWidth = 2.5;
       cam.left = -viewWidth / 2;
       cam.right = viewWidth / 2;
@@ -137,7 +141,7 @@ const TimelineVisualization = ({
       const newX = cameraStartXRef.current + worldDelta;
 
       // Clamp camera position to valid range
-      const viewWidth = 4.0;
+      const viewWidth = 8.0;
       const minX = viewWidth / 2;
       const maxX = totalWidth - viewWidth / 2;
       const clampedX = Math.max(minX, Math.min(maxX, newX));
@@ -173,10 +177,39 @@ const TimelineVisualization = ({
   // Reset preview camera position when switching to preview mode
   useEffect(() => {
     if (mode === 'preview') {
-      const viewWidth = 4.0;
+      const viewWidth = 8.0;
       setPreviewCameraX(viewWidth / 2); // Start at the beginning
     }
   }, [mode]);
+
+  // Notify parent of scroll info changes
+  useEffect(() => {
+    if (mode === 'preview' && onScrollInfoChange) {
+      const viewWidth = 8.0;
+      const scrollableWidth = totalWidth - viewWidth;
+      const progress = scrollableWidth > 0 ? (previewCameraX - viewWidth / 2) / scrollableWidth : 0;
+      onScrollInfoChange({
+        progress: Math.max(0, Math.min(1, progress)),
+        totalWidth,
+        viewWidth
+      });
+    }
+  }, [mode, previewCameraX, totalWidth, onScrollInfoChange]);
+
+  // Provide camera position setter to parent
+  useEffect(() => {
+    if (!onSetCameraPosition) return;
+
+    const handleSetPosition = (progress: number) => {
+      const viewWidth = 8.0;
+      const scrollableWidth = totalWidth - viewWidth;
+      const newX = viewWidth / 2 + progress * scrollableWidth;
+
+      setPreviewCameraX(newX);
+    };
+
+    onSetCameraPosition(handleSetPosition);
+  }, [totalWidth, onSetCameraPosition]);
 
   // Smooth camera movement for playback mode
   useFrame(() => {
