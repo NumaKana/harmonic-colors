@@ -24,6 +24,7 @@ const ParticleSystem = ({
   const pointsRefs = useRef<Array<THREE.Points<THREE.BufferGeometry> | null>>([]);
 
   // Generate particle geometry and materials for each particle config
+  // Only regenerate when width/height change, not when particles array reference changes
   const particleSystems = useMemo(() => {
     return particles.map((config) => {
       const count = config.count;
@@ -76,7 +77,8 @@ const ParticleSystem = ({
         config
       };
     });
-  }, [particles, width, height]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [width, height]);
 
   // Animate particles
   useFrame((state) => {
