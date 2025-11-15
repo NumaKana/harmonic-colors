@@ -1,4 +1,4 @@
-import { Key, Note, Chord } from '../types';
+import { Key, Note, Chord, MinorScaleType } from '../types';
 
 const NOTES: Note[] = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
@@ -21,7 +21,7 @@ function getNote(root: Note, semitones: number): Note {
 /**
  * Generate diatonic chords for a given key
  */
-export function getDiatonicChords(key: Key): Chord[] {
+export function getDiatonicChords(key: Key, minorScaleType: MinorScaleType = 'melodic'): Chord[] {
   const { tonic, mode } = key;
 
   if (mode === 'major') {
@@ -36,31 +36,65 @@ export function getDiatonicChords(key: Key): Chord[] {
       { root: getNote(tonic, 11), quality: 'diminished', tensions: [], alterations: [], duration: 4 }, // vii°
     ];
   } else {
-    // Minor key: i, ii°, III, iv, v, VI, VII
-    return [
-      { root: getNote(tonic, 0), quality: 'minor', tensions: [], alterations: [], duration: 4 },       // i
-      { root: getNote(tonic, 2), quality: 'diminished', tensions: [], alterations: [], duration: 4 },  // ii°
-      { root: getNote(tonic, 3), quality: 'major', tensions: [], alterations: [], duration: 4 },       // III
-      { root: getNote(tonic, 5), quality: 'minor', tensions: [], alterations: [], duration: 4 },       // iv
-      { root: getNote(tonic, 7), quality: 'minor', tensions: [], alterations: [], duration: 4 },       // v
-      { root: getNote(tonic, 8), quality: 'major', tensions: [], alterations: [], duration: 4 },       // VI
-      { root: getNote(tonic, 10), quality: 'major', tensions: [], alterations: [], duration: 4 },      // VII
-    ];
+    // Minor key - varies by scale type
+    if (minorScaleType === 'natural') {
+      // Natural minor: i, ii°, III, iv, v, VI, VII
+      return [
+        { root: getNote(tonic, 0), quality: 'minor', tensions: [], alterations: [], duration: 4 },       // i
+        { root: getNote(tonic, 2), quality: 'diminished', tensions: [], alterations: [], duration: 4 },  // ii°
+        { root: getNote(tonic, 3), quality: 'major', tensions: [], alterations: [], duration: 4 },       // III
+        { root: getNote(tonic, 5), quality: 'minor', tensions: [], alterations: [], duration: 4 },       // iv
+        { root: getNote(tonic, 7), quality: 'minor', tensions: [], alterations: [], duration: 4 },       // v
+        { root: getNote(tonic, 8), quality: 'major', tensions: [], alterations: [], duration: 4 },       // VI
+        { root: getNote(tonic, 10), quality: 'major', tensions: [], alterations: [], duration: 4 },      // VII
+      ];
+    } else if (minorScaleType === 'harmonic') {
+      // Harmonic minor: i, ii°, III+, iv, V, VI, vii°
+      return [
+        { root: getNote(tonic, 0), quality: 'minor', tensions: [], alterations: [], duration: 4 },       // i
+        { root: getNote(tonic, 2), quality: 'diminished', tensions: [], alterations: [], duration: 4 },  // ii°
+        { root: getNote(tonic, 3), quality: 'augmented', tensions: [], alterations: [], duration: 4 },   // III+
+        { root: getNote(tonic, 5), quality: 'minor', tensions: [], alterations: [], duration: 4 },       // iv
+        { root: getNote(tonic, 7), quality: 'major', tensions: [], alterations: [], duration: 4 },       // V (raised 7th)
+        { root: getNote(tonic, 8), quality: 'major', tensions: [], alterations: [], duration: 4 },       // VI
+        { root: getNote(tonic, 11), quality: 'diminished', tensions: [], alterations: [], duration: 4 }, // vii°
+      ];
+    } else {
+      // Melodic minor (ascending): i, ii, III+, IV, V, vi°, vii°
+      return [
+        { root: getNote(tonic, 0), quality: 'minor', tensions: [], alterations: [], duration: 4 },       // i
+        { root: getNote(tonic, 2), quality: 'minor', tensions: [], alterations: [], duration: 4 },       // ii (raised 6th)
+        { root: getNote(tonic, 3), quality: 'augmented', tensions: [], alterations: [], duration: 4 },   // III+
+        { root: getNote(tonic, 5), quality: 'major', tensions: [], alterations: [], duration: 4 },       // IV (raised 6th)
+        { root: getNote(tonic, 7), quality: 'major', tensions: [], alterations: [], duration: 4 },       // V (raised 7th)
+        { root: getNote(tonic, 9), quality: 'diminished', tensions: [], alterations: [], duration: 4 },  // vi° (raised 6th)
+        { root: getNote(tonic, 11), quality: 'diminished', tensions: [], alterations: [], duration: 4 }, // vii° (raised 7th)
+      ];
+    }
   }
 }
 
 /**
  * Get the roman numeral for a diatonic chord
  */
-export function getRomanNumeral(key: Key, chordIndex: number): string {
+export function getRomanNumeral(key: Key, chordIndex: number, minorScaleType: MinorScaleType = 'melodic'): string {
   const { mode } = key;
 
   if (mode === 'major') {
     const numerals = ['I', 'ii', 'iii', 'IV', 'V', 'vi', 'vii°'];
     return numerals[chordIndex] || '';
   } else {
-    const numerals = ['i', 'ii°', 'III', 'iv', 'v', 'VI', 'VII'];
-    return numerals[chordIndex] || '';
+    if (minorScaleType === 'natural') {
+      const numerals = ['i', 'ii°', 'III', 'iv', 'v', 'VI', 'VII'];
+      return numerals[chordIndex] || '';
+    } else if (minorScaleType === 'harmonic') {
+      const numerals = ['i', 'ii°', 'III+', 'iv', 'V', 'VI', 'vii°'];
+      return numerals[chordIndex] || '';
+    } else {
+      // Melodic minor
+      const numerals = ['i', 'ii', 'III+', 'IV', 'V', 'vi°', 'vii°'];
+      return numerals[chordIndex] || '';
+    }
   }
 }
 

@@ -174,6 +174,68 @@
   transform: translateY(1px);
 }
 
+/* Minor Scale Type Controls */
+.settings-sidebar .minor-scale-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.settings-sidebar .minor-scale-option {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 1rem;
+  background-color: #2a2a2a;
+  border: 2px solid #555;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.settings-sidebar .minor-scale-option:hover {
+  border-color: #667eea;
+  background-color: #2f2f2f;
+}
+
+.settings-sidebar .minor-scale-option input[type="radio"] {
+  display: none;
+}
+
+.settings-sidebar .minor-scale-option input[type="radio"]:checked + .minor-scale-label {
+  color: #667eea;
+  font-weight: 600;
+}
+
+.settings-sidebar .minor-scale-option input[type="radio"]:checked ~ .minor-scale-detail {
+  color: #aaa;
+}
+
+.settings-sidebar .minor-scale-option input[type="radio"]:checked + .minor-scale-label::before {
+  content: '✓ ';
+  color: #667eea;
+  font-weight: bold;
+}
+
+.settings-sidebar .minor-scale-option:has(input:checked) {
+  border-color: #667eea;
+  background-color: rgba(102, 126, 234, 0.1);
+}
+
+.settings-sidebar .minor-scale-label {
+  font-size: 1rem;
+  color: #ccc;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.settings-sidebar .minor-scale-detail {
+  font-size: 0.85rem;
+  color: #888;
+  font-family: 'Courier New', monospace;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .settings-sidebar {
