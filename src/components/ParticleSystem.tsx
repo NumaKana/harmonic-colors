@@ -41,8 +41,10 @@ const ParticleSystem = ({
         positions[i3 + 2] = 0; // z
 
         // Random velocity for floating animation (very slow movement)
-        velocities[i3] = (Math.random() - 0.5) * 0.002; // x velocity (very slow)
-        velocities[i3 + 1] = (Math.random() - 0.5) * 0.002; // y velocity (very slow)
+        // Scale velocity by width to maintain consistent relative speed
+        const velocityScale = Math.min(width / 2.0, 1.0); // Normalize to reference width of 2.0
+        velocities[i3] = (Math.random() - 0.5) * 0.002 * velocityScale; // x velocity (very slow)
+        velocities[i3 + 1] = (Math.random() - 0.5) * 0.002 * velocityScale; // y velocity (very slow)
         velocities[i3 + 2] = 0; // z velocity
 
         // Random phase for animation variation
@@ -89,14 +91,17 @@ const ParticleSystem = ({
       const phases = geometry.attributes.phase.array as Float32Array;
       const count = particleSystems[index].count;
 
+      // Scale float amplitude by width to maintain consistent relative movement
+      const floatScale = Math.min(width / 2.0, 1.0); // Normalize to reference width of 2.0
+
       // Update each particle position
       for (let i = 0; i < count; i++) {
         const i3 = i * 3;
         const phase = phases[i];
 
         // Floating animation with sine wave (very slow and gentle)
-        const floatX = Math.sin(time * 0.1 + phase) * 0.001;
-        const floatY = Math.cos(time * 0.15 + phase) * 0.001;
+        const floatX = Math.sin(time * 0.1 + phase) * 0.001 * floatScale;
+        const floatY = Math.cos(time * 0.15 + phase) * 0.001 * floatScale;
 
         // Update position with velocity and floating
         positions[i3] += velocities[i3] + floatX;
