@@ -61,17 +61,28 @@ function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
 
   const handleAddChord = (chord: Chord) => {
+    // Calculate the global index for the new chord
+    let globalIndex = 0;
+    for (const section of sections) {
+      if (section.id === currentSectionId) {
+        globalIndex += section.chords.length; // Position after all chords in current section
+        break;
+      }
+      globalIndex += section.chords.length;
+    }
+
     setSections(sections.map(section => {
       if (section.id === currentSectionId) {
         // Add sectionId to the chord
         const chordWithSection = { ...chord, sectionId: section.id };
         const newChords = [...section.chords, chordWithSection];
-        // Auto-select the newly added chord
-        setSelectedChordIndex(newChords.length - 1);
         return { ...section, chords: newChords };
       }
       return section;
     }));
+
+    // Auto-select the newly added chord with global index
+    setSelectedChordIndex(globalIndex);
   };
 
   const handleRemoveChord = (globalIndex: number) => {
@@ -118,15 +129,44 @@ function App() {
 
   const handleSelectChord = (index: number) => {
     setSelectedChordIndex(index);
+
+    // Find which section contains this chord and switch to it
+    let currentGlobalIndex = 0;
+    for (const section of sections) {
+      if (index < currentGlobalIndex + section.chords.length) {
+        // This section contains the selected chord
+        if (currentSectionId !== section.id) {
+          setCurrentSectionId(section.id);
+        }
+        break;
+      }
+      currentGlobalIndex += section.chords.length;
+    }
   };
 
-  const handleUpdateChord = (index: number, updatedChord: Chord) => {
+  const handleUpdateChord = (globalIndex: number, updatedChord: Chord) => {
+    // Find which section contains the chord at this global index
+    let currentGlobalIndex = 0;
+    let targetSectionId: string | null = null;
+    let localIndex = -1;
+
+    for (const section of sections) {
+      if (globalIndex < currentGlobalIndex + section.chords.length) {
+        targetSectionId = section.id;
+        localIndex = globalIndex - currentGlobalIndex;
+        break;
+      }
+      currentGlobalIndex += section.chords.length;
+    }
+
+    if (targetSectionId === null) return; // Invalid index
+
     setSections(sections.map(section => {
-      if (section.id === currentSectionId) {
+      if (section.id === targetSectionId) {
         return {
           ...section,
           chords: section.chords.map((chord, i) =>
-            i === index ? { ...updatedChord, sectionId: section.id } : chord
+            i === localIndex ? { ...updatedChord, sectionId: section.id } : chord
           )
         };
       }
@@ -211,6 +251,25 @@ function App() {
     };
   }, []);
 
+  // Convert global selected index to local index for current section
+  const getLocalSelectedIndex = (): number | undefined => {
+    if (selectedChordIndex === null) return undefined;
+
+    let currentGlobalIndex = 0;
+    for (const section of sections) {
+      if (section.id === currentSectionId) {
+        const localIndex = selectedChordIndex - currentGlobalIndex;
+        // Check if the selected chord belongs to this section
+        if (localIndex >= 0 && localIndex < section.chords.length) {
+          return localIndex;
+        }
+        return undefined; // Selected chord is not in current section
+      }
+      currentGlobalIndex += section.chords.length;
+    }
+    return undefined;
+  };
+
   return (
     <div className="app">
       <header className="header">
@@ -249,6 +308,7 @@ function App() {
             onUpdateChord={handleUpdateChord}
             currentIndex={currentChordIndex >= 0 ? currentChordIndex : undefined}
             selectedIndex={selectedChordIndex !== null ? selectedChordIndex : undefined}
+            localSelectedIndex={getLocalSelectedIndex()}
             timeSignature={timeSignature}
             onPlayingIndexChange={handlePlayingIndexChange}
             onPlaybackPositionChange={handlePlaybackPositionChange}
