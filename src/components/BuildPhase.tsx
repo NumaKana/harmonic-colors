@@ -1,4 +1,4 @@
-import { Key, Chord, Section } from '../types';
+import { Key, Chord, Section, MinorScaleType } from '../types';
 import ChordPalette from './ChordPalette';
 import ChordSequence from './ChordSequence';
 import PlaybackControls from './PlaybackControls';
@@ -26,6 +26,7 @@ interface BuildPhaseProps {
   onBpmChange: (bpm: number) => void;
   onMetronomeChange: (enabled: boolean) => void;
   hueRotation: number;
+  minorScaleType: MinorScaleType;
   // Section management
   sections: Section[];
   currentSectionId: string;
@@ -53,6 +54,7 @@ const BuildPhase = ({
   onBpmChange,
   onMetronomeChange,
   hueRotation,
+  minorScaleType,
   sections,
   currentSectionId,
   onSectionSelect,
@@ -77,7 +79,7 @@ const BuildPhase = ({
 
   return (
     <div className="build-phase">
-      <ChordPalette selectedKey={selectedKey} onChordSelect={onChordSelect} hueRotation={hueRotation} />
+      <ChordPalette selectedKey={selectedKey} onChordSelect={onChordSelect} hueRotation={hueRotation} minorScaleType={minorScaleType} />
       <ChordSequence
         sections={sections}
         currentSectionId={currentSectionId}

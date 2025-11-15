@@ -1,4 +1,4 @@
-import { Key } from '../types';
+import { Key, MinorScaleType } from '../types';
 import HueWheel from './HueWheel';
 import './SettingsSidebar.css';
 
@@ -8,6 +8,8 @@ interface SettingsSidebarProps {
   hueRotation: number;
   onHueRotationChange: (rotation: number) => void;
   selectedKey: Key;
+  minorScaleType: MinorScaleType;
+  onMinorScaleTypeChange: (scaleType: MinorScaleType) => void;
 }
 
 const SettingsSidebar = ({
@@ -15,7 +17,9 @@ const SettingsSidebar = ({
   onClose,
   hueRotation,
   onHueRotationChange,
-  selectedKey
+  selectedKey,
+  minorScaleType,
+  onMinorScaleTypeChange
 }: SettingsSidebarProps) => {
   return (
     <>
@@ -78,6 +82,50 @@ const SettingsSidebar = ({
             <p className="settings-description">
               Click on the color wheel or use the input to adjust the hue rotation.
               This affects all chord colors in the visualization.
+            </p>
+          </div>
+
+          {/* Minor Scale Type Control */}
+          <div className="settings-section">
+            <h3 className="settings-section-title">Minor Scale Type</h3>
+            <div className="minor-scale-options">
+              <label className="minor-scale-option">
+                <input
+                  type="radio"
+                  name="minor-scale-type"
+                  value="natural"
+                  checked={minorScaleType === 'natural'}
+                  onChange={() => onMinorScaleTypeChange('natural')}
+                />
+                <span className="minor-scale-label">Natural Minor</span>
+                <span className="minor-scale-detail">i, ii°, III, iv, v, VI, VII</span>
+              </label>
+              <label className="minor-scale-option">
+                <input
+                  type="radio"
+                  name="minor-scale-type"
+                  value="harmonic"
+                  checked={minorScaleType === 'harmonic'}
+                  onChange={() => onMinorScaleTypeChange('harmonic')}
+                />
+                <span className="minor-scale-label">Harmonic Minor</span>
+                <span className="minor-scale-detail">i, ii°, III+, iv, V, VI, vii°</span>
+              </label>
+              <label className="minor-scale-option">
+                <input
+                  type="radio"
+                  name="minor-scale-type"
+                  value="melodic"
+                  checked={minorScaleType === 'melodic'}
+                  onChange={() => onMinorScaleTypeChange('melodic')}
+                />
+                <span className="minor-scale-label">Melodic Minor</span>
+                <span className="minor-scale-detail">i, ii, III+, IV, V, vi°, vii°</span>
+              </label>
+            </div>
+            <p className="settings-description">
+              Select the minor scale type for generating diatonic chords in minor keys.
+              This only affects minor keys; major keys remain unchanged.
             </p>
           </div>
         </div>

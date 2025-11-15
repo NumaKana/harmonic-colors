@@ -3,12 +3,13 @@ import './App.css';
 import BuildPhase from './components/BuildPhase';
 import ConfirmPhase from './components/ConfirmPhase';
 import SettingsSidebar from './components/SettingsSidebar';
-import { Key, Chord, Section } from './types';
+import { Key, Chord, Section, MinorScaleType } from './types';
 import { audioEngine } from './utils/audioEngine';
 
 type Phase = 'build' | 'confirm';
 
 const HUE_ROTATION_STORAGE_KEY = 'harmonic-colors-hue-rotation';
+const MINOR_SCALE_TYPE_STORAGE_KEY = 'harmonic-colors-minor-scale-type';
 
 function App() {
   const [currentPhase, setCurrentPhase] = useState<Phase>('build');
@@ -41,6 +42,12 @@ function App() {
   const [hueRotation, setHueRotation] = useState<number>(() => {
     const saved = localStorage.getItem(HUE_ROTATION_STORAGE_KEY);
     return saved !== null ? Number(saved) : 0;
+  });
+
+  // Load minorScaleType from LocalStorage (default: melodic)
+  const [minorScaleType, setMinorScaleType] = useState<MinorScaleType>(() => {
+    const saved = localStorage.getItem(MINOR_SCALE_TYPE_STORAGE_KEY);
+    return (saved as MinorScaleType) || 'melodic';
   });
 
   // Settings sidebar state
@@ -134,6 +141,11 @@ function App() {
   const handleHueRotationChange = (rotation: number) => {
     setHueRotation(rotation);
     localStorage.setItem(HUE_ROTATION_STORAGE_KEY, String(rotation));
+  };
+
+  const handleMinorScaleTypeChange = (scaleType: MinorScaleType) => {
+    setMinorScaleType(scaleType);
+    localStorage.setItem(MINOR_SCALE_TYPE_STORAGE_KEY, scaleType);
   };
 
   // Section management handlers
@@ -232,6 +244,7 @@ function App() {
             onBpmChange={setBpm}
             onMetronomeChange={setMetronomeEnabled}
             hueRotation={hueRotation}
+            minorScaleType={minorScaleType}
             sections={sections}
             currentSectionId={currentSectionId}
             onSectionSelect={setCurrentSectionId}
@@ -266,6 +279,8 @@ function App() {
         hueRotation={hueRotation}
         onHueRotationChange={handleHueRotationChange}
         selectedKey={selectedKey}
+        minorScaleType={minorScaleType}
+        onMinorScaleTypeChange={handleMinorScaleTypeChange}
       />
     </div>
   )

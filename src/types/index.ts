@@ -12,6 +12,8 @@ export type Tension = 9 | 11 | 13;
 
 export type Alteration = 'b9' | '#9' | '#11' | 'b13';
 
+export type MinorScaleType = 'natural' | 'harmonic' | 'melodic';
+
 export interface Chord {
   root: Note;
   quality: ChordQuality;

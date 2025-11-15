@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Key, Chord } from '../types';
+import { Key, Chord, MinorScaleType } from '../types';
 import { getDiatonicChords, getRomanNumeral, getChordDisplayName } from '../utils/diatonic';
 import { audioEngine } from '../utils/audioEngine';
 import ChordColorPreview from './ChordColorPreview';
@@ -10,6 +10,7 @@ interface ChordPaletteProps {
   selectedKey: Key;
   onChordSelect: (chord: Chord) => void;
   hueRotation?: number;
+  minorScaleType: MinorScaleType;
 }
 
 type NoteDuration = 4 | 3 | 2 | 1.5 | 1 | 0.75 | 0.5;
@@ -24,8 +25,8 @@ const DURATION_OPTIONS: { value: NoteDuration; label: string; symbol: string }[]
   { value: 0.5, label: 'Eighth Note', symbol: '♪' },
 ];
 
-const ChordPalette = ({ selectedKey, onChordSelect, hueRotation = 0 }: ChordPaletteProps) => {
-  const diatonicChords = getDiatonicChords(selectedKey);
+const ChordPalette = ({ selectedKey, onChordSelect, hueRotation = 0, minorScaleType }: ChordPaletteProps) => {
+  const diatonicChords = getDiatonicChords(selectedKey, minorScaleType);
   const [selectedDuration, setSelectedDuration] = useState<NoteDuration>(4);
   const [editingChord, setEditingChord] = useState<Chord | null>(null);
   const [isCreatingNew, setIsCreatingNew] = useState<boolean>(false);
@@ -122,9 +123,9 @@ const ChordPalette = ({ selectedKey, onChordSelect, hueRotation = 0 }: ChordPale
               <button
                 className="chord-button"
                 onClick={() => handleChordClick(chord)}
-                title={`${getRomanNumeral(selectedKey, index)} - ${getChordDisplayName(chord)}`}
+                title={`${getRomanNumeral(selectedKey, index, minorScaleType)} - ${getChordDisplayName(chord)}`}
               >
-                <div className="chord-button-roman">{getRomanNumeral(selectedKey, index)}</div>
+                <div className="chord-button-roman">{getRomanNumeral(selectedKey, index, minorScaleType)}</div>
                 <div className="chord-button-name">{getChordDisplayName(chord)}</div>
               </button>
               <button
