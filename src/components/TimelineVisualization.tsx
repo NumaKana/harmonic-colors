@@ -6,7 +6,7 @@
 import { useRef, useMemo, useEffect, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { OrthographicCamera } from 'three';
-import { Chord, Key, Section } from '../types';
+import { Chord, Key, Section, VisualizationStyle } from '../types';
 import { generateKeyColor, generateChordColor, getMarbleRatio, generateParticles } from '../utils/colorGenerator';
 import TimelineSegment from './TimelineSegment';
 import ParticleSystem from './ParticleSystem';
@@ -19,6 +19,7 @@ interface TimelineVisualizationProps {
   playbackPosition: number;
   mode: 'playback' | 'preview';
   hueRotation?: number;
+  visualizationStyle?: VisualizationStyle;
 }
 
 const TimelineVisualization = ({
@@ -28,7 +29,8 @@ const TimelineVisualization = ({
   currentIndex,
   playbackPosition,
   mode,
-  hueRotation = 0
+  hueRotation = 0,
+  visualizationStyle = 'marble'
 }: TimelineVisualizationProps) => {
   const { camera, gl } = useThree();
   const cameraRef = useRef<OrthographicCamera>(camera as OrthographicCamera);
@@ -208,6 +210,7 @@ const TimelineVisualization = ({
               nextColor1={nextSegment?.color1}
               nextColor2={nextSegment?.color2}
               blendWidth={0.3}
+              visualizationStyle={visualizationStyle}
             />
             {/* Render particles if tensions/alterations exist */}
             {segment.particles.length > 0 && (

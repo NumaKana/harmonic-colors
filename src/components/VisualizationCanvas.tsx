@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Chord, Key, Section } from '../types';
+import { Chord, Key, Section, VisualizationStyle } from '../types';
 import TimelineVisualization from './TimelineVisualization';
 import CompactPlayButton from './CompactPlayButton';
 import './VisualizationCanvas.css';
@@ -18,6 +18,7 @@ interface VisualizationCanvasProps {
   timeSignature?: number;
   onPlayingIndexChange?: (index: number) => void;
   onPlaybackPositionChange?: (position: number) => void;
+  visualizationStyle?: VisualizationStyle;
 }
 
 const VisualizationCanvas = ({
@@ -31,7 +32,8 @@ const VisualizationCanvas = ({
   metronomeEnabled = false,
   timeSignature = 4,
   onPlayingIndexChange,
-  onPlaybackPositionChange
+  onPlaybackPositionChange,
+  visualizationStyle = 'marble'
 }: VisualizationCanvasProps) => {
   const fallbackCanvasRef = useRef<HTMLDivElement>(null);
   const [webGLSupported, setWebGLSupported] = useState(true);
@@ -106,6 +108,7 @@ const VisualizationCanvas = ({
               playbackPosition={playbackPosition}
               mode={timelineMode}
               hueRotation={hueRotation}
+              visualizationStyle={visualizationStyle}
             />
           </Canvas>
           </div>

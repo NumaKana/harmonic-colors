@@ -14,6 +14,8 @@ export type Alteration = 'b9' | '#9' | '#11' | 'b13';
 
 export type MinorScaleType = 'natural' | 'harmonic' | 'melodic';
 
+export type VisualizationStyle = 'marble' | 'stripes';
+
 export interface Chord {
   root: Note;
   quality: ChordQuality;

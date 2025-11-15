@@ -1,6 +1,7 @@
 import { Canvas } from '@react-three/fiber';
-import { Key, Chord } from '../types';
+import { Key, Chord, VisualizationStyle } from '../types';
 import ColorGradientMesh from './ColorGradientMesh';
+import StripesVisualization from './StripesVisualization';
 import CameraReset from './CameraReset';
 import ParticleSystem from './ParticleSystem';
 import { generateKeyColor, generateChordColor, getMarbleRatio, generateParticles } from '../utils/colorGenerator';
@@ -10,9 +11,10 @@ interface VisualizationPreviewProps {
   selectedKey: Key;
   currentChord?: Chord;
   hueRotation?: number;
+  visualizationStyle?: VisualizationStyle;
 }
 
-const VisualizationPreview = ({ selectedKey, currentChord, hueRotation = 0 }: VisualizationPreviewProps) => {
+const VisualizationPreview = ({ selectedKey, currentChord, hueRotation = 0, visualizationStyle = 'marble' }: VisualizationPreviewProps) => {
   // Generate key color (base color)
   const keyColor = generateKeyColor(selectedKey, hueRotation);
 
@@ -38,11 +40,18 @@ const VisualizationPreview = ({ selectedKey, currentChord, hueRotation = 0 }: Vi
         style={{ width: '100%', height: '100%' }}
       >
         <CameraReset />
-        <ColorGradientMesh
-          color1={keyColor}
-          color2={chordColor}
-          marbleRatio={marbleRatio}
-        />
+        {visualizationStyle === 'marble' ? (
+          <ColorGradientMesh
+            color1={keyColor}
+            color2={chordColor}
+            marbleRatio={marbleRatio}
+          />
+        ) : (
+          <StripesVisualization
+            color1={keyColor}
+            color2={chordColor}
+          />
+        )}
         {/* Render particles if tensions/alterations exist */}
         {particles.length > 0 && (
           <ParticleSystem
