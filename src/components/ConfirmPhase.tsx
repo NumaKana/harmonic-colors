@@ -16,7 +16,8 @@ interface ConfirmPhaseProps {
   timeSignature: number;
   onPlayingIndexChange: (index: number) => void;
   onPlaybackPositionChange: (position: number) => void;
-  hueRotation: number;
+  majorHueRotation: number;
+  minorHueRotation: number;
   visualizationStyle: VisualizationStyle;
 }
 
@@ -33,7 +34,8 @@ const ConfirmPhase = ({
   timeSignature,
   onPlayingIndexChange,
   onPlaybackPositionChange,
-  hueRotation,
+  majorHueRotation,
+  minorHueRotation,
   visualizationStyle
 }: ConfirmPhaseProps) => {
   return (
@@ -55,7 +57,8 @@ const ConfirmPhase = ({
         timeSignature={timeSignature}
         onPlayingIndexChange={onPlayingIndexChange}
         onPlaybackPositionChange={onPlaybackPositionChange}
-        hueRotation={hueRotation}
+        majorHueRotation={majorHueRotation}
+        minorHueRotation={minorHueRotation}
         visualizationStyle={visualizationStyle}
       />
     </div>

@@ -7,7 +7,7 @@ import { useRef, useMemo, useEffect, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { OrthographicCamera } from 'three';
 import { Chord, Key, Section, VisualizationStyle } from '../types';
-import { generateKeyColor, generateChordColor, getMarbleRatio, generateParticles } from '../utils/colorGenerator';
+import { generateKeyColor, generateChordColor, getMarbleRatio, generateParticles, getHueRotationForKey } from '../utils/colorGenerator';
 import TimelineSegment from './TimelineSegment';
 import ParticleSystem from './ParticleSystem';
 
@@ -18,7 +18,8 @@ interface TimelineVisualizationProps {
   currentIndex: number;
   playbackPosition: number;
   mode: 'playback' | 'preview';
-  hueRotation?: number;
+  majorHueRotation?: number;
+  minorHueRotation?: number;
   visualizationStyle?: VisualizationStyle;
   onScrollInfoChange?: (info: { progress: number; totalWidth: number; viewWidth: number }) => void;
   onSetCameraPosition?: (handler: (progress: number) => void) => void;
@@ -31,7 +32,8 @@ const TimelineVisualization = ({
   currentIndex,
   playbackPosition,
   mode,
-  hueRotation = 0,
+  majorHueRotation = 0,
+  minorHueRotation = 0,
   visualizationStyle = 'marble',
   onScrollInfoChange,
   onSetCameraPosition
@@ -56,7 +58,10 @@ const TimelineVisualization = ({
         ? sections.find(s => s.id === chord.sectionId)?.key || selectedKey
         : selectedKey;
 
-      // Generate colors using the chord's section key
+      // Get the appropriate hue rotation for this chord's key
+      const hueRotation = getHueRotationForKey(chordKey, majorHueRotation, minorHueRotation);
+
+      // Generate colors using the chord's section key and appropriate hue rotation
       const keyColor = generateKeyColor(chordKey, hueRotation);
       const chordColor = generateChordColor(chord, chordKey, keyColor);
       const marbleRatio = getMarbleRatio(chord, chordKey);
@@ -81,7 +86,7 @@ const TimelineVisualization = ({
       currentX += width;
       return segment;
     });
-  }, [chords, selectedKey, sections, hueRotation]);
+  }, [chords, selectedKey, sections, majorHueRotation, minorHueRotation]);
 
   // Calculate total width
   const totalWidth = useMemo(() => {
