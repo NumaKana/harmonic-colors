@@ -1,4 +1,4 @@
-import { Key, Chord, Section, MinorScaleType } from '../types';
+import { Key, Chord, Section, MinorScaleType, VisualizationStyle } from '../types';
 import ChordPalette from './ChordPalette';
 import ChordSequence from './ChordSequence';
 import PlaybackControls from './PlaybackControls';
@@ -27,6 +27,7 @@ interface BuildPhaseProps {
   onMetronomeChange: (enabled: boolean) => void;
   hueRotation: number;
   minorScaleType: MinorScaleType;
+  visualizationStyle: VisualizationStyle;
   // Section management
   sections: Section[];
   currentSectionId: string;
@@ -55,6 +56,7 @@ const BuildPhase = ({
   onMetronomeChange,
   hueRotation,
   minorScaleType,
+  visualizationStyle,
   sections,
   currentSectionId,
   onSectionSelect,
@@ -107,6 +109,7 @@ const BuildPhase = ({
         selectedKey={selectedKey}
         currentChord={currentChord}
         hueRotation={hueRotation}
+        visualizationStyle={visualizationStyle}
       />
 
       <div className="visualization-info">

@@ -24,6 +24,7 @@ const ParticleSystem = ({
   const pointsRefs = useRef<Array<THREE.Points<THREE.BufferGeometry> | null>>([]);
 
   // Generate particle geometry and materials for each particle config
+  // Only regenerate when width/height change, not when particles array reference changes
   const particleSystems = useMemo(() => {
     return particles.map((config) => {
       const count = config.count;
@@ -40,9 +41,11 @@ const ParticleSystem = ({
         positions[i3 + 1] = (Math.random() - 0.5) * height; // y
         positions[i3 + 2] = 0; // z
 
-        // Random velocity for floating animation (slower movement)
-        velocities[i3] = (Math.random() - 0.5) * 0.005; // x velocity (much slower)
-        velocities[i3 + 1] = (Math.random() - 0.5) * 0.005; // y velocity (much slower)
+        // Random velocity for floating animation (very slow movement)
+        // Scale velocity by width to maintain consistent relative speed
+        const velocityScale = Math.min(width / 2.0, 1.0); // Normalize to reference width of 2.0
+        velocities[i3] = (Math.random() - 0.5) * 0.002 * velocityScale; // x velocity (very slow)
+        velocities[i3 + 1] = (Math.random() - 0.5) * 0.002 * velocityScale; // y velocity (very slow)
         velocities[i3 + 2] = 0; // z velocity
 
         // Random phase for animation variation
@@ -74,7 +77,8 @@ const ParticleSystem = ({
         config
       };
     });
-  }, [particles, width, height]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [width, height]);
 
   // Animate particles
   useFrame((state) => {
@@ -89,14 +93,17 @@ const ParticleSystem = ({
       const phases = geometry.attributes.phase.array as Float32Array;
       const count = particleSystems[index].count;
 
+      // Scale float amplitude by width to maintain consistent relative movement
+      const floatScale = Math.min(width / 2.0, 1.0); // Normalize to reference width of 2.0
+
       // Update each particle position
       for (let i = 0; i < count; i++) {
         const i3 = i * 3;
         const phase = phases[i];
 
-        // Floating animation with sine wave (slower and gentler)
-        const floatX = Math.sin(time * 0.2 + phase) * 0.003;
-        const floatY = Math.cos(time * 0.3 + phase) * 0.003;
+        // Floating animation with sine wave (very slow and gentle)
+        const floatX = Math.sin(time * 0.1 + phase) * 0.001 * floatScale;
+        const floatY = Math.cos(time * 0.15 + phase) * 0.001 * floatScale;
 
         // Update position with velocity and floating
         positions[i3] += velocities[i3] + floatX;
@@ -115,7 +122,7 @@ const ParticleSystem = ({
       geometry.attributes.position.needsUpdate = true;
 
       // Very slow rotation of entire particle system
-      points.rotation.z = Math.sin(time * 0.1) * 0.05;
+      points.rotation.z = Math.sin(time * 0.05) * 0.03;
     });
   });
 

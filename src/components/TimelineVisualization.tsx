@@ -6,7 +6,7 @@
 import { useRef, useMemo, useEffect, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { OrthographicCamera } from 'three';
-import { Chord, Key, Section } from '../types';
+import { Chord, Key, Section, VisualizationStyle } from '../types';
 import { generateKeyColor, generateChordColor, getMarbleRatio, generateParticles } from '../utils/colorGenerator';
 import TimelineSegment from './TimelineSegment';
 import ParticleSystem from './ParticleSystem';
@@ -19,6 +19,7 @@ interface TimelineVisualizationProps {
   playbackPosition: number;
   mode: 'playback' | 'preview';
   hueRotation?: number;
+  visualizationStyle?: VisualizationStyle;
 }
 
 const TimelineVisualization = ({
@@ -28,7 +29,8 @@ const TimelineVisualization = ({
   currentIndex,
   playbackPosition,
   mode,
-  hueRotation = 0
+  hueRotation = 0,
+  visualizationStyle = 'marble'
 }: TimelineVisualizationProps) => {
   const { camera, gl } = useThree();
   const cameraRef = useRef<OrthographicCamera>(camera as OrthographicCamera);
@@ -44,7 +46,7 @@ const TimelineVisualization = ({
   const segmentData = useMemo(() => {
     let currentX = 0;
 
-    return chords.map((chord) => {
+    return chords.map((chord, chordIndex) => {
       // Find the section key for this chord
       const chordKey = chord.sectionId && sections.length > 0
         ? sections.find(s => s.id === chord.sectionId)?.key || selectedKey
@@ -56,15 +58,20 @@ const TimelineVisualization = ({
       const marbleRatio = getMarbleRatio(chord, chordKey);
       const particles = generateParticles(chord); // Generate particles for tensions
       const width = chord.duration * 0.5; // Scale duration to visual width
+      const x = currentX + width / 2; // Center position
 
       const segment = {
+        id: `chord-${chordIndex}-${chord.root}-${chord.quality}`, // Unique stable ID
         chord,
         color1: keyColor,
         color2: chordColor,
         marbleRatio,
         particles,
         width,
-        x: currentX + width / 2 // Center position
+        x,
+        // Pre-calculate positions to avoid creating new arrays on every render
+        segmentPosition: [x, 0, 0] as [number, number, number],
+        particlePosition: [x, 0, 0.05] as [number, number, number]
       };
 
       currentX += width;
@@ -198,22 +205,23 @@ const TimelineVisualization = ({
         const nextSegment = index < segmentData.length - 1 ? segmentData[index + 1] : null;
 
         return (
-          <group key={index}>
+          <group key={segment.id}>
             <TimelineSegment
               color1={segment.color1}
               color2={segment.color2}
               marbleRatio={segment.marbleRatio}
               width={segment.width}
-              position={[segment.x, 0, 0]}
+              position={segment.segmentPosition}
               nextColor1={nextSegment?.color1}
               nextColor2={nextSegment?.color2}
               blendWidth={0.3}
+              visualizationStyle={visualizationStyle}
             />
             {/* Render particles if tensions/alterations exist */}
             {segment.particles.length > 0 && (
               <ParticleSystem
                 particles={segment.particles}
-                position={[segment.x, 0, 0.05]}
+                position={segment.particlePosition}
                 width={segment.width}
                 height={2.0}
               />

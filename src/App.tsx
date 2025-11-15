@@ -3,13 +3,14 @@ import './App.css';
 import BuildPhase from './components/BuildPhase';
 import ConfirmPhase from './components/ConfirmPhase';
 import SettingsSidebar from './components/SettingsSidebar';
-import { Key, Chord, Section, MinorScaleType } from './types';
+import { Key, Chord, Section, MinorScaleType, VisualizationStyle } from './types';
 import { audioEngine } from './utils/audioEngine';
 
 type Phase = 'build' | 'confirm';
 
 const HUE_ROTATION_STORAGE_KEY = 'harmonic-colors-hue-rotation';
 const MINOR_SCALE_TYPE_STORAGE_KEY = 'harmonic-colors-minor-scale-type';
+const VISUALIZATION_STYLE_STORAGE_KEY = 'harmonic-colors-visualization-style';
 
 function App() {
   const [currentPhase, setCurrentPhase] = useState<Phase>('build');
@@ -48,6 +49,12 @@ function App() {
   const [minorScaleType, setMinorScaleType] = useState<MinorScaleType>(() => {
     const saved = localStorage.getItem(MINOR_SCALE_TYPE_STORAGE_KEY);
     return (saved as MinorScaleType) || 'melodic';
+  });
+
+  // Load visualizationStyle from LocalStorage (default: marble)
+  const [visualizationStyle, setVisualizationStyle] = useState<VisualizationStyle>(() => {
+    const saved = localStorage.getItem(VISUALIZATION_STYLE_STORAGE_KEY);
+    return (saved as VisualizationStyle) || 'marble';
   });
 
   // Settings sidebar state
@@ -148,6 +155,11 @@ function App() {
     localStorage.setItem(MINOR_SCALE_TYPE_STORAGE_KEY, scaleType);
   };
 
+  const handleVisualizationStyleChange = (style: VisualizationStyle) => {
+    setVisualizationStyle(style);
+    localStorage.setItem(VISUALIZATION_STYLE_STORAGE_KEY, style);
+  };
+
   // Section management handlers
   const handleSectionAdd = () => {
     const newId = String(Date.now());
@@ -245,6 +257,7 @@ function App() {
             onMetronomeChange={setMetronomeEnabled}
             hueRotation={hueRotation}
             minorScaleType={minorScaleType}
+            visualizationStyle={visualizationStyle}
             sections={sections}
             currentSectionId={currentSectionId}
             onSectionSelect={setCurrentSectionId}
@@ -268,6 +281,7 @@ function App() {
             onPlayingIndexChange={handlePlayingIndexChange}
             onPlaybackPositionChange={handlePlaybackPositionChange}
             hueRotation={hueRotation}
+            visualizationStyle={visualizationStyle}
           />
         )}
       </main>
@@ -281,6 +295,8 @@ function App() {
         selectedKey={selectedKey}
         minorScaleType={minorScaleType}
         onMinorScaleTypeChange={handleMinorScaleTypeChange}
+        visualizationStyle={visualizationStyle}
+        onVisualizationStyleChange={handleVisualizationStyleChange}
       />
     </div>
   )

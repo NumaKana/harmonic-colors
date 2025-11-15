@@ -1,4 +1,4 @@
-import { Key, MinorScaleType } from '../types';
+import { Key, MinorScaleType, VisualizationStyle } from '../types';
 import HueWheel from './HueWheel';
 import './SettingsSidebar.css';
 
@@ -10,6 +10,8 @@ interface SettingsSidebarProps {
   selectedKey: Key;
   minorScaleType: MinorScaleType;
   onMinorScaleTypeChange: (scaleType: MinorScaleType) => void;
+  visualizationStyle: VisualizationStyle;
+  onVisualizationStyleChange: (style: VisualizationStyle) => void;
 }
 
 const SettingsSidebar = ({
@@ -19,7 +21,9 @@ const SettingsSidebar = ({
   onHueRotationChange,
   selectedKey,
   minorScaleType,
-  onMinorScaleTypeChange
+  onMinorScaleTypeChange,
+  visualizationStyle,
+  onVisualizationStyleChange
 }: SettingsSidebarProps) => {
   return (
     <>
@@ -82,6 +86,39 @@ const SettingsSidebar = ({
             <p className="settings-description">
               Click on the color wheel or use the input to adjust the hue rotation.
               This affects all chord colors in the visualization.
+            </p>
+          </div>
+
+          {/* Visualization Style Control */}
+          <div className="settings-section">
+            <h3 className="settings-section-title">Visualization Style</h3>
+            <div className="visualization-style-options">
+              <label className="visualization-style-option">
+                <input
+                  type="radio"
+                  name="visualization-style"
+                  value="marble"
+                  checked={visualizationStyle === 'marble'}
+                  onChange={() => onVisualizationStyleChange('marble')}
+                />
+                <span className="visualization-style-label">Marble Pattern</span>
+                <span className="visualization-style-detail">Smooth blended gradient</span>
+              </label>
+              <label className="visualization-style-option">
+                <input
+                  type="radio"
+                  name="visualization-style"
+                  value="stripes"
+                  checked={visualizationStyle === 'stripes'}
+                  onChange={() => onVisualizationStyleChange('stripes')}
+                />
+                <span className="visualization-style-label">Horizontal Stripes</span>
+                <span className="visualization-style-detail">20% Color1 / 60% Color2 / 20% Color1</span>
+              </label>
+            </div>
+            <p className="settings-description">
+              Choose between a smooth marble pattern or clean horizontal stripes.
+              Particles are displayed in both styles.
             </p>
           </div>
 
