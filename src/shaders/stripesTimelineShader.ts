@@ -2,9 +2,9 @@
  * GLSL Shader for timeline segment with horizontal stripes
  *
  * Creates horizontal stripes pattern:
- * - Top 30%: Color 1
- * - Middle 40%: Color 2
- * - Bottom 30%: Color 1
+ * - Top 20%: Color 1
+ * - Middle 60%: Color 2
+ * - Bottom 20%: Color 1
  */
 
 export const stripesVertexShader = `
@@ -69,19 +69,19 @@ export const stripesFragmentShader = `
     vec3 color2 = hsl2rgb(uColor2HSL);
 
     // Create horizontal stripes based on vertical position (vUv.y)
-    // Top 30%: Color 1
-    // Middle 40%: Color 2
-    // Bottom 30%: Color 1
+    // Top 20%: Color 1
+    // Middle 60%: Color 2
+    // Bottom 20%: Color 1
     vec3 currentColor;
 
-    if (vUv.y > 0.7) {
-      // Top 30%: Color 1
+    if (vUv.y > 0.8) {
+      // Top 20%: Color 1
       currentColor = color1;
-    } else if (vUv.y > 0.3) {
-      // Middle 40%: Color 2
+    } else if (vUv.y > 0.2) {
+      // Middle 60%: Color 2
       currentColor = color2;
     } else {
-      // Bottom 30%: Color 1
+      // Bottom 20%: Color 1
       currentColor = color1;
     }
 
@@ -98,9 +98,9 @@ export const stripesFragmentShader = `
 
       // Create same stripe pattern for next segment
       vec3 nextColor;
-      if (vUv.y > 0.7) {
+      if (vUv.y > 0.8) {
         nextColor = nextColor1;
-      } else if (vUv.y > 0.3) {
+      } else if (vUv.y > 0.2) {
         nextColor = nextColor2;
       } else {
         nextColor = nextColor1;

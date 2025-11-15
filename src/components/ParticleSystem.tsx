@@ -40,9 +40,9 @@ const ParticleSystem = ({
         positions[i3 + 1] = (Math.random() - 0.5) * height; // y
         positions[i3 + 2] = 0; // z
 
-        // Random velocity for floating animation (slower movement)
-        velocities[i3] = (Math.random() - 0.5) * 0.005; // x velocity (much slower)
-        velocities[i3 + 1] = (Math.random() - 0.5) * 0.005; // y velocity (much slower)
+        // Random velocity for floating animation (very slow movement)
+        velocities[i3] = (Math.random() - 0.5) * 0.002; // x velocity (very slow)
+        velocities[i3 + 1] = (Math.random() - 0.5) * 0.002; // y velocity (very slow)
         velocities[i3 + 2] = 0; // z velocity
 
         // Random phase for animation variation
@@ -94,9 +94,9 @@ const ParticleSystem = ({
         const i3 = i * 3;
         const phase = phases[i];
 
-        // Floating animation with sine wave (slower and gentler)
-        const floatX = Math.sin(time * 0.2 + phase) * 0.003;
-        const floatY = Math.cos(time * 0.3 + phase) * 0.003;
+        // Floating animation with sine wave (very slow and gentle)
+        const floatX = Math.sin(time * 0.1 + phase) * 0.001;
+        const floatY = Math.cos(time * 0.15 + phase) * 0.001;
 
         // Update position with velocity and floating
         positions[i3] += velocities[i3] + floatX;
@@ -115,7 +115,7 @@ const ParticleSystem = ({
       geometry.attributes.position.needsUpdate = true;
 
       // Very slow rotation of entire particle system
-      points.rotation.z = Math.sin(time * 0.1) * 0.05;
+      points.rotation.z = Math.sin(time * 0.05) * 0.03;
     });
   });
 

@@ -113,7 +113,7 @@ const SettingsSidebar = ({
                   onChange={() => onVisualizationStyleChange('stripes')}
                 />
                 <span className="visualization-style-label">Horizontal Stripes</span>
-                <span className="visualization-style-detail">30% Color1 / 40% Color2 / 30% Color1</span>
+                <span className="visualization-style-detail">20% Color1 / 60% Color2 / 20% Color1</span>
               </label>
             </div>
             <p className="settings-description">

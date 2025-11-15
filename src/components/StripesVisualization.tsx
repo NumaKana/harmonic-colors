@@ -15,9 +15,9 @@ interface StripesVisualizationProps {
  * StripesVisualization Component
  *
  * Renders a fullscreen plane with horizontal stripes:
- * - Top 30%: Color 1
- * - Middle 40%: Color 2
- * - Bottom 30%: Color 1
+ * - Top 20%: Color 1
+ * - Middle 60%: Color 2
+ * - Bottom 20%: Color 1
  *
  * Includes smooth transition animations when colors change.
  */
@@ -88,17 +88,17 @@ const StripesVisualization = ({
     const color1CSS = hslToCSS(currentColor1);
     const color2CSS = hslToCSS(currentColor2);
 
-    // Top stripe (30%): Color 1
+    // Top stripe (20%): Color 1
     ctx.fillStyle = color1CSS;
-    ctx.fillRect(0, 0, 1, 30);
+    ctx.fillRect(0, 0, 1, 20);
 
-    // Middle stripe (40%): Color 2
+    // Middle stripe (60%): Color 2
     ctx.fillStyle = color2CSS;
-    ctx.fillRect(0, 30, 1, 40);
+    ctx.fillRect(0, 20, 1, 60);
 
-    // Bottom stripe (30%): Color 1
+    // Bottom stripe (20%): Color 1
     ctx.fillStyle = color1CSS;
-    ctx.fillRect(0, 70, 1, 30);
+    ctx.fillRect(0, 80, 1, 20);
 
     // Mark texture as needing update
     texture.needsUpdate = true;
