@@ -4,7 +4,7 @@ import ChordSequence from './ChordSequence';
 import PlaybackControls from './PlaybackControls';
 import VisualizationPreview from './VisualizationPreview';
 import EditableChordInfo from './EditableChordInfo';
-import { generateKeyColor, generateChordColor, hslToCSS } from '../utils/colorGenerator';
+import { generateKeyColor, generateChordColor, hslToCSS, getHueRotationForKey } from '../utils/colorGenerator';
 import { getChordDisplayName } from '../utils/diatonic';
 import { analyzeHarmonicFunction } from '../utils/harmonicAnalysis';
 import './BuildPhase.css';
@@ -26,7 +26,8 @@ interface BuildPhaseProps {
   onTimeSignatureChange: (timeSignature: number) => void;
   onBpmChange: (bpm: number) => void;
   onMetronomeChange: (enabled: boolean) => void;
-  hueRotation: number;
+  majorHueRotation: number;
+  minorHueRotation: number;
   minorScaleType: MinorScaleType;
   visualizationStyle: VisualizationStyle;
   // Section management
@@ -56,7 +57,8 @@ const BuildPhase = ({
   onTimeSignatureChange,
   onBpmChange,
   onMetronomeChange,
-  hueRotation,
+  majorHueRotation,
+  minorHueRotation,
   minorScaleType,
   visualizationStyle,
   sections,
@@ -75,6 +77,7 @@ const BuildPhase = ({
     : undefined;
 
   // Generate colors for info display
+  const hueRotation = getHueRotationForKey(selectedKey, majorHueRotation, minorHueRotation);
   const color1 = generateKeyColor(selectedKey, hueRotation);
   const color2 = currentChord ? generateChordColor(currentChord, selectedKey, color1) : color1;
 

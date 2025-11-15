@@ -4,7 +4,16 @@
       "Bash(gh issue view:*)",
       "Bash(git checkout:*)",
       "Bash(git pull:*)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(git branch:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\n確認フェーズで各コードを所属セクションのキーに基づいて色付けする\n\n複数セクションが存在する場合、確認フェーズで全てのコードが現在選択中のセクションのキーで色計算されていた問題を修正しました。各コードが所属するセクションのキーを使用して色付けされるようになり、転調が視覚的に明確になります。\n\n## 主な変更内容\n\n### 型定義 (types/index.ts)\n- `Chord`インターフェースに`sectionId?: string`を追加\n  - 各コードが所属するセクションを識別可能に\n\n### App.tsx\n- `handleAddChord`: コード追加時に`sectionId`を設定\n- `handleUpdateChord`: コード更新時も`sectionId`を保持\n- ConfirmPhaseに`sections`配列を渡す\n\n### ConfirmPhase.tsx\n- `sections`プロップを追加\n- VisualizationCanvasに`sections`を渡す\n\n### VisualizationCanvas.tsx\n- `sections`プロップを追加\n- TimelineVisualizationに`sections`を渡す\n\n### TimelineVisualization.tsx\n- `sections`プロップを追加\n- 各コードの色生成時に`chord.sectionId`から該当セクションのキーを取得\n- セクションキーを使用して`generateKeyColor`、`generateChordColor`、`getMarbleRatio`を実行\n\n## 動作\n\n**修正前**:\n- Section 1 (C Major): C, F, G → キーC Majorで色計算（正しい）\n- Section 2 (F Major): F, Bb, C → キーC Majorで色計算（間違い）\n\n**修正後**:\n- Section 1 (C Major): C, F, G → キーC Majorで色計算（正しい）\n- Section 2 (F Major): F, Bb, C → キーF Majorで色計算（正しい）\n\n転調が視覚的に劇的な色相変化として表現されます。\n\nFixes #65\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)",
+      "Bash(gh pr create:*)",
+      "Bash(npm run build:*)",
+      "Bash(git commit:*)",
+      "Bash(git remote:*)",
+      "Bash(gh issue create:*)"
     ],
     "deny": [],
     "ask": []

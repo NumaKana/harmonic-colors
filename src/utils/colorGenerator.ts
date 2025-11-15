@@ -2,6 +2,13 @@ import { Key, Chord, ColorHSL, Note, ParticleConfig } from '../types';
 import { getHarmonicFunctionType } from './harmonicAnalysis';
 
 /**
+ * Get the appropriate hue rotation based on key mode
+ */
+export function getHueRotationForKey(key: Key, majorHueRotation: number, minorHueRotation: number): number {
+  return key.mode === 'major' ? majorHueRotation : minorHueRotation;
+}
+
+/**
  * Calculate the scale degree of a chord within a key
  * Returns 1-7 for diatonic chords, or null for non-diatonic
  */

@@ -8,7 +8,8 @@ import './VisualizationCanvas.css';
 interface VisualizationCanvasProps {
   selectedKey: Key;
   currentChord?: Chord;
-  hueRotation?: number;
+  majorHueRotation?: number;
+  minorHueRotation?: number;
   chordProgression?: Chord[];
   sections?: Section[]; // All sections for key lookup
   currentChordIndex?: number;
@@ -23,7 +24,8 @@ interface VisualizationCanvasProps {
 
 const VisualizationCanvas = ({
   selectedKey,
-  hueRotation = 0,
+  majorHueRotation = 0,
+  minorHueRotation = 0,
   chordProgression = [],
   sections = [],
   currentChordIndex = -1,
@@ -163,7 +165,8 @@ const VisualizationCanvas = ({
                 currentIndex={currentChordIndex}
                 playbackPosition={playbackPosition}
                 mode={timelineMode}
-                hueRotation={hueRotation}
+                majorHueRotation={majorHueRotation}
+                minorHueRotation={minorHueRotation}
                 visualizationStyle={visualizationStyle}
                 onScrollInfoChange={(info) => {
                   setScrollProgress(info.progress);
