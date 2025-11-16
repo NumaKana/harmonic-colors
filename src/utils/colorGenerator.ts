@@ -89,29 +89,22 @@ export function generateChordColor(
   const harmonicFunction = analysis.function;
   const isDiatonic = analysis.isDiatonic;
 
-  // For non-diatonic chords, use the chord's root note as the hue base
-  // This creates a clear visual distinction from diatonic chords
+  // Determine color calculation method
+  // For visual coherence, borrowed chords and secondary dominants
+  // should use key-based hue (like diatonic chords) unless they are truly chromatic
   let hue: number;
 
-  if (!isDiatonic) {
-    // Non-diatonic: use chord root hue as base
+  // Use chord root hue only for truly chromatic chords (not secondary dominants or borrowed chords)
+  const isTrulyChromaticChord = !isDiatonic && !analysis.isSecondaryDominant && !analysis.isBorrowedChord;
+
+  if (isTrulyChromaticChord) {
+    // Truly chromatic chords (e.g., chromatic mediants): use chord root hue as base
     const chordRootHue = NOTE_TO_HUE[chord.root];
-
-    // Add special adjustments for specific non-diatonic patterns
-    let specialAdjustment = 0;
-
-    if (analysis.isSecondaryDominant) {
-      // Secondary dominants: shift hue for emphasis
-      specialAdjustment = 45; // Distinct shift for V7/X chords
-    } else if (analysis.isBorrowedChord) {
-      // Borrowed chords: moderate shift
-      specialAdjustment = 30;
-    }
-
-    hue = (chordRootHue + specialAdjustment) % 360;
+    hue = chordRootHue;
   } else {
-    // Diatonic: use traditional key-based hue with harmonic function adjustment
+    // Diatonic, secondary dominants, and borrowed chords: use key-based hue
     let hueAdjustment = 0;
+
     switch (harmonicFunction) {
       case 'tonic':
         hueAdjustment = 0; // ±0 degrees
@@ -123,6 +116,14 @@ export function generateChordColor(
         hueAdjustment = 30; // +30 degrees
         break;
     }
+
+    // Additional adjustment for secondary dominants and borrowed chords
+    if (analysis.isSecondaryDominant) {
+      hueAdjustment += 15; // Extra shift for secondary dominants
+    } else if (analysis.isBorrowedChord) {
+      hueAdjustment += 10; // Subtle shift for borrowed chords
+    }
+
     hue = (baseColor.hue + hueAdjustment) % 360;
   }
 
@@ -291,17 +292,22 @@ export function getMarbleRatio(chord: Chord, key: Key): number {
   const harmonicFunction = analysis.function;
   const isDiatonic = analysis.isDiatonic;
 
-  // Non-diatonic chords: emphasize Color 2 (chord color) more
-  if (!isDiatonic) {
-    if (analysis.isSecondaryDominant) {
-      return 0.4; // 40% color1, 60% color2 - strong chord color presence
-    } else if (analysis.isBorrowedChord) {
-      return 0.45; // 45% color1, 55% color2
-    }
-    return 0.5; // 50/50 for other non-diatonic chords
+  // Truly chromatic chords: emphasize Color 2 (chord color) significantly
+  const isTrulyChromaticChord = !isDiatonic && !analysis.isSecondaryDominant && !analysis.isBorrowedChord;
+
+  if (isTrulyChromaticChord) {
+    return 0.3; // 30% color1, 70% color2 - strong chord color presence
   }
 
-  // Diatonic chords: traditional ratios
+  // Secondary dominants: slightly more Color 2
+  if (analysis.isSecondaryDominant) {
+    return 0.45; // 45% color1, 55% color2
+  }
+
+  // Borrowed chords: follow standard harmonic function ratios
+  // (they blend in with diatonic chords for visual coherence)
+
+  // Diatonic chords and borrowed chords: traditional ratios
   switch (harmonicFunction) {
     case 'tonic':
       return 0.7; // 70% color1, 30% color2
