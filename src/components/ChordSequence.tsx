@@ -281,17 +281,21 @@ const ChordSequence = ({ sections, currentSectionId, currentSectionKey, onRemove
                         let beatPosition = 0;
                         let chordForThisBeat = null;
                         let isFirstBeatOfChord = false;
+                        let chordStartBeat = 0;
+                        let chordEndBeat = 0;
 
                         for (const { chord, originalIndex, sectionId } of measure.chords) {
-                          const chordStartBeat = beatPosition;
-                          const chordEndBeat = beatPosition + chord.duration;
+                          const startBeat = beatPosition;
+                          const endBeat = beatPosition + chord.duration;
 
                           // Check if this beat slot overlaps with the chord's time span
-                          if (beatIndex < chordEndBeat && beatIndex + 1 > chordStartBeat) {
+                          if (beatIndex < endBeat && beatIndex + 1 > startBeat) {
                             chordForThisBeat = { chord, originalIndex, sectionId };
+                            chordStartBeat = startBeat;
+                            chordEndBeat = endBeat;
                             // A chord starts at the first beat it occupies (floor of start position)
-                            isFirstBeatOfChord = Math.floor(chordStartBeat) === beatIndex;
-                            break;
+                            isFirstBeatOfChord = Math.floor(startBeat) === beatIndex;
+                            // Don't break - we want the last matching chord if multiple chords overlap this beat
                           }
                           beatPosition += chord.duration;
                         }
@@ -299,7 +303,39 @@ const ChordSequence = ({ sections, currentSectionId, currentSectionKey, onRemove
                         // Only render the chord on its first beat, spanning multiple beats
                         if (chordForThisBeat && isFirstBeatOfChord) {
                           const { chord, originalIndex, sectionId } = chordForThisBeat;
-                          const widthInBeats = chord.duration;
+                          // Calculate how many beat grid positions this chord should span
+                          // We need to check if there's another chord starting at a later beat in this measure
+                          let widthInBeats = chord.duration;
+
+                          // Check if the next chord in the measure starts before this chord ends
+                          let nextChordStartBeat = null;
+                          let tempBeatPosition = 0;
+                          let foundCurrent = false;
+
+                          for (const { chord: c } of measure.chords) {
+                            if (foundCurrent) {
+                              nextChordStartBeat = tempBeatPosition;
+                              break;
+                            }
+                            if (c === chord) {
+                              foundCurrent = true;
+                            }
+                            tempBeatPosition += c.duration;
+                          }
+
+                          if (nextChordStartBeat !== null && nextChordStartBeat <= chordEndBeat) {
+                            // Next chord starts before or when this one ends - adjust width to avoid overlap
+                            const nextChordFirstBeat = Math.floor(nextChordStartBeat);
+                            const thisChordFirstBeat = Math.floor(chordStartBeat);
+                            widthInBeats = Math.max(1, nextChordFirstBeat - thisChordFirstBeat);
+                          } else {
+                            // No overlap - use full duration
+                            const firstBeatPos = Math.floor(chordStartBeat);
+                            const lastBeatPos = Math.ceil(chordEndBeat) - 1;
+                            widthInBeats = lastBeatPos - firstBeatPos + 1;
+                          }
+
+                          widthInBeats = Math.min(widthInBeats, timeSignature - beatIndex);
                           const isPlaying = currentIndex === originalIndex;
                           const isSelected = selectedIndex === originalIndex;
                           const isCurrentSection = sectionId === currentSectionId;
