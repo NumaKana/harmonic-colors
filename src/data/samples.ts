@@ -13,54 +13,62 @@ export interface SampleSong {
 }
 
 /**
- * Just The Two Of Us - Grover Washington Jr.
- * Key: C# Major (Db Major enharmonic equivalent)
- * Famous for its smooth jazz progression
+ * Just The Two Of Us - Grover Washington Jr. feat. Bill Withers
+ * Key: F minor
+ * Famous smooth jazz-R&B chord progression
+ *
+ * Original progression: Dbmaj7 - C7(♭9) - Fm7 - Ebm7 A♭7
+ * This is a double-time modified reordering of "Sunny" chord progression
  */
 const justTheTwoOfUs: SampleSong = {
   id: 'just-the-two-of-us',
   title: 'Just The Two Of Us',
-  artist: 'Grover Washington Jr.',
+  artist: 'Grover Washington Jr. feat. Bill Withers',
   sections: [
     {
       id: 'intro',
       name: 'Intro',
-      key: { tonic: 'C#', mode: 'major' },
+      key: { tonic: 'F', mode: 'minor' },
       chords: [
         { root: 'C#', quality: 'major', seventh: 'maj7', tensions: [], alterations: [], duration: 4 },
-        { root: 'D#', quality: 'minor', seventh: 'm7', tensions: [], alterations: [], duration: 4 },
-        { root: 'C#', quality: 'major', seventh: 'maj7', tensions: [], alterations: [], duration: 4 },
-        { root: 'D#', quality: 'minor', seventh: 'm7', tensions: [], alterations: [], duration: 4 },
+        { root: 'C', quality: 'major', seventh: '7', tensions: [], alterations: ['b9'], duration: 4 },
+        { root: 'F', quality: 'minor', seventh: 'm7', tensions: [], alterations: [], duration: 4 },
+        { root: 'D#', quality: 'minor', seventh: 'm7', tensions: [], alterations: [], duration: 2 },
+        { root: 'G#', quality: 'major', seventh: '7', tensions: [], alterations: [], duration: 2 },
       ]
     },
     {
       id: 'verse',
       name: 'Verse',
-      key: { tonic: 'C#', mode: 'major' },
+      key: { tonic: 'F', mode: 'minor' },
       chords: [
         { root: 'C#', quality: 'major', seventh: 'maj7', tensions: [], alterations: [], duration: 4 },
-        { root: 'D#', quality: 'minor', seventh: 'm7', tensions: [], alterations: [], duration: 4 },
+        { root: 'C', quality: 'major', seventh: '7', tensions: [], alterations: ['b9'], duration: 4 },
+        { root: 'F', quality: 'minor', seventh: 'm7', tensions: [], alterations: [], duration: 4 },
+        { root: 'D#', quality: 'minor', seventh: 'm7', tensions: [], alterations: [], duration: 2 },
+        { root: 'G#', quality: 'major', seventh: '7', tensions: [], alterations: [], duration: 2 },
         { root: 'C#', quality: 'major', seventh: 'maj7', tensions: [], alterations: [], duration: 4 },
-        { root: 'D#', quality: 'minor', seventh: 'm7', tensions: [], alterations: [], duration: 4 },
-        { root: 'F', quality: 'major', seventh: 'maj7', tensions: [], alterations: [], duration: 4 },
-        { root: 'G', quality: 'major', seventh: '7', tensions: [], alterations: [], duration: 4 },
-        { root: 'D#', quality: 'minor', seventh: 'm7', tensions: [], alterations: [], duration: 4 },
-        { root: 'A', quality: 'major', seventh: '7', tensions: [], alterations: [], duration: 4 },
+        { root: 'C', quality: 'major', seventh: '7', tensions: [], alterations: ['b9'], duration: 4 },
+        { root: 'F', quality: 'minor', seventh: 'm7', tensions: [], alterations: [], duration: 4 },
+        { root: 'D#', quality: 'minor', seventh: 'm7', tensions: [], alterations: [], duration: 2 },
+        { root: 'G#', quality: 'major', seventh: '7', tensions: [], alterations: [], duration: 2 },
       ]
     },
     {
       id: 'chorus',
       name: 'Chorus',
-      key: { tonic: 'C#', mode: 'major' },
+      key: { tonic: 'F', mode: 'minor' },
       chords: [
         { root: 'C#', quality: 'major', seventh: 'maj7', tensions: [], alterations: [], duration: 4 },
-        { root: 'D#', quality: 'minor', seventh: 'm7', tensions: [], alterations: [], duration: 4 },
-        { root: 'C', quality: 'major', seventh: 'maj7', tensions: [], alterations: [], duration: 4 },
-        { root: 'C#', quality: 'minor', seventh: 'm7', tensions: [], alterations: [], duration: 4 },
-        { root: 'D#', quality: 'minor', seventh: 'm7', tensions: [], alterations: [], duration: 4 },
-        { root: 'A', quality: 'major', seventh: '7', tensions: [], alterations: [], duration: 4 },
+        { root: 'C', quality: 'major', seventh: '7', tensions: [], alterations: ['b9'], duration: 4 },
+        { root: 'F', quality: 'minor', seventh: 'm7', tensions: [], alterations: [], duration: 4 },
+        { root: 'E', quality: 'minor', seventh: 'm7', tensions: [], alterations: [], duration: 2 },
+        { root: 'D#', quality: 'minor', seventh: 'm7', tensions: [], alterations: [], duration: 2 },
         { root: 'C#', quality: 'major', seventh: 'maj7', tensions: [], alterations: [], duration: 4 },
-        { root: 'D#', quality: 'minor', seventh: 'm7', tensions: [], alterations: [], duration: 4 },
+        { root: 'C', quality: 'major', seventh: '7', tensions: [], alterations: ['b9'], duration: 4 },
+        { root: 'F', quality: 'minor', seventh: 'm7', tensions: [], alterations: [], duration: 4 },
+        { root: 'D#', quality: 'minor', seventh: 'm7', tensions: [], alterations: [], duration: 2 },
+        { root: 'G#', quality: 'major', seventh: '7', tensions: [], alterations: [], duration: 2 },
       ]
     }
   ]
