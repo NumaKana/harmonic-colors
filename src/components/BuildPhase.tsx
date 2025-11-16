@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { Key, Chord, Section, MinorScaleType, VisualizationStyle } from '../types';
 import ChordPalette from './ChordPalette';
 import ChordSequence from './ChordSequence';
 import PlaybackControls from './PlaybackControls';
 import VisualizationPreview from './VisualizationPreview';
 import EditableChordInfo from './EditableChordInfo';
+import SampleSelector from './SampleSelector';
 import { generateKeyColor, generateChordColor, hslToCSS, getHueRotationForKey } from '../utils/colorGenerator';
 import { getChordDisplayName } from '../utils/diatonic';
 import { analyzeHarmonicFunction } from '../utils/harmonicAnalysis';
@@ -71,6 +73,9 @@ const BuildPhase = ({
   onSectionKeyChange,
   onLoadSample
 }: BuildPhaseProps) => {
+  // Sample selector modal state
+  const [isSampleSelectorOpen, setIsSampleSelectorOpen] = useState(false);
+
   // Get current chord for preview using local index
   const currentChord = localSelectedIndex !== undefined && localSelectedIndex >= 0
     ? chords[localSelectedIndex]
@@ -91,12 +96,20 @@ const BuildPhase = ({
       <div className="build-phase-header">
         <button
           className="sample-load-button"
-          onClick={() => onLoadSample('just-the-two-of-us')}
+          onClick={() => setIsSampleSelectorOpen(true)}
           title="Load sample chord progression"
         >
-          📝 Load Sample (Just The Two Of Us)
+          📝 Load Sample
         </button>
       </div>
+
+      {/* Sample Selector Modal */}
+      <SampleSelector
+        isOpen={isSampleSelectorOpen}
+        onClose={() => setIsSampleSelectorOpen(false)}
+        onSelect={onLoadSample}
+      />
+
       <ChordPalette selectedKey={selectedKey} onChordSelect={onChordSelect} hueRotation={hueRotation} minorScaleType={minorScaleType} />
       <ChordSequence
         sections={sections}
