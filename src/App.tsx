@@ -3,6 +3,7 @@ import './App.css';
 import BuildPhase from './components/BuildPhase';
 import ConfirmPhase from './components/ConfirmPhase';
 import SettingsSidebar from './components/SettingsSidebar';
+import HelpModal from './components/HelpModal';
 import { Key, Chord, Section, MinorScaleType, VisualizationStyle } from './types';
 import { audioEngine } from './utils/audioEngine';
 import { getSampleSong } from './data/samples';
@@ -97,6 +98,9 @@ function App() {
 
   // Settings sidebar state
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+
+  // Help modal state
+  const [isHelpOpen, setIsHelpOpen] = useState<boolean>(false);
 
   const handleAddChord = (chord: Chord) => {
     // Calculate the global index for the new chord
@@ -363,13 +367,22 @@ function App() {
             確認
           </button>
         </div>
-        <button
-          className="settings-button"
-          onClick={() => setIsSettingsOpen(true)}
-          title="Open settings"
-        >
-          ⚙
-        </button>
+        <div className="header-buttons">
+          <button
+            className="help-button"
+            onClick={() => setIsHelpOpen(true)}
+            title="ヘルプ / Help"
+          >
+            ❓
+          </button>
+          <button
+            className="settings-button"
+            onClick={() => setIsSettingsOpen(true)}
+            title="設定 / Settings"
+          >
+            ⚙
+          </button>
+        </div>
       </header>
       <main className="main">
         {currentPhase === 'build' ? (
@@ -439,6 +452,12 @@ function App() {
         onMinorScaleTypeChange={handleMinorScaleTypeChange}
         visualizationStyle={visualizationStyle}
         onVisualizationStyleChange={handleVisualizationStyleChange}
+      />
+
+      {/* Help Modal */}
+      <HelpModal
+        isOpen={isHelpOpen}
+        onClose={() => setIsHelpOpen(false)}
       />
     </div>
   )

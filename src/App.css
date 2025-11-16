@@ -61,10 +61,16 @@
   box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 }
 
-.settings-button {
+.header-buttons {
   position: absolute;
   top: 2rem;
   right: 2rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.help-button,
+.settings-button {
   width: 48px;
   height: 48px;
   background-color: #2a2a2a;
@@ -79,11 +85,20 @@
   justify-content: center;
 }
 
+.help-button:hover,
 .settings-button:hover {
   background-color: #333;
   border-color: #667eea;
   color: #fff;
+}
+
+.settings-button:hover {
   transform: rotate(45deg);
+}
+
+.help-button:active,
+.settings-button:active {
+  transform: scale(0.95);
 }
 
 .settings-button:active {
@@ -116,9 +131,13 @@
     font-size: 0.95rem;
   }
 
-  .settings-button {
+  .header-buttons {
     top: 1rem;
     right: 1rem;
+  }
+
+  .help-button,
+  .settings-button {
     width: 44px;
     height: 44px;
     font-size: 1.3rem;
@@ -147,11 +166,16 @@
     font-size: 0.9rem;
   }
 
-  .settings-button {
+  .header-buttons {
     top: 0.75rem;
     right: 0.75rem;
-    width: 44px;
-    height: 44px;
-    font-size: 1.3rem;
+    gap: 0.4rem;
+  }
+
+  .help-button,
+  .settings-button {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
   }
 }

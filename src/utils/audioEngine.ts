@@ -75,10 +75,10 @@ class AudioEngine {
 
   /**
    * Convert a chord to an array of note frequencies
-   * Root notes: A1~E3 (MIDI 21~52)
+   * Root notes: C2~B2 (MIDI 24~35)
    * Other notes: C3~E5 (MIDI 48~76)
    */
-  getChordNotes(chord: Chord, octave: number = 4): string[] {
+  getChordNotes(chord: Chord): string[] {
     const notes: string[] = [];
 
     // Determine root octave to place it in A1~E3 range
@@ -186,20 +186,11 @@ class AudioEngine {
   }
 
   /**
-   * Get the appropriate octave for a root note to place it in C2~E5 range
+   * Get the appropriate octave for a root note to place it in C2~B2 range
    */
-  private getRootOctave(root: Note): number {
-    // MIDI note numbers for reference:
-    // C2 = 24, C3 = 36, C4 = 48, E5 = 76
-    const noteToMidi: { [key in Note]: number } = {
-      'C': 0, 'C#': 1, 'D': 2, 'D#': 3, 'E': 4, 'F': 5,
-      'F#': 6, 'G': 7, 'G#': 8, 'A': 9, 'A#': 10, 'B': 11
-    };
-
-    const noteIndex = noteToMidi[root];
-
-    // Place low notes (C-E) in octave 2, mid notes (F-B) in octave 2
-    // All notes in octave 2 for consistent bass range (C2~B2 = MIDI 24~35)
+  private getRootOctave(_root: Note): number {
+    // All root notes are placed in octave 2 for consistent bass range
+    // C2~B2 = MIDI 24~35
     return 2;
   }
 
@@ -240,20 +231,6 @@ class AudioEngine {
     }
 
     return `${resultNote}${resultOctave}`;
-  }
-
-  /**
-   * Transpose a note by a given number of semitones
-   */
-  private transposeNote(root: Note, semitones: number, octave: number): string {
-    const notes: Note[] = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-    const rootIndex = notes.indexOf(root);
-
-    const totalSemitones = rootIndex + semitones;
-    const newOctave = octave + Math.floor(totalSemitones / 12);
-    const newNoteIndex = totalSemitones % 12;
-
-    return `${notes[newNoteIndex]}${newOctave}`;
   }
 
   /**
