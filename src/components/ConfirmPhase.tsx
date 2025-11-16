@@ -1,4 +1,4 @@
-import { Key, Chord, Section, VisualizationStyle } from '../types';
+import { Key, Chord, Section, MinorScaleType, VisualizationStyle } from '../types';
 import VisualizationCanvas from './VisualizationCanvas';
 import ChordNameBar from './ChordNameBar';
 import './ConfirmPhase.css';
@@ -18,6 +18,7 @@ interface ConfirmPhaseProps {
   onPlaybackPositionChange: (position: number) => void;
   majorHueRotation: number;
   minorHueRotation: number;
+  minorScaleType: MinorScaleType;
   visualizationStyle: VisualizationStyle;
 }
 
@@ -36,6 +37,7 @@ const ConfirmPhase = ({
   onPlaybackPositionChange,
   majorHueRotation,
   minorHueRotation,
+  minorScaleType,
   visualizationStyle
 }: ConfirmPhaseProps) => {
   return (
@@ -59,6 +61,7 @@ const ConfirmPhase = ({
         onPlaybackPositionChange={onPlaybackPositionChange}
         majorHueRotation={majorHueRotation}
         minorHueRotation={minorHueRotation}
+        minorScaleType={minorScaleType}
         visualizationStyle={visualizationStyle}
       />
     </div>

@@ -419,6 +419,7 @@ function App() {
             onPlaybackPositionChange={handlePlaybackPositionChange}
             majorHueRotation={majorHueRotation}
             minorHueRotation={minorHueRotation}
+            minorScaleType={minorScaleType}
             visualizationStyle={visualizationStyle}
           />
         )}

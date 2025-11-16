@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Chord, Key, Section, VisualizationStyle } from '../types';
+import { Chord, Key, Section, MinorScaleType, VisualizationStyle } from '../types';
 import TimelineVisualization from './TimelineVisualization';
 import CompactPlayButton from './CompactPlayButton';
 import './VisualizationCanvas.css';
@@ -10,6 +10,7 @@ interface VisualizationCanvasProps {
   currentChord?: Chord;
   majorHueRotation?: number;
   minorHueRotation?: number;
+  minorScaleType?: MinorScaleType;
   chordProgression?: Chord[];
   sections?: Section[]; // All sections for key lookup
   currentChordIndex?: number;
@@ -26,6 +27,7 @@ const VisualizationCanvas = ({
   selectedKey,
   majorHueRotation = 0,
   minorHueRotation = 0,
+  minorScaleType = 'natural',
   chordProgression = [],
   sections = [],
   currentChordIndex = -1,
@@ -167,6 +169,7 @@ const VisualizationCanvas = ({
                 mode={timelineMode}
                 majorHueRotation={majorHueRotation}
                 minorHueRotation={minorHueRotation}
+                minorScaleType={minorScaleType}
                 visualizationStyle={visualizationStyle}
                 onScrollInfoChange={(info) => {
                   setScrollProgress(info.progress);
