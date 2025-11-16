@@ -10,17 +10,23 @@ interface PlaybackControlsProps {
   onTimeSignatureChange?: (timeSignature: number) => void;
   onBpmChange?: (bpm: number) => void;
   onMetronomeChange?: (enabled: boolean) => void;
+  metronomeEnabled?: boolean;
 }
 
-const PlaybackControls = ({ chords, onPlayingIndexChange, onPlaybackPositionChange, onTimeSignatureChange, onBpmChange, onMetronomeChange }: PlaybackControlsProps) => {
+const PlaybackControls = ({ chords, onPlayingIndexChange, onPlaybackPositionChange, onTimeSignatureChange, onBpmChange, onMetronomeChange, metronomeEnabled: initialMetronomeEnabled = false }: PlaybackControlsProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [bpm, setBpm] = useState(120);
-  const [metronomeEnabled, setMetronomeEnabled] = useState(false);
+  const [metronomeEnabled, setMetronomeEnabled] = useState(initialMetronomeEnabled);
   const [timeSignature, setTimeSignature] = useState(4);
 
   const startTimeRef = useRef<number>(0);
   const currentIndexRef = useRef<number>(-1);
   const animationFrameRef = useRef<number | null>(null);
+
+  // Sync metronome state with audioEngine on mount
+  useEffect(() => {
+    audioEngine.setMetronomeEnabled(metronomeEnabled);
+  }, [metronomeEnabled]);
 
   // Animation loop to update playback position
   useEffect(() => {

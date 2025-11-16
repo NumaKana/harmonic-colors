@@ -28,6 +28,7 @@ interface BuildPhaseProps {
   onTimeSignatureChange: (timeSignature: number) => void;
   onBpmChange: (bpm: number) => void;
   onMetronomeChange: (enabled: boolean) => void;
+  metronomeEnabled: boolean;
   majorHueRotation: number;
   minorHueRotation: number;
   minorScaleType: MinorScaleType;
@@ -60,6 +61,7 @@ const BuildPhase = ({
   onTimeSignatureChange,
   onBpmChange,
   onMetronomeChange,
+  metronomeEnabled,
   majorHueRotation,
   minorHueRotation,
   minorScaleType,
@@ -132,6 +134,7 @@ const BuildPhase = ({
         onTimeSignatureChange={onTimeSignatureChange}
         onBpmChange={onBpmChange}
         onMetronomeChange={onMetronomeChange}
+        metronomeEnabled={metronomeEnabled}
       />
 
       <VisualizationPreview

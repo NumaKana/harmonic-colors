@@ -286,9 +286,11 @@ const ChordSequence = ({ sections, currentSectionId, currentSectionKey, onRemove
                           const chordStartBeat = beatPosition;
                           const chordEndBeat = beatPosition + chord.duration;
 
-                          if (beatIndex >= chordStartBeat && beatIndex < chordEndBeat) {
+                          // Check if this beat slot overlaps with the chord's time span
+                          if (beatIndex < chordEndBeat && beatIndex + 1 > chordStartBeat) {
                             chordForThisBeat = { chord, originalIndex, sectionId };
-                            isFirstBeatOfChord = beatIndex === chordStartBeat;
+                            // A chord starts at the first beat it occupies (floor of start position)
+                            isFirstBeatOfChord = Math.floor(chordStartBeat) === beatIndex;
                             break;
                           }
                           beatPosition += chord.duration;
