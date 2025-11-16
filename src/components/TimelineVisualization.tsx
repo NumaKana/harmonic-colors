@@ -305,14 +305,6 @@ const TimelineVisualization = ({
           </group>
         );
       })}
-
-      {/* Current position indicator in playback mode */}
-      {mode === 'playback' && currentIndex >= 0 && (
-        <mesh position={[playbackPosition * 0.5, 0, 0.1]}>
-          <planeGeometry args={[0.02, 2.5]} />
-          <meshBasicMaterial color="#ffffff" opacity={0.8} transparent />
-        </mesh>
-      )}
     </group>
   );
 };
