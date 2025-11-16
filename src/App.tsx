@@ -34,7 +34,7 @@ function App() {
   const [timeSignature, setTimeSignature] = useState<number>(4);
   const [playbackPosition, setPlaybackPosition] = useState<number>(0); // Current playback position in beats
   const [bpm, setBpm] = useState<number>(120);
-  const [metronomeEnabled, setMetronomeEnabled] = useState<boolean>(false);
+  const [metronomeEnabled, setMetronomeEnabled] = useState<boolean>(true);
 
   // Derived values for backward compatibility
   const currentSection = sections.find(s => s.id === currentSectionId) || sections[0];
@@ -287,11 +287,25 @@ function App() {
     // Confirm before overwriting current progression
     const message = `現在のコード進行を「${sample.title}」で上書きしますか？`;
     if (window.confirm(message)) {
-      setSections(sample.sections);
+      // Add sectionId to each chord
+      const sectionsWithIds = sample.sections.map(section => ({
+        ...section,
+        chords: section.chords.map(chord => ({
+          ...chord,
+          sectionId: section.id
+        }))
+      }));
+
+      setSections(sectionsWithIds);
       setCurrentSectionId(sample.sections[0].id);
       setSelectedChordIndex(null);
       setCurrentChordIndex(-1);
       setPlaybackPosition(0);
+
+      // Apply BPM if specified
+      if (sample.bpm) {
+        setBpm(sample.bpm);
+      }
     }
   };
 
