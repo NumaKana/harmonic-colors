@@ -5,6 +5,7 @@ import ConfirmPhase from './components/ConfirmPhase';
 import SettingsSidebar from './components/SettingsSidebar';
 import { Key, Chord, Section, MinorScaleType, VisualizationStyle } from './types';
 import { audioEngine } from './utils/audioEngine';
+import { getSampleSong } from './data/samples';
 
 type Phase = 'build' | 'confirm';
 
@@ -33,7 +34,7 @@ function App() {
   const [timeSignature, setTimeSignature] = useState<number>(4);
   const [playbackPosition, setPlaybackPosition] = useState<number>(0); // Current playback position in beats
   const [bpm, setBpm] = useState<number>(120);
-  const [metronomeEnabled, setMetronomeEnabled] = useState<boolean>(false);
+  const [metronomeEnabled, setMetronomeEnabled] = useState<boolean>(true);
 
   // Derived values for backward compatibility
   const currentSection = sections.find(s => s.id === currentSectionId) || sections[0];
@@ -276,6 +277,38 @@ function App() {
     ));
   };
 
+  const handleLoadSample = (sampleId: string) => {
+    const sample = getSampleSong(sampleId);
+    if (!sample) {
+      console.error(`Sample song not found: ${sampleId}`);
+      return;
+    }
+
+    // Confirm before overwriting current progression
+    const message = `現在のコード進行を「${sample.title}」で上書きしますか？`;
+    if (window.confirm(message)) {
+      // Add sectionId to each chord
+      const sectionsWithIds = sample.sections.map(section => ({
+        ...section,
+        chords: section.chords.map(chord => ({
+          ...chord,
+          sectionId: section.id
+        }))
+      }));
+
+      setSections(sectionsWithIds);
+      setCurrentSectionId(sample.sections[0].id);
+      setSelectedChordIndex(null);
+      setCurrentChordIndex(-1);
+      setPlaybackPosition(0);
+
+      // Apply BPM if specified
+      if (sample.bpm) {
+        setBpm(sample.bpm);
+      }
+    }
+  };
+
   // Get current chord for visualization
   // Priority: 1. Playing chord, 2. Selected chord, 3. Last chord
   const currentChord = currentChordIndex >= 0
@@ -368,6 +401,7 @@ function App() {
             onSectionRemove={handleSectionRemove}
             onSectionNameChange={handleSectionNameChange}
             onSectionKeyChange={handleSectionKeyChange}
+            onLoadSample={handleLoadSample}
           />
         ) : (
           <ConfirmPhase
