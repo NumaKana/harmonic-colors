@@ -110,18 +110,18 @@ export function generateChordColor(
         hueAdjustment = 0; // ±0 degrees
         break;
       case 'subdominant':
-        hueAdjustment = 15; // +15 degrees
+        hueAdjustment = 10; // +10 degrees (reduced from 15)
         break;
       case 'dominant':
-        hueAdjustment = 30; // +30 degrees
+        hueAdjustment = 20; // +20 degrees (reduced from 30)
         break;
     }
 
     // Additional adjustment for secondary dominants and borrowed chords
     if (analysis.isSecondaryDominant) {
-      hueAdjustment += 15; // Extra shift for secondary dominants
+      hueAdjustment += 12; // Extra shift for secondary dominants
     } else if (analysis.isBorrowedChord) {
-      hueAdjustment += 10; // Subtle shift for borrowed chords
+      hueAdjustment += 8; // Subtle shift for borrowed chords
     }
 
     hue = (baseColor.hue + hueAdjustment) % 360;
@@ -146,12 +146,12 @@ export function generateChordColor(
         microLightnessAdjustment = 0;
       } else if (scaleDegree === 3) {
         // iii: significantly darker and less saturated
-        microHueAdjustment = -8;
+        microHueAdjustment = -5;
         microSaturationAdjustment = -15;
         microLightnessAdjustment = -15;
       } else if (scaleDegree === 6) {
         // vi: significantly brighter and more saturated
-        microHueAdjustment = 8;
+        microHueAdjustment = 5;
         microSaturationAdjustment = 15;
         microLightnessAdjustment = 15;
       }
@@ -159,12 +159,12 @@ export function generateChordColor(
       // ii, IV
       if (scaleDegree === 2) {
         // ii: darker and less saturated
-        microHueAdjustment = -5;
+        microHueAdjustment = -3;
         microSaturationAdjustment = -12;
         microLightnessAdjustment = -12;
       } else if (scaleDegree === 4) {
         // IV: brighter and more saturated
-        microHueAdjustment = 5;
+        microHueAdjustment = 3;
         microSaturationAdjustment = 12;
         microLightnessAdjustment = 12;
       }
@@ -177,7 +177,7 @@ export function generateChordColor(
         microLightnessAdjustment = 0;
       } else if (scaleDegree === 7) {
         // vii: significantly darker and less saturated
-        microHueAdjustment = -8;
+        microHueAdjustment = -5;
         microSaturationAdjustment = -15;
         microLightnessAdjustment = -15;
       }
