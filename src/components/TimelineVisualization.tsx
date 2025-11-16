@@ -6,7 +6,7 @@
 import { useRef, useMemo, useEffect, useState } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { OrthographicCamera } from 'three';
-import { Chord, Key, Section, VisualizationStyle } from '../types';
+import { Chord, Key, Section, MinorScaleType, VisualizationStyle } from '../types';
 import { generateKeyColor, generateChordColor, getMarbleRatio, generateParticles, getHueRotationForKey } from '../utils/colorGenerator';
 import TimelineSegment from './TimelineSegment';
 import ParticleSystem from './ParticleSystem';
@@ -20,6 +20,7 @@ interface TimelineVisualizationProps {
   mode: 'playback' | 'preview';
   majorHueRotation?: number;
   minorHueRotation?: number;
+  minorScaleType?: MinorScaleType;
   visualizationStyle?: VisualizationStyle;
   onScrollInfoChange?: (info: { progress: number; totalWidth: number; viewWidth: number }) => void;
   onSetCameraPosition?: (handler: (progress: number) => void) => void;
@@ -34,6 +35,7 @@ const TimelineVisualization = ({
   mode,
   majorHueRotation = 0,
   minorHueRotation = 0,
+  minorScaleType = 'natural',
   visualizationStyle = 'marble',
   onScrollInfoChange,
   onSetCameraPosition
@@ -63,8 +65,8 @@ const TimelineVisualization = ({
 
       // Generate colors using the chord's section key and appropriate hue rotation
       const keyColor = generateKeyColor(chordKey, hueRotation);
-      const chordColor = generateChordColor(chord, chordKey, keyColor);
-      const marbleRatio = getMarbleRatio(chord, chordKey);
+      const chordColor = generateChordColor(chord, chordKey, keyColor, minorScaleType);
+      const marbleRatio = getMarbleRatio(chord, chordKey, minorScaleType);
       const particles = generateParticles(chord); // Generate particles for tensions
       const width = chord.duration * 0.5; // Scale duration to visual width
       const x = currentX + width / 2; // Center position

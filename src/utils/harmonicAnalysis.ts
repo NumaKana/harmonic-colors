@@ -1,4 +1,4 @@
-import { Chord, Key, Note, ChordQuality, HarmonicFunction, HarmonicFunctionType } from '../types';
+import { Chord, Key, Note, ChordQuality, HarmonicFunction, HarmonicFunctionType, MinorScaleType } from '../types';
 
 const NOTES: Note[] = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
@@ -139,12 +139,43 @@ function detectBorrowedChord(chord: Chord, key: Key): string | null {
 
 /**
  * Analyze the harmonic function of a chord in a given key
+ * @param chord The chord to analyze
+ * @param key The current key
+ * @param minorScaleType The type of minor scale (only used when key.mode === 'minor')
  */
-export function analyzeHarmonicFunction(chord: Chord, key: Key): HarmonicFunction {
+export function analyzeHarmonicFunction(
+  chord: Chord,
+  key: Key,
+  minorScaleType: MinorScaleType = 'natural'
+): HarmonicFunction {
   const interval = getIntervalFromTonic(key.tonic, chord.root);
   const { mode } = key;
 
-  // Check for secondary dominants first
+  // IMPORTANT: Check diatonic dominant (V/V7) BEFORE checking for secondary dominants
+  // This prevents diatonic V and V7 from being misidentified as secondary dominants
+  if (interval === 7 && chord.quality === 'major') {
+    // This is V or V7 - always diatonic in both major and minor keys
+    return {
+      romanNumeral: chord.seventh === '7' ? 'V7' : 'V',
+      function: 'dominant',
+      isDiatonic: true,
+    };
+  }
+
+  // For minor keys, also check other diatonic chords before secondary dominant detection
+  if (mode === 'minor') {
+    // Quick check for melodic minor IV
+    if (minorScaleType === 'melodic' && interval === 5 && chord.quality === 'major') {
+      // This is diatonic IV in melodic minor, not a secondary dominant
+      return {
+        romanNumeral: 'IV',
+        function: 'subdominant',
+        isDiatonic: true,
+      };
+    }
+  }
+
+  // Check for secondary dominants
   const secondaryTarget = detectSecondaryDominant(chord, key);
   if (secondaryTarget !== null) {
     // This is a secondary dominant
@@ -156,6 +187,8 @@ export function analyzeHarmonicFunction(chord: Chord, key: Key): HarmonicFunctio
       romanNumeral: `V7/${targetRomanMap[secondaryTarget] || '?'}`,
       function: 'dominant',
       isDiatonic: false,
+      isSecondaryDominant: true,
+      secondaryDominantTarget: secondaryTarget,
     };
   }
 
@@ -179,6 +212,7 @@ export function analyzeHarmonicFunction(chord: Chord, key: Key): HarmonicFunctio
       romanNumeral,
       function: harmonicFunction,
       isDiatonic: false,
+      isBorrowedChord: true,
     };
   }
 
@@ -236,7 +270,7 @@ export function analyzeHarmonicFunction(chord: Chord, key: Key): HarmonicFunctio
         };
     }
   } else {
-    // Minor mode
+    // Minor mode - diatonic judgment depends on scale type
     switch (interval) {
       case 0: // i
         return {
@@ -244,42 +278,103 @@ export function analyzeHarmonicFunction(chord: Chord, key: Key): HarmonicFunctio
           function: 'tonic',
           isDiatonic: chord.quality === 'minor',
         };
-      case 2: // ii°
-        return {
-          romanNumeral: 'ii°',
-          function: 'subdominant',
-          isDiatonic: chord.quality === 'diminished',
-        };
+      case 2: // ii° (natural, harmonic) or ii (melodic)
+        if (minorScaleType === 'melodic') {
+          return {
+            romanNumeral: chord.quality === 'minor' ? 'ii' : 'ii°',
+            function: 'subdominant',
+            isDiatonic: chord.quality === 'minor',
+          };
+        } else {
+          return {
+            romanNumeral: 'ii°',
+            function: 'subdominant',
+            isDiatonic: chord.quality === 'diminished',
+          };
+        }
       case 3: // III
         return {
           romanNumeral: 'III',
           function: 'tonic', // III is relative major
           isDiatonic: chord.quality === 'major',
         };
-      case 5: // iv
-        return {
-          romanNumeral: 'iv',
-          function: 'subdominant',
-          isDiatonic: chord.quality === 'minor',
-        };
-      case 7: // v or V
-        return {
-          romanNumeral: chord.quality === 'major' ? 'V' : 'v',
-          function: 'dominant',
-          isDiatonic: chord.quality === 'minor', // Natural minor has minor v
-        };
-      case 8: // VI
+      case 5: // iv (natural, harmonic) or IV (melodic)
+        if (minorScaleType === 'melodic') {
+          return {
+            romanNumeral: chord.quality === 'major' ? 'IV' : 'iv',
+            function: 'subdominant',
+            isDiatonic: chord.quality === 'major',
+          };
+        } else {
+          return {
+            romanNumeral: 'iv',
+            function: 'subdominant',
+            isDiatonic: chord.quality === 'minor',
+          };
+        }
+      case 7: // v (natural) or V (harmonic, melodic)
+        if (minorScaleType === 'natural') {
+          return {
+            romanNumeral: chord.quality === 'major' ? 'V' : 'v',
+            function: 'dominant',
+            isDiatonic: chord.quality === 'minor',
+          };
+        } else {
+          // Harmonic and melodic minor have major V
+          return {
+            romanNumeral: chord.quality === 'major' ? 'V' : 'v',
+            function: 'dominant',
+            isDiatonic: chord.quality === 'major',
+          };
+        }
+      case 8: // VI (natural) or ♯vi° (melodic - typically not used)
         return {
           romanNumeral: 'VI',
           function: 'subdominant',
           isDiatonic: chord.quality === 'major',
         };
-      case 10: // VII
-        return {
-          romanNumeral: 'VII',
-          function: 'subdominant',
-          isDiatonic: chord.quality === 'major',
-        };
+      case 9: // ♯vi° (harmonic minor only)
+        if (minorScaleType === 'harmonic' && chord.quality === 'diminished') {
+          return {
+            romanNumeral: '♯vi°',
+            function: 'dominant',
+            isDiatonic: true,
+          };
+        } else {
+          return {
+            romanNumeral: `${chord.root}`,
+            function: 'tonic',
+            isDiatonic: false,
+          };
+        }
+      case 10: // VII (natural, harmonic) or ♯VII° (melodic)
+        if (minorScaleType === 'melodic') {
+          return {
+            romanNumeral: chord.quality === 'diminished' ? '♯vii°' : 'VII',
+            function: 'dominant',
+            isDiatonic: chord.quality === 'diminished',
+          };
+        } else {
+          return {
+            romanNumeral: 'VII',
+            function: 'subdominant',
+            isDiatonic: chord.quality === 'major',
+          };
+        }
+      case 11: // ♯vii° (harmonic, melodic)
+        if (minorScaleType === 'harmonic' || minorScaleType === 'melodic') {
+          return {
+            romanNumeral: '♯vii°',
+            function: 'dominant',
+            isDiatonic: chord.quality === 'diminished',
+          };
+        } else {
+          return {
+            romanNumeral: `${chord.root}`,
+            function: 'tonic',
+            isDiatonic: false,
+          };
+        }
       default:
         // Non-diatonic chord
         return {
@@ -294,7 +389,11 @@ export function analyzeHarmonicFunction(chord: Chord, key: Key): HarmonicFunctio
 /**
  * Get the harmonic function type for a chord in a key
  */
-export function getHarmonicFunctionType(chord: Chord, key: Key): HarmonicFunctionType {
-  const analysis = analyzeHarmonicFunction(chord, key);
+export function getHarmonicFunctionType(
+  chord: Chord,
+  key: Key,
+  minorScaleType: MinorScaleType = 'natural'
+): HarmonicFunctionType {
+  const analysis = analyzeHarmonicFunction(chord, key, minorScaleType);
   return analysis.function;
 }

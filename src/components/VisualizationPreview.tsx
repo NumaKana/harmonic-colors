@@ -1,5 +1,5 @@
 import { Canvas } from '@react-three/fiber';
-import { Key, Chord, VisualizationStyle } from '../types';
+import { Key, Chord, VisualizationStyle, MinorScaleType } from '../types';
 import ColorGradientMesh from './ColorGradientMesh';
 import StripesVisualization from './StripesVisualization';
 import CameraReset from './CameraReset';
@@ -12,15 +12,16 @@ interface VisualizationPreviewProps {
   currentChord?: Chord;
   hueRotation?: number;
   visualizationStyle?: VisualizationStyle;
+  minorScaleType?: MinorScaleType;
 }
 
-const VisualizationPreview = ({ selectedKey, currentChord, hueRotation = 0, visualizationStyle = 'marble' }: VisualizationPreviewProps) => {
+const VisualizationPreview = ({ selectedKey, currentChord, hueRotation = 0, visualizationStyle = 'marble', minorScaleType = 'natural' }: VisualizationPreviewProps) => {
   // Generate key color (base color)
   const keyColor = generateKeyColor(selectedKey, hueRotation);
 
   // Generate chord color and marble ratio if chord exists
-  const chordColor = currentChord ? generateChordColor(currentChord, selectedKey, keyColor) : keyColor;
-  const marbleRatio = currentChord ? getMarbleRatio(currentChord, selectedKey) : 0.7;
+  const chordColor = currentChord ? generateChordColor(currentChord, selectedKey, keyColor, minorScaleType) : keyColor;
+  const marbleRatio = currentChord ? getMarbleRatio(currentChord, selectedKey, minorScaleType) : 0.7;
   const particles = currentChord ? generateParticles(currentChord) : [];
 
   return (

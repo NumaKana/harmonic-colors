@@ -136,7 +136,7 @@ const ChordPalette = ({ selectedKey, onChordSelect, hueRotation = 0, minorScaleT
                 ✏️
               </button>
             </div>
-            <ChordColorPreview selectedKey={selectedKey} chord={chord} hueRotation={hueRotation} />
+            <ChordColorPreview selectedKey={selectedKey} chord={chord} hueRotation={hueRotation} minorScaleType={minorScaleType} />
           </div>
         ))}
       </div>

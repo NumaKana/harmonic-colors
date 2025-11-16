@@ -1,5 +1,5 @@
-import { Key, Chord, ColorHSL, Note, ParticleConfig } from '../types';
-import { getHarmonicFunctionType } from './harmonicAnalysis';
+import { Key, Chord, ColorHSL, Note, ParticleConfig, MinorScaleType } from '../types';
+import { analyzeHarmonicFunction } from './harmonicAnalysis';
 
 /**
  * Get the appropriate hue rotation based on key mode
@@ -10,7 +10,7 @@ export function getHueRotationForKey(key: Key, majorHueRotation: number, minorHu
 
 /**
  * Calculate the scale degree of a chord within a key
- * Returns 1-7 for diatonic chords, or null for non-diatonic
+ * Returns 1-7 for scale degrees, or null for non-diatonic
  */
 function getScaleDegree(chord: Chord, key: Key): number | null {
   const noteOrder: Note[] = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -21,14 +21,18 @@ function getScaleDegree(chord: Chord, key: Key): number | null {
   let semitones = (rootIndex - tonicIndex + 12) % 12;
 
   // Map semitones to scale degree
+  // This maps intervals to degrees (1=tonic, 2=second, etc.)
   const semitoneToScaleDegree: Record<number, number> = {
-    0: 1,  // I
-    2: 2,  // ii
-    4: 3,  // iii
-    5: 4,  // IV
-    7: 5,  // V
-    9: 6,  // vi
-    11: 7  // vii
+    0: 1,  // tonic
+    2: 2,  // second
+    3: 3,  // minor third (for minor keys)
+    4: 3,  // major third (for major keys)
+    5: 4,  // fourth
+    7: 5,  // fifth
+    8: 6,  // minor sixth (for minor keys)
+    9: 6,  // major sixth (for major keys)
+    10: 7, // minor seventh (for minor keys)
+    11: 7  // major seventh (for major keys)
   };
 
   return semitoneToScaleDegree[semitones] ?? null;
@@ -82,32 +86,71 @@ export function generateKeyColor(key: Key, hueRotation: number = 0): ColorHSL {
 export function generateChordColor(
   chord: Chord,
   key: Key,
-  baseColor: ColorHSL
+  baseColor: ColorHSL,
+  minorScaleType: MinorScaleType = 'natural'
 ): ColorHSL {
-  // Get the harmonic function
-  const harmonicFunction = getHarmonicFunctionType(chord, key);
+  // Get the full harmonic analysis
+  const analysis = analyzeHarmonicFunction(chord, key, minorScaleType);
+  const harmonicFunction = analysis.function;
+  const isDiatonic = analysis.isDiatonic;
 
-  // Calculate hue adjustment based on harmonic function
-  let hueAdjustment = 0;
-  switch (harmonicFunction) {
-    case 'tonic':
-      hueAdjustment = 0; // ±0 degrees
-      break;
-    case 'subdominant':
-      hueAdjustment = 15; // +15 degrees
-      break;
-    case 'dominant':
-      hueAdjustment = 30; // +30 degrees
-      break;
+  // Determine color calculation method
+  // For visual coherence, borrowed chords and secondary dominants
+  // should use key-based hue (like diatonic chords) unless they are truly chromatic
+  let hue: number;
+
+  // Use chord root hue only for truly chromatic chords (not secondary dominants or borrowed chords)
+  const isTrulyChromaticChord = !isDiatonic && !analysis.isSecondaryDominant && !analysis.isBorrowedChord;
+
+  if (isTrulyChromaticChord) {
+    // Truly chromatic chords (e.g., chromatic mediants): use chord root hue as base
+    const chordRootHue = NOTE_TO_HUE[chord.root];
+    hue = chordRootHue;
+  } else {
+    // Diatonic, secondary dominants, and borrowed chords: use key-based hue
+    let hueAdjustment = 0;
+
+    switch (harmonicFunction) {
+      case 'tonic':
+        hueAdjustment = 0; // ±0 degrees
+        break;
+      case 'subdominant':
+        hueAdjustment = 10; // +10 degrees (reduced from 15)
+        break;
+      case 'dominant':
+        hueAdjustment = 20; // +20 degrees (reduced from 30)
+        break;
+    }
+
+    // Additional adjustment for secondary dominants and borrowed chords
+    if (analysis.isSecondaryDominant && analysis.secondaryDominantTarget !== undefined) {
+      // Vary hue adjustment based on target chord to distinguish different secondary dominants
+      // Target intervals: 0(I), 2(ii), 4(iii), 5(IV), 7(V), 9(vi), 11(vii°)
+      const targetAdjustmentMap: Record<number, number> = {
+        0: 12,  // V7/I
+        2: 18,  // V7/ii
+        4: 24,  // V7/iii
+        5: 6,   // V7/IV
+        7: 15,  // V7/V
+        9: 21,  // V7/vi
+        11: 9   // V7/vii°
+      };
+      hueAdjustment += targetAdjustmentMap[analysis.secondaryDominantTarget] ?? 12;
+    } else if (analysis.isBorrowedChord) {
+      hueAdjustment += 8; // Subtle shift for borrowed chords
+    }
+
+    hue = (baseColor.hue + hueAdjustment) % 360;
   }
 
   // Apply micro-adjustment based on scale degree within harmonic function
+  // Only for diatonic chords
   const scaleDegree = getScaleDegree(chord, key);
   let microHueAdjustment = 0;
   let microSaturationAdjustment = 0;
   let microLightnessAdjustment = 0;
 
-  if (scaleDegree !== null) {
+  if (isDiatonic && scaleDegree !== null) {
     // Apply different adjustments for different scale degrees within the same harmonic function
     // Focus on saturation and lightness differences for better perceptibility
     if (harmonicFunction === 'tonic') {
@@ -119,46 +162,56 @@ export function generateChordColor(
         microLightnessAdjustment = 0;
       } else if (scaleDegree === 3) {
         // iii: significantly darker and less saturated
-        microHueAdjustment = -8;
+        microHueAdjustment = -5;
         microSaturationAdjustment = -15;
         microLightnessAdjustment = -15;
       } else if (scaleDegree === 6) {
         // vi: significantly brighter and more saturated
-        microHueAdjustment = 8;
+        microHueAdjustment = 5;
         microSaturationAdjustment = 15;
         microLightnessAdjustment = 15;
       }
     } else if (harmonicFunction === 'subdominant') {
-      // ii, IV
+      // ii, IV, VI, VII (in minor keys)
       if (scaleDegree === 2) {
         // ii: darker and less saturated
-        microHueAdjustment = -5;
+        microHueAdjustment = -3;
         microSaturationAdjustment = -12;
         microLightnessAdjustment = -12;
       } else if (scaleDegree === 4) {
-        // IV: brighter and more saturated
-        microHueAdjustment = 5;
+        // IV: closer to tonic hue, brighter and more saturated
+        microHueAdjustment = -2;
         microSaturationAdjustment = 12;
         microLightnessAdjustment = 12;
+      } else if (scaleDegree === 6) {
+        // VI (natural minor): shifted hue, moderate brightness
+        microHueAdjustment = -5;
+        microSaturationAdjustment = 5;
+        microLightnessAdjustment = 5;
+      } else if (scaleDegree === 7) {
+        // VII (natural/harmonic minor): shifted hue in opposite direction
+        microHueAdjustment = 5;
+        microSaturationAdjustment = 8;
+        microLightnessAdjustment = 8;
       }
     } else if (harmonicFunction === 'dominant') {
       // V, vii
       if (scaleDegree === 5) {
-        // V: no adjustment (neutral reference)
-        microHueAdjustment = 0;
-        microSaturationAdjustment = 0;
+        // V: slight hue shift to distinguish from IV
+        microHueAdjustment = 3;
+        microSaturationAdjustment = 5;
         microLightnessAdjustment = 0;
       } else if (scaleDegree === 7) {
         // vii: significantly darker and less saturated
-        microHueAdjustment = -8;
+        microHueAdjustment = -5;
         microSaturationAdjustment = -15;
         microLightnessAdjustment = -15;
       }
     }
-  }
 
-  // Apply hue adjustment (keep within ±30 degree range for diatonic chords)
-  const hue = (baseColor.hue + hueAdjustment + microHueAdjustment) % 360;
+    // Apply micro hue adjustment only for diatonic chords
+    hue = (hue + microHueAdjustment) % 360;
+  }
 
   // Calculate lightness adjustment based on chord quality and function
   let lightnessAdjustment = 0;
@@ -260,9 +313,31 @@ export function hslToCSS(color: ColorHSL): string {
  * Returns the ratio of Color 1 to Color 2 (0-1)
  * Higher value = more Color 1 (key color)
  */
-export function getMarbleRatio(chord: Chord, key: Key): number {
-  const harmonicFunction = getHarmonicFunctionType(chord, key);
+export function getMarbleRatio(
+  chord: Chord,
+  key: Key,
+  minorScaleType: MinorScaleType = 'natural'
+): number {
+  const analysis = analyzeHarmonicFunction(chord, key, minorScaleType);
+  const harmonicFunction = analysis.function;
+  const isDiatonic = analysis.isDiatonic;
 
+  // Truly chromatic chords: emphasize Color 2 (chord color) significantly
+  const isTrulyChromaticChord = !isDiatonic && !analysis.isSecondaryDominant && !analysis.isBorrowedChord;
+
+  if (isTrulyChromaticChord) {
+    return 0.3; // 30% color1, 70% color2 - strong chord color presence
+  }
+
+  // Secondary dominants: slightly more Color 2
+  if (analysis.isSecondaryDominant) {
+    return 0.45; // 45% color1, 55% color2
+  }
+
+  // Borrowed chords: follow standard harmonic function ratios
+  // (they blend in with diatonic chords for visual coherence)
+
+  // Diatonic chords and borrowed chords: traditional ratios
   switch (harmonicFunction) {
     case 'tonic':
       return 0.7; // 70% color1, 30% color2

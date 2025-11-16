@@ -86,10 +86,10 @@ const BuildPhase = ({
   // Generate colors for info display
   const hueRotation = getHueRotationForKey(selectedKey, majorHueRotation, minorHueRotation);
   const color1 = generateKeyColor(selectedKey, hueRotation);
-  const color2 = currentChord ? generateChordColor(currentChord, selectedKey, color1) : color1;
+  const color2 = currentChord ? generateChordColor(currentChord, selectedKey, color1, minorScaleType) : color1;
 
   // Get harmonic function info
-  const harmonicFunction = currentChord ? analyzeHarmonicFunction(currentChord, selectedKey) : null;
+  const harmonicFunction = currentChord ? analyzeHarmonicFunction(currentChord, selectedKey, minorScaleType) : null;
 
   return (
     <div className="build-phase">

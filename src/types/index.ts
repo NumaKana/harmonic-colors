@@ -63,6 +63,11 @@ export interface HarmonicFunction {
   romanNumeral: string;
   function: HarmonicFunctionType;
   isDiatonic: boolean;
+  // Additional info for non-diatonic chords
+  isSecondaryDominant?: boolean;
+  secondaryDominantTarget?: number; // Target interval for secondary dominants (0-11)
+  isBorrowedChord?: boolean;
+  isChromaticMediant?: boolean; // For chromatic mediant relationships
 }
 
 export interface Section {
