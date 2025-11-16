@@ -8,6 +8,38 @@
   padding: 2rem;
 }
 
+.build-phase-header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.sample-load-button {
+  padding: 0.6rem 1.2rem;
+  background-color: #4a5568;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sample-load-button:hover {
+  background-color: #2d3748;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.sample-load-button:active {
+  transform: translateY(0);
+}
+
 .build-phase .visualization-info {
   display: flex;
   flex-direction: column;

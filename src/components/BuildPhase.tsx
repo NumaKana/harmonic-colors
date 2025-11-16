@@ -38,6 +38,7 @@ interface BuildPhaseProps {
   onSectionRemove: (id: string) => void;
   onSectionNameChange: (id: string, name: string) => void;
   onSectionKeyChange: (id: string, key: Key) => void;
+  onLoadSample: (sampleId: string) => void;
 }
 
 const BuildPhase = ({
@@ -67,7 +68,8 @@ const BuildPhase = ({
   onSectionAdd,
   onSectionRemove,
   onSectionNameChange: _onSectionNameChange,
-  onSectionKeyChange
+  onSectionKeyChange,
+  onLoadSample
 }: BuildPhaseProps) => {
   // Get current chord for preview using local index
   const currentChord = localSelectedIndex !== undefined && localSelectedIndex >= 0
@@ -86,6 +88,15 @@ const BuildPhase = ({
 
   return (
     <div className="build-phase">
+      <div className="build-phase-header">
+        <button
+          className="sample-load-button"
+          onClick={() => onLoadSample('just-the-two-of-us')}
+          title="Load sample chord progression"
+        >
+          📝 Load Sample (Just The Two Of Us)
+        </button>
+      </div>
       <ChordPalette selectedKey={selectedKey} onChordSelect={onChordSelect} hueRotation={hueRotation} minorScaleType={minorScaleType} />
       <ChordSequence
         sections={sections}

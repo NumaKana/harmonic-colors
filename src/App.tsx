@@ -5,6 +5,7 @@ import ConfirmPhase from './components/ConfirmPhase';
 import SettingsSidebar from './components/SettingsSidebar';
 import { Key, Chord, Section, MinorScaleType, VisualizationStyle } from './types';
 import { audioEngine } from './utils/audioEngine';
+import { getSampleSong } from './data/samples';
 
 type Phase = 'build' | 'confirm';
 
@@ -276,6 +277,24 @@ function App() {
     ));
   };
 
+  const handleLoadSample = (sampleId: string) => {
+    const sample = getSampleSong(sampleId);
+    if (!sample) {
+      console.error(`Sample song not found: ${sampleId}`);
+      return;
+    }
+
+    // Confirm before overwriting current progression
+    const message = `現在のコード進行を「${sample.title}」で上書きしますか？`;
+    if (window.confirm(message)) {
+      setSections(sample.sections);
+      setCurrentSectionId(sample.sections[0].id);
+      setSelectedChordIndex(null);
+      setCurrentChordIndex(-1);
+      setPlaybackPosition(0);
+    }
+  };
+
   // Get current chord for visualization
   // Priority: 1. Playing chord, 2. Selected chord, 3. Last chord
   const currentChord = currentChordIndex >= 0
@@ -368,6 +387,7 @@ function App() {
             onSectionRemove={handleSectionRemove}
             onSectionNameChange={handleSectionNameChange}
             onSectionKeyChange={handleSectionKeyChange}
+            onLoadSample={handleLoadSample}
           />
         ) : (
           <ConfirmPhase
