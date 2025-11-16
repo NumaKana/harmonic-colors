@@ -166,11 +166,44 @@ const TimelineVisualization = ({
       canvas.style.cursor = 'grab';
     };
 
+    // Touch event handlers
+    const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length === 0) return;
+      isDraggingRef.current = true;
+      dragStartXRef.current = e.touches[0].clientX;
+      cameraStartXRef.current = previewCameraX;
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!isDraggingRef.current || e.touches.length === 0) return;
+      e.preventDefault(); // Prevent scrolling
+
+      const deltaX = e.touches[0].clientX - dragStartXRef.current;
+      // Convert screen pixels to world units (invert direction for natural scrolling)
+      const worldDelta = -deltaX * 0.005;
+      const newX = cameraStartXRef.current + worldDelta;
+
+      // Clamp camera position to valid range
+      const viewWidth = 8.0;
+      const minX = viewWidth / 2;
+      const maxX = totalWidth - viewWidth / 2;
+      const clampedX = Math.max(minX, Math.min(maxX, newX));
+
+      setPreviewCameraX(clampedX);
+    };
+
+    const handleTouchEnd = () => {
+      isDraggingRef.current = false;
+    };
+
     canvas.style.cursor = 'grab';
     canvas.addEventListener('mousedown', handleMouseDown);
     canvas.addEventListener('mousemove', handleMouseMove);
     canvas.addEventListener('mouseup', handleMouseUp);
     canvas.addEventListener('mouseleave', handleMouseLeave);
+    canvas.addEventListener('touchstart', handleTouchStart, { passive: true });
+    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+    canvas.addEventListener('touchend', handleTouchEnd);
 
     return () => {
       canvas.style.cursor = 'default';
@@ -178,6 +211,9 @@ const TimelineVisualization = ({
       canvas.removeEventListener('mousemove', handleMouseMove);
       canvas.removeEventListener('mouseup', handleMouseUp);
       canvas.removeEventListener('mouseleave', handleMouseLeave);
+      canvas.removeEventListener('touchstart', handleTouchStart);
+      canvas.removeEventListener('touchmove', handleTouchMove);
+      canvas.removeEventListener('touchend', handleTouchEnd);
     };
   }, [mode, gl, totalWidth, previewCameraX]);
 

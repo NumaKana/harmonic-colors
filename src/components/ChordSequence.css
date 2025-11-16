@@ -292,3 +292,132 @@
 .measure-chord-remove:active {
   transform: scale(0.9);
 }
+
+/* Mobile responsive design */
+@media (max-width: 900px) {
+  .chord-sequence {
+    max-width: 100%;
+  }
+
+  .measure-row {
+    flex-wrap: wrap;
+  }
+
+  .measure {
+    min-width: calc(50% - 0.25rem);
+  }
+}
+
+@media (max-width: 768px) {
+  .chord-sequence {
+    padding: 0.75rem;
+  }
+
+  .chord-sequence-header {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .chord-sequence-title {
+    font-size: 0.9rem;
+  }
+
+  .add-key-button {
+    min-height: 44px;
+    padding: 0.5rem 1rem;
+  }
+
+  .chord-sequence-rows {
+    gap: 1rem;
+    max-height: 400px;
+  }
+
+  .measure-number {
+    min-width: 24px;
+    max-width: 24px;
+    font-size: 0.7rem;
+  }
+
+  .measure-chord-name {
+    font-size: 0.8rem;
+  }
+
+  .measure-chord-duration {
+    font-size: 0.85rem;
+  }
+
+  .measure-chord-remove,
+  .section-bracket-remove {
+    width: 24px;
+    height: 24px;
+    font-size: 1.2rem;
+    opacity: 1;
+  }
+
+  .section-bracket-label {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .chord-sequence {
+    padding: 0.5rem;
+  }
+
+  .chord-sequence-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .chord-sequence-title {
+    font-size: 0.85rem;
+  }
+
+  .chord-sequence-controls {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .add-key-button {
+    flex: 1;
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
+    white-space: nowrap;
+  }
+
+  .chord-sequence-rows {
+    gap: 0.75rem;
+  }
+
+  .measure-row {
+    gap: 0.3rem;
+  }
+
+  .measure {
+    min-width: 100%;
+    min-height: 60px;
+  }
+
+  .measure-number {
+    min-width: 20px;
+    max-width: 20px;
+    font-size: 0.65rem;
+  }
+
+  .measure-chord {
+    padding: 0.2rem 0.3rem;
+  }
+
+  .measure-chord-name {
+    font-size: 0.75rem;
+  }
+
+  .measure-chord-duration {
+    font-size: 0.8rem;
+  }
+
+  .section-bracket-label {
+    font-size: 0.65rem;
+  }
+}

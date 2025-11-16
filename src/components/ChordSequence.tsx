@@ -230,8 +230,8 @@ const ChordSequence = ({ sections, currentSectionId, currentSectionKey, onRemove
                   const section = sections.find(s => s.id === bracket.sectionId);
                   if (!section) return null;
 
-                  const widthPercent = ((bracket.endCol - bracket.startCol) / 4) * 100;
-                  const leftPercent = (bracket.startCol / 4) * 100;
+                  const widthPercent = ((bracket.endCol - bracket.startCol) / row.length) * 100;
+                  const leftPercent = (bracket.startCol / row.length) * 100;
 
                   return (
                     <div

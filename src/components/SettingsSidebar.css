@@ -334,4 +334,88 @@
     width: 100%;
     max-width: 100%;
   }
+
+  .settings-header {
+    padding: 1.25rem;
+  }
+
+  .settings-title {
+    font-size: 1.1rem;
+  }
+
+  .settings-close-button {
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 1.4rem;
+  }
+
+  .settings-content {
+    padding: 1.25rem;
+  }
+
+  .settings-sidebar .hue-rotation-input {
+    min-height: 44px;
+  }
+
+  .settings-sidebar .hue-rotation-reset,
+  .settings-sidebar .hue-rotation-reset-both {
+    min-height: 44px;
+  }
+
+  .settings-sidebar .visualization-style-option,
+  .settings-sidebar .minor-scale-option {
+    min-height: 44px;
+    padding: 0.85rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .settings-header {
+    padding: 1rem;
+  }
+
+  .settings-title {
+    font-size: 1rem;
+  }
+
+  .settings-content {
+    padding: 1rem;
+  }
+
+  .settings-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .settings-section-title {
+    font-size: 0.95rem;
+  }
+
+  .settings-description {
+    font-size: 0.8rem;
+  }
+
+  .settings-sidebar .hue-rotation-label {
+    font-size: 0.85rem;
+  }
+
+  .settings-sidebar .hue-rotation-input {
+    min-height: 44px;
+    font-size: 0.95rem;
+  }
+
+  .settings-sidebar .hue-rotation-reset,
+  .settings-sidebar .hue-rotation-reset-both {
+    min-height: 44px;
+    font-size: 0.9rem;
+  }
+
+  .settings-sidebar .visualization-style-label,
+  .settings-sidebar .minor-scale-label {
+    font-size: 0.95rem;
+  }
+
+  .settings-sidebar .visualization-style-detail,
+  .settings-sidebar .minor-scale-detail {
+    font-size: 0.8rem;
+  }
 }

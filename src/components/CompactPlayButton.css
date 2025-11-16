@@ -46,3 +46,22 @@
   cursor: not-allowed;
   opacity: 0.5;
 }
+
+/* Mobile responsive design */
+@media (max-width: 768px) {
+  .compact-play-button {
+    width: 52px;
+    height: 52px;
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .compact-play-button {
+    width: 56px;
+    height: 56px;
+    top: 8px;
+    right: 8px;
+    font-size: 1.4rem;
+  }
+}
