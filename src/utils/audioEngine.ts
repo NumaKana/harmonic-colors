@@ -75,12 +75,15 @@ class AudioEngine {
 
   /**
    * Convert a chord to an array of note frequencies
+   * Root notes: A1~E3 (MIDI 21~52)
+   * Other notes: C3~E5 (MIDI 48~76)
    */
   getChordNotes(chord: Chord, octave: number = 4): string[] {
     const notes: string[] = [];
 
-    // Add root note
-    notes.push(`${chord.root}${octave}`);
+    // Determine root octave to place it in A1~E3 range
+    const rootOctave = this.getRootOctave(chord.root);
+    notes.push(`${chord.root}${rootOctave}`);
 
     // Determine third interval based on quality and seventh
     let thirdInterval = 4; // Major 3rd (default)
@@ -96,7 +99,7 @@ class AudioEngine {
       // Use quality if no seventh or seventh is '7' or 'maj7'
       thirdInterval = chord.quality === 'major' || chord.quality === 'augmented' ? 4 : 3;
     }
-    notes.push(this.transposeNote(chord.root, thirdInterval, octave));
+    notes.push(this.transposeNoteInRange(chord.root, thirdInterval, 3, 5)); // C3~E5
 
     // Determine fifth interval based on seventh (overrides quality if specified)
     let fifthInterval = 7; // Perfect fifth (default)
@@ -115,7 +118,7 @@ class AudioEngine {
         fifthInterval = 8; // Augmented fifth
       }
     }
-    notes.push(this.transposeNote(chord.root, fifthInterval, octave));
+    notes.push(this.transposeNoteInRange(chord.root, fifthInterval, 3, 5)); // C3~E5
 
     // Add seventh if present
     if (chord.seventh) {
@@ -139,7 +142,7 @@ class AudioEngine {
           break;
       }
 
-      notes.push(this.transposeNote(chord.root, seventhInterval, octave));
+      notes.push(this.transposeNoteInRange(chord.root, seventhInterval, 3, 5)); // C3~E5
     }
 
     // Add tensions (9th, 11th, 13th)
@@ -156,7 +159,7 @@ class AudioEngine {
           interval = 21; // 13th = octave + 9 semitones
           break;
       }
-      notes.push(this.transposeNote(chord.root, interval, octave));
+      notes.push(this.transposeNoteInRange(chord.root, interval, 3, 5)); // C3~E5
     });
 
     // Add alterations (♭9, ♯9, ♯11, ♭13)
@@ -176,10 +179,67 @@ class AudioEngine {
           interval = 20; // ♭13 = octave + 8 semitones
           break;
       }
-      notes.push(this.transposeNote(chord.root, interval, octave));
+      notes.push(this.transposeNoteInRange(chord.root, interval, 3, 5)); // C3~E5
     });
 
     return notes;
+  }
+
+  /**
+   * Get the appropriate octave for a root note to place it in C2~E5 range
+   */
+  private getRootOctave(root: Note): number {
+    // MIDI note numbers for reference:
+    // C2 = 24, C3 = 36, C4 = 48, E5 = 76
+    const noteToMidi: { [key in Note]: number } = {
+      'C': 0, 'C#': 1, 'D': 2, 'D#': 3, 'E': 4, 'F': 5,
+      'F#': 6, 'G': 7, 'G#': 8, 'A': 9, 'A#': 10, 'B': 11
+    };
+
+    const noteIndex = noteToMidi[root];
+
+    // Place low notes (C-E) in octave 2, mid notes (F-B) in octave 2
+    // All notes in octave 2 for consistent bass range (C2~B2 = MIDI 24~35)
+    return 2;
+  }
+
+  /**
+   * Transpose a note by semitones and constrain it to a given octave range
+   */
+  private transposeNoteInRange(root: Note, semitones: number, minOctave: number, maxOctave: number): string {
+    const notes: Note[] = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+    const rootIndex = notes.indexOf(root);
+
+    // Start from a middle octave and transpose
+    let baseOctave = 4;
+    const totalSemitones = rootIndex + semitones;
+    let resultOctave = baseOctave + Math.floor(totalSemitones / 12);
+    const noteIndex = totalSemitones % 12;
+    const resultNote = notes[noteIndex];
+
+    // Adjust octave to fit within the range
+    const noteToMidi: { [key in Note]: number } = {
+      'C': 0, 'C#': 1, 'D': 2, 'D#': 3, 'E': 4, 'F': 5,
+      'F#': 6, 'G': 7, 'G#': 8, 'A': 9, 'A#': 10, 'B': 11
+    };
+
+    const minMidi = minOctave * 12 + noteToMidi['C'];
+    const maxMidi = maxOctave * 12 + noteToMidi['E'];
+    let currentMidi = resultOctave * 12 + noteToMidi[resultNote];
+
+    // Shift octave down if too high
+    while (currentMidi > maxMidi && resultOctave > minOctave) {
+      resultOctave--;
+      currentMidi = resultOctave * 12 + noteToMidi[resultNote];
+    }
+
+    // Shift octave up if too low
+    while (currentMidi < minMidi && resultOctave < maxOctave) {
+      resultOctave++;
+      currentMidi = resultOctave * 12 + noteToMidi[resultNote];
+    }
+
+    return `${resultNote}${resultOctave}`;
   }
 
   /**
