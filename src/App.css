@@ -77,7 +77,6 @@
   border: 1px solid #444;
   border-radius: 50%;
   color: #aaa;
-  font-size: 1.5rem;
   cursor: pointer;
   transition: all 0.2s;
   display: flex;
@@ -85,19 +84,30 @@
   justify-content: center;
 }
 
-.help-button:hover,
-.settings-button:hover {
+.help-button {
+  font-size: 1.2rem;
+  font-weight: bold;
+  font-style: italic;
+}
+
+.settings-button {
+  font-size: 1.5rem;
+}
+
+.help-button:hover {
   background-color: #333;
-  border-color: #667eea;
+  border-color: #555;
   color: #fff;
 }
 
 .settings-button:hover {
+  background-color: #333;
+  border-color: #555;
+  color: #fff;
   transform: rotate(45deg);
 }
 
-.help-button:active,
-.settings-button:active {
+.help-button:active {
   transform: scale(0.95);
 }
 
@@ -140,6 +150,13 @@
   .settings-button {
     width: 44px;
     height: 44px;
+  }
+
+  .help-button {
+    font-size: 1.1rem;
+  }
+
+  .settings-button {
     font-size: 1.3rem;
   }
 }
@@ -176,6 +193,13 @@
   .settings-button {
     width: 40px;
     height: 40px;
+  }
+
+  .help-button {
+    font-size: 1rem;
+  }
+
+  .settings-button {
     font-size: 1.2rem;
   }
 }

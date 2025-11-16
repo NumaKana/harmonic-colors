@@ -373,7 +373,7 @@ function App() {
             onClick={() => setIsHelpOpen(true)}
             title="ヘルプ / Help"
           >
-            ❓
+            i
           </button>
           <button
             className="settings-button"
