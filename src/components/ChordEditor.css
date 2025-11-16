@@ -216,10 +216,70 @@
 }
 
 /* Responsive */
+@media (max-width: 768px) {
+  .chord-editor-header {
+    padding: 1.25rem;
+  }
+
+  .chord-editor-title {
+    font-size: 1.1rem;
+  }
+
+  .chord-editor-close {
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 1.4rem;
+  }
+
+  .chord-editor-content {
+    padding: 1.25rem;
+    gap: 1.25rem;
+  }
+
+  .option-button {
+    min-height: 44px;
+  }
+
+  .duration-select {
+    min-height: 44px;
+  }
+
+  .chord-editor-footer {
+    padding: 1.25rem;
+  }
+
+  .cancel-button,
+  .create-button {
+    min-height: 44px;
+  }
+}
+
 @media (max-width: 600px) {
   .chord-editor {
     width: 95%;
     max-width: none;
+  }
+
+  .chord-editor-header {
+    padding: 1rem;
+  }
+
+  .chord-editor-title {
+    font-size: 1rem;
+  }
+
+  .chord-editor-content {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .chord-preview {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .chord-preview-name {
+    font-size: 1.3rem;
   }
 
   .button-group {
@@ -227,7 +287,24 @@
   }
 
   .option-button {
-    padding: 0.4rem 0.8rem;
+    padding: 0.5rem 0.8rem;
     font-size: 0.85rem;
+    min-height: 44px;
+  }
+
+  .duration-select {
+    min-height: 44px;
+    font-size: 0.9rem;
+  }
+
+  .chord-editor-footer {
+    padding: 1rem;
+    gap: 0.5rem;
+  }
+
+  .cancel-button,
+  .create-button {
+    min-height: 44px;
+    font-size: 0.95rem;
   }
 }

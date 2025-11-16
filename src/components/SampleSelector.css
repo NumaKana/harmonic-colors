@@ -201,4 +201,88 @@
     width: 95%;
     max-height: 90vh;
   }
+
+  .sample-selector-header {
+    padding: 1.25rem;
+  }
+
+  .sample-selector-title {
+    font-size: 1.1rem;
+  }
+
+  .sample-selector-close {
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 1.4rem;
+  }
+
+  .sample-selector-content {
+    padding: 1.25rem;
+  }
+
+  .sample-item {
+    min-height: 44px;
+  }
+
+  .sample-selector-footer {
+    padding: 1rem 1.25rem;
+  }
+
+  .sample-selector-cancel {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 600px) {
+  .sample-selector-header {
+    padding: 1rem;
+  }
+
+  .sample-selector-title {
+    font-size: 1rem;
+  }
+
+  .sample-selector-content {
+    padding: 1rem;
+  }
+
+  .sample-selector-description {
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+  }
+
+  .sample-list {
+    gap: 0.75rem;
+  }
+
+  .sample-item {
+    padding: 1rem;
+  }
+
+  .sample-item-title {
+    font-size: 1rem;
+  }
+
+  .sample-item-artist {
+    font-size: 0.85rem;
+  }
+
+  .sample-item-description {
+    font-size: 0.8rem;
+  }
+
+  .sample-item-info {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .sample-selector-footer {
+    padding: 1rem;
+  }
+
+  .sample-selector-cancel {
+    width: 100%;
+    min-height: 44px;
+    font-size: 0.9rem;
+  }
 }

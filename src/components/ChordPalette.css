@@ -168,3 +168,77 @@
   color: #fff;
   font-weight: 600;
 }
+
+/* Mobile responsive design */
+@media (max-width: 900px) {
+  .chord-buttons {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .chord-palette {
+    padding: 0.75rem;
+  }
+
+  .chord-buttons {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+
+  .new-chord-button {
+    min-height: 44px;
+  }
+
+  .duration-select {
+    min-height: 44px;
+    min-width: 150px;
+  }
+
+  .chord-button {
+    padding: 0.6rem 0.75rem;
+    min-height: 44px;
+  }
+
+  .edit-chord-button {
+    min-width: 44px;
+    width: 44px;
+  }
+}
+
+@media (max-width: 600px) {
+  .chord-palette {
+    padding: 0.5rem;
+  }
+
+  .chord-buttons {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.4rem;
+  }
+
+  .chord-palette-title {
+    font-size: 0.9rem;
+  }
+
+  .new-chord-button {
+    font-size: 0.85rem;
+    padding: 0.5rem 0.85rem;
+  }
+
+  .duration-label {
+    font-size: 0.85rem;
+  }
+
+  .duration-select {
+    font-size: 0.85rem;
+    min-width: 120px;
+  }
+
+  .chord-button-roman {
+    font-size: 0.75rem;
+  }
+
+  .chord-button-name {
+    font-size: 1rem;
+  }
+}

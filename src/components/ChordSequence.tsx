@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Chord, Section, Key } from '../types';
 import { getChordDisplayName } from '../utils/diatonic';
 import { audioEngine } from '../utils/audioEngine';
@@ -147,6 +148,24 @@ const groupMeasuresIntoRows = (measures: Measure[], measuresPerRow: number = 4):
 };
 
 const ChordSequence = ({ sections, currentSectionId, currentSectionKey, onRemoveChord, onSelectChord, onSectionSelect, onSectionAdd, onSectionRemove, onSectionKeyChange, currentIndex, selectedIndex, timeSignature = 4 }: ChordSequenceProps) => {
+  // Track window width to determine columns per row
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1000);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Determine columns based on window width
+  const getColumnsPerRow = () => {
+    if (windowWidth <= 600) return 1;
+    if (windowWidth <= 900) return 2;
+    return 4;
+  };
+
+  const columnsPerRow = getColumnsPerRow();
+
   const handleChordClick = async (chord: Chord, index: number) => {
     // Select the chord
     onSelectChord(index);
@@ -230,8 +249,28 @@ const ChordSequence = ({ sections, currentSectionId, currentSectionKey, onRemove
                   const section = sections.find(s => s.id === bracket.sectionId);
                   if (!section) return null;
 
-                  const widthPercent = ((bracket.endCol - bracket.startCol) / 4) * 100;
-                  const leftPercent = (bracket.startCol / 4) * 100;
+                  // Calculate width based on actual columns that will be displayed
+                  // Desktop: 4 columns, Tablet (900px): 2 columns, Mobile (600px): 1 column
+                  // We need to map bracket positions (0-4 for 4 measures) to visible columns
+                  // For example: if row has 4 measures but only 2 are visible per row,
+                  // measures 0-1 are on first visual row, measures 2-3 are on second visual row
+
+                  // Map measure indices to visual columns (wrapping based on columnsPerRow)
+                  const startVisualCol = bracket.startCol % columnsPerRow;
+                  const endVisualCol = bracket.endCol % columnsPerRow === 0 && bracket.endCol > 0
+                    ? columnsPerRow
+                    : bracket.endCol % columnsPerRow;
+
+                  // Calculate how many visual rows this bracket spans
+                  const startRow = Math.floor(bracket.startCol / columnsPerRow);
+                  const endRow = Math.floor((bracket.endCol - 1) / columnsPerRow);
+
+                  // If bracket spans multiple visual rows, only show it on its starting row
+                  // and extend to the end of that row
+                  const actualEndCol = startRow === endRow ? endVisualCol : columnsPerRow;
+
+                  const widthPercent = ((actualEndCol - startVisualCol) / columnsPerRow) * 100;
+                  const leftPercent = (startVisualCol / columnsPerRow) * 100;
 
                   return (
                     <div
@@ -268,11 +307,8 @@ const ChordSequence = ({ sections, currentSectionId, currentSectionKey, onRemove
               {/* Measures */}
               <div className="measure-row">
                 {row.map((measure) => {
-                  // Calculate measure width: each measure takes 1/4 of the row (25%)
-                  const measureWidthPercent = (1 / 4) * 100;
-
                   return (
-                    <div key={measure.measureNumber} className="measure" style={{ width: `${measureWidthPercent}%` }}>
+                    <div key={measure.measureNumber} className="measure">
                       <div className="measure-number">{measure.measureNumber}</div>
                       <div className="measure-content" style={{ gridTemplateColumns: `repeat(${timeSignature}, 1fr)` }}>
                       {/* Create beat grid slots based on time signature */}

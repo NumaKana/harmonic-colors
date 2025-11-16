@@ -47,3 +47,34 @@
   pointer-events: none;
   z-index: 10;
 }
+
+/* Mobile responsive design */
+@media (max-width: 768px) {
+  .chord-name-bar {
+    height: 50px;
+  }
+
+  .chord-name-item {
+    font-size: 1.1rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .chord-name-item.current {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .chord-name-bar {
+    height: 45px;
+  }
+
+  .chord-name-item {
+    font-size: 1rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .chord-name-item.current {
+    font-size: 1.2rem;
+  }
+}

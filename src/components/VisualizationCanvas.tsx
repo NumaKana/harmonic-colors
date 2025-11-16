@@ -59,7 +59,7 @@ const VisualizationCanvas = ({
     }
   }, []);
 
-  // Scrollbar drag handling with React synthetic events
+  // Scrollbar drag handling with React synthetic events (Mouse)
   const handleScrollbarMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDraggingScrollbar(true);
@@ -69,6 +69,23 @@ const VisualizationCanvas = ({
     const rect = scrollbarRef.current.getBoundingClientRect();
     const clickX = e.clientX - rect.left;
     const progress = Math.max(0, Math.min(1, clickX / rect.width));
+
+    // Update camera position via ref
+    if (setCameraPositionRef.current) {
+      setCameraPositionRef.current(progress);
+    }
+  };
+
+  // Touch event handlers
+  const handleScrollbarTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDraggingScrollbar(true);
+
+    if (!scrollbarRef.current || e.touches.length === 0) return;
+
+    const rect = scrollbarRef.current.getBoundingClientRect();
+    const touchX = e.touches[0].clientX - rect.left;
+    const progress = Math.max(0, Math.min(1, touchX / rect.width));
 
     // Update camera position via ref
     if (setCameraPositionRef.current) {
@@ -95,16 +112,39 @@ const VisualizationCanvas = ({
       }
     };
 
+    const handleTouchMove = (e: TouchEvent) => {
+      e.preventDefault();
+
+      if (!scrollbarRef.current || e.touches.length === 0) return;
+
+      const rect = scrollbarRef.current.getBoundingClientRect();
+      const touchX = e.touches[0].clientX - rect.left;
+      const progress = Math.max(0, Math.min(1, touchX / rect.width));
+
+      // Update camera position via ref
+      if (setCameraPositionRef.current) {
+        setCameraPositionRef.current(progress);
+      }
+    };
+
     const handleMouseUp = () => {
+      setIsDraggingScrollbar(false);
+    };
+
+    const handleTouchEnd = () => {
       setIsDraggingScrollbar(false);
     };
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('touchmove', handleTouchMove, { passive: false });
+    window.addEventListener('touchend', handleTouchEnd);
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
     };
   }, [isDraggingScrollbar]);
 
@@ -189,6 +229,7 @@ const VisualizationCanvas = ({
               className="timeline-scrollbar"
               ref={scrollbarRef}
               onMouseDown={handleScrollbarMouseDown}
+              onTouchStart={handleScrollbarTouchStart}
             >
               <div
                 className="scrollbar-thumb"

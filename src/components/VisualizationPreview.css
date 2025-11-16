@@ -6,3 +6,16 @@
   border: 1px solid #444;
   overflow: hidden;
 }
+
+/* Mobile responsive design */
+@media (max-width: 768px) {
+  .visualization-preview {
+    height: 300px;
+  }
+}
+
+@media (max-width: 600px) {
+  .visualization-preview {
+    height: 250px;
+  }
+}
