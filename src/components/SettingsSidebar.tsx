@@ -5,8 +5,10 @@ import './SettingsSidebar.css';
 interface SettingsSidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  hueRotation: number;
-  onHueRotationChange: (rotation: number) => void;
+  majorHueRotation: number;
+  minorHueRotation: number;
+  onMajorHueRotationChange: (rotation: number) => void;
+  onMinorHueRotationChange: (rotation: number) => void;
   selectedKey: Key;
   minorScaleType: MinorScaleType;
   onMinorScaleTypeChange: (scaleType: MinorScaleType) => void;
@@ -17,8 +19,10 @@ interface SettingsSidebarProps {
 const SettingsSidebar = ({
   isOpen,
   onClose,
-  hueRotation,
-  onHueRotationChange,
+  majorHueRotation,
+  minorHueRotation,
+  onMajorHueRotationChange,
+  onMinorHueRotationChange,
   selectedKey,
   minorScaleType,
   onMinorScaleTypeChange,
@@ -50,44 +54,89 @@ const SettingsSidebar = ({
           <div className="settings-section">
             <h3 className="settings-section-title">Color Adjustment</h3>
 
-            {/* Hue Wheel Visual */}
+            {/* Hue Wheel Visual with dual rings */}
             <HueWheel
-              rotation={hueRotation}
-              onChange={onHueRotationChange}
+              majorRotation={majorHueRotation}
+              minorRotation={minorHueRotation}
+              onMajorChange={onMajorHueRotationChange}
+              onMinorChange={onMinorHueRotationChange}
               currentKey={selectedKey.tonic}
+              currentMode={selectedKey.mode}
             />
 
-            <div className="hue-rotation-control">
-              <label htmlFor="hue-rotation" className="hue-rotation-label">
-                Hue Rotation:
-              </label>
-              <div className="hue-rotation-input-group">
-                <input
-                  type="number"
-                  id="hue-rotation"
-                  className="hue-rotation-input"
-                  value={hueRotation}
-                  onChange={(e) => onHueRotationChange(Number(e.target.value))}
-                  min={0}
-                  max={359}
-                  title="Adjust the hue rotation angle (0-359°)"
+            <div className="hue-rotation-controls">
+              {/* Major Hue Rotation */}
+              <div className="hue-rotation-control">
+                <label htmlFor="major-hue-rotation" className="hue-rotation-label">
+                  Major Hue Rotation:
+                </label>
+                <div className="hue-rotation-input-group">
+                  <input
+                    type="number"
+                    id="major-hue-rotation"
+                    className="hue-rotation-input"
+                    value={majorHueRotation}
+                    onChange={(e) => onMajorHueRotationChange(Number(e.target.value))}
+                    min={0}
+                    max={359}
+                    title="Adjust the hue rotation for major keys (0-359°)"
                 />
                 <span className="hue-rotation-unit">°</span>
               </div>
               <button
                 className="hue-rotation-reset"
-                onClick={() => onHueRotationChange(0)}
-                title="Reset to default (0°)"
+                onClick={() => onMajorHueRotationChange(0)}
+                title="Reset major hue to default (0°)"
               >
                 Reset
               </button>
             </div>
 
-            <p className="settings-description">
-              Click on the color wheel or use the input to adjust the hue rotation.
-              This affects all chord colors in the visualization.
-            </p>
+            {/* Minor Hue Rotation */}
+            <div className="hue-rotation-control">
+              <label htmlFor="minor-hue-rotation" className="hue-rotation-label">
+                Minor Hue Rotation:
+              </label>
+              <div className="hue-rotation-input-group">
+                <input
+                  type="number"
+                  id="minor-hue-rotation"
+                  className="hue-rotation-input"
+                  value={minorHueRotation}
+                  onChange={(e) => onMinorHueRotationChange(Number(e.target.value))}
+                  min={0}
+                  max={359}
+                  title="Adjust the hue rotation for minor keys (0-359°)"
+                />
+                <span className="hue-rotation-unit">°</span>
+              </div>
+              <button
+                className="hue-rotation-reset"
+                onClick={() => onMinorHueRotationChange(90)}
+                title="Reset minor hue to default (90°)"
+              >
+                Reset
+              </button>
+            </div>
+
+            {/* Reset Both Button */}
+            <button
+              className="hue-rotation-reset-both"
+              onClick={() => {
+                onMajorHueRotationChange(0);
+                onMinorHueRotationChange(90);
+              }}
+              title="Reset both major and minor hue rotations to default (major: 0°, minor: 90°)"
+            >
+              Reset Both
+            </button>
           </div>
+
+          <p className="settings-description">
+            Click on the outer ring (major) or inner ring (minor) of the color wheel to adjust hue rotations separately.
+            This allows different color schemes for major and minor keys.
+          </p>
+        </div>
 
           {/* Visualization Style Control */}
           <div className="settings-section">

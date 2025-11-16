@@ -8,9 +8,13 @@ import { audioEngine } from './utils/audioEngine';
 
 type Phase = 'build' | 'confirm';
 
-const HUE_ROTATION_STORAGE_KEY = 'harmonic-colors-hue-rotation';
+const MAJOR_HUE_ROTATION_STORAGE_KEY = 'harmonic-colors-major-hue-rotation';
+const MINOR_HUE_ROTATION_STORAGE_KEY = 'harmonic-colors-minor-hue-rotation';
 const MINOR_SCALE_TYPE_STORAGE_KEY = 'harmonic-colors-minor-scale-type';
 const VISUALIZATION_STYLE_STORAGE_KEY = 'harmonic-colors-visualization-style';
+
+// Legacy key for migration
+const LEGACY_HUE_ROTATION_STORAGE_KEY = 'harmonic-colors-hue-rotation';
 
 function App() {
   const [currentPhase, setCurrentPhase] = useState<Phase>('build');
@@ -39,10 +43,43 @@ function App() {
   // All chords from all sections for full playback
   const allChords = sections.flatMap(section => section.chords);
 
-  // Load hueRotation from LocalStorage
-  const [hueRotation, setHueRotation] = useState<number>(() => {
-    const saved = localStorage.getItem(HUE_ROTATION_STORAGE_KEY);
-    return saved !== null ? Number(saved) : 0;
+  // Load majorHueRotation and minorHueRotation from LocalStorage with migration
+  const [majorHueRotation, setMajorHueRotation] = useState<number>(() => {
+    // Try to load major hue rotation
+    const savedMajor = localStorage.getItem(MAJOR_HUE_ROTATION_STORAGE_KEY);
+    if (savedMajor !== null) {
+      return Number(savedMajor);
+    }
+
+    // Migration: check for legacy hueRotation
+    const legacyRotation = localStorage.getItem(LEGACY_HUE_ROTATION_STORAGE_KEY);
+    if (legacyRotation !== null) {
+      const rotation = Number(legacyRotation);
+      localStorage.setItem(MAJOR_HUE_ROTATION_STORAGE_KEY, String(rotation));
+      return rotation;
+    }
+
+    return 0;
+  });
+
+  const [minorHueRotation, setMinorHueRotation] = useState<number>(() => {
+    // Try to load minor hue rotation
+    const savedMinor = localStorage.getItem(MINOR_HUE_ROTATION_STORAGE_KEY);
+    if (savedMinor !== null) {
+      return Number(savedMinor);
+    }
+
+    // Migration: check for legacy hueRotation
+    const legacyRotation = localStorage.getItem(LEGACY_HUE_ROTATION_STORAGE_KEY);
+    if (legacyRotation !== null) {
+      const rotation = Number(legacyRotation);
+      localStorage.setItem(MINOR_HUE_ROTATION_STORAGE_KEY, String(rotation));
+      // Remove legacy key after migration
+      localStorage.removeItem(LEGACY_HUE_ROTATION_STORAGE_KEY);
+      return rotation;
+    }
+
+    return 90; // Default to 90° for relative minor alignment (e.g., C major and A minor)
   });
 
   // Load minorScaleType from LocalStorage (default: melodic)
@@ -185,9 +222,14 @@ function App() {
     setPlaybackPosition(position);
   };
 
-  const handleHueRotationChange = (rotation: number) => {
-    setHueRotation(rotation);
-    localStorage.setItem(HUE_ROTATION_STORAGE_KEY, String(rotation));
+  const handleMajorHueRotationChange = (rotation: number) => {
+    setMajorHueRotation(rotation);
+    localStorage.setItem(MAJOR_HUE_ROTATION_STORAGE_KEY, String(rotation));
+  };
+
+  const handleMinorHueRotationChange = (rotation: number) => {
+    setMinorHueRotation(rotation);
+    localStorage.setItem(MINOR_HUE_ROTATION_STORAGE_KEY, String(rotation));
   };
 
   const handleMinorScaleTypeChange = (scaleType: MinorScaleType) => {
@@ -315,7 +357,8 @@ function App() {
             onTimeSignatureChange={setTimeSignature}
             onBpmChange={setBpm}
             onMetronomeChange={setMetronomeEnabled}
-            hueRotation={hueRotation}
+            majorHueRotation={majorHueRotation}
+            minorHueRotation={minorHueRotation}
             minorScaleType={minorScaleType}
             visualizationStyle={visualizationStyle}
             sections={sections}
@@ -340,7 +383,8 @@ function App() {
             timeSignature={timeSignature}
             onPlayingIndexChange={handlePlayingIndexChange}
             onPlaybackPositionChange={handlePlaybackPositionChange}
-            hueRotation={hueRotation}
+            majorHueRotation={majorHueRotation}
+            minorHueRotation={minorHueRotation}
             visualizationStyle={visualizationStyle}
           />
         )}
@@ -350,8 +394,10 @@ function App() {
       <SettingsSidebar
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
-        hueRotation={hueRotation}
-        onHueRotationChange={handleHueRotationChange}
+        majorHueRotation={majorHueRotation}
+        minorHueRotation={minorHueRotation}
+        onMajorHueRotationChange={handleMajorHueRotationChange}
+        onMinorHueRotationChange={handleMinorHueRotationChange}
         selectedKey={selectedKey}
         minorScaleType={minorScaleType}
         onMinorScaleTypeChange={handleMinorScaleTypeChange}
