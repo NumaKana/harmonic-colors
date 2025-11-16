@@ -157,7 +157,7 @@
   display: flex;
   align-items: stretch;
   min-height: 70px;
-  /* width set inline to 25% (1/4 of row) */
+  width: 25%;
   min-width: 0;
   background-color: #2a2a2a;
   border: 2px solid #555;
@@ -304,7 +304,8 @@
   }
 
   .measure {
-    min-width: calc(50% - 0.25rem);
+    width: calc(50% - 0.25rem);
+    min-width: 0;
   }
 }
 
@@ -395,7 +396,8 @@
   }
 
   .measure {
-    min-width: 100%;
+    width: 100%;
+    min-width: 0;
     min-height: 60px;
   }
 
