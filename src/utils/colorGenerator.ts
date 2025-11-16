@@ -1,5 +1,5 @@
 import { Key, Chord, ColorHSL, Note, ParticleConfig } from '../types';
-import { getHarmonicFunctionType } from './harmonicAnalysis';
+import { analyzeHarmonicFunction } from './harmonicAnalysis';
 
 /**
  * Get the appropriate hue rotation based on key mode
@@ -84,30 +84,56 @@ export function generateChordColor(
   key: Key,
   baseColor: ColorHSL
 ): ColorHSL {
-  // Get the harmonic function
-  const harmonicFunction = getHarmonicFunctionType(chord, key);
+  // Get the full harmonic analysis
+  const analysis = analyzeHarmonicFunction(chord, key);
+  const harmonicFunction = analysis.function;
+  const isDiatonic = analysis.isDiatonic;
 
-  // Calculate hue adjustment based on harmonic function
-  let hueAdjustment = 0;
-  switch (harmonicFunction) {
-    case 'tonic':
-      hueAdjustment = 0; // ±0 degrees
-      break;
-    case 'subdominant':
-      hueAdjustment = 15; // +15 degrees
-      break;
-    case 'dominant':
-      hueAdjustment = 30; // +30 degrees
-      break;
+  // For non-diatonic chords, use the chord's root note as the hue base
+  // This creates a clear visual distinction from diatonic chords
+  let hue: number;
+
+  if (!isDiatonic) {
+    // Non-diatonic: use chord root hue as base
+    const chordRootHue = NOTE_TO_HUE[chord.root];
+
+    // Add special adjustments for specific non-diatonic patterns
+    let specialAdjustment = 0;
+
+    if (analysis.isSecondaryDominant) {
+      // Secondary dominants: shift hue for emphasis
+      specialAdjustment = 45; // Distinct shift for V7/X chords
+    } else if (analysis.isBorrowedChord) {
+      // Borrowed chords: moderate shift
+      specialAdjustment = 30;
+    }
+
+    hue = (chordRootHue + specialAdjustment) % 360;
+  } else {
+    // Diatonic: use traditional key-based hue with harmonic function adjustment
+    let hueAdjustment = 0;
+    switch (harmonicFunction) {
+      case 'tonic':
+        hueAdjustment = 0; // ±0 degrees
+        break;
+      case 'subdominant':
+        hueAdjustment = 15; // +15 degrees
+        break;
+      case 'dominant':
+        hueAdjustment = 30; // +30 degrees
+        break;
+    }
+    hue = (baseColor.hue + hueAdjustment) % 360;
   }
 
   // Apply micro-adjustment based on scale degree within harmonic function
+  // Only for diatonic chords
   const scaleDegree = getScaleDegree(chord, key);
   let microHueAdjustment = 0;
   let microSaturationAdjustment = 0;
   let microLightnessAdjustment = 0;
 
-  if (scaleDegree !== null) {
+  if (isDiatonic && scaleDegree !== null) {
     // Apply different adjustments for different scale degrees within the same harmonic function
     // Focus on saturation and lightness differences for better perceptibility
     if (harmonicFunction === 'tonic') {
@@ -155,10 +181,10 @@ export function generateChordColor(
         microLightnessAdjustment = -15;
       }
     }
-  }
 
-  // Apply hue adjustment (keep within ±30 degree range for diatonic chords)
-  const hue = (baseColor.hue + hueAdjustment + microHueAdjustment) % 360;
+    // Apply micro hue adjustment only for diatonic chords
+    hue = (hue + microHueAdjustment) % 360;
+  }
 
   // Calculate lightness adjustment based on chord quality and function
   let lightnessAdjustment = 0;
@@ -261,8 +287,21 @@ export function hslToCSS(color: ColorHSL): string {
  * Higher value = more Color 1 (key color)
  */
 export function getMarbleRatio(chord: Chord, key: Key): number {
-  const harmonicFunction = getHarmonicFunctionType(chord, key);
+  const analysis = analyzeHarmonicFunction(chord, key);
+  const harmonicFunction = analysis.function;
+  const isDiatonic = analysis.isDiatonic;
 
+  // Non-diatonic chords: emphasize Color 2 (chord color) more
+  if (!isDiatonic) {
+    if (analysis.isSecondaryDominant) {
+      return 0.4; // 40% color1, 60% color2 - strong chord color presence
+    } else if (analysis.isBorrowedChord) {
+      return 0.45; // 45% color1, 55% color2
+    }
+    return 0.5; // 50/50 for other non-diatonic chords
+  }
+
+  // Diatonic chords: traditional ratios
   switch (harmonicFunction) {
     case 'tonic':
       return 0.7; // 70% color1, 30% color2

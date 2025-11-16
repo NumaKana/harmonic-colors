@@ -156,6 +156,7 @@ export function analyzeHarmonicFunction(chord: Chord, key: Key): HarmonicFunctio
       romanNumeral: `V7/${targetRomanMap[secondaryTarget] || '?'}`,
       function: 'dominant',
       isDiatonic: false,
+      isSecondaryDominant: true,
     };
   }
 
@@ -179,6 +180,7 @@ export function analyzeHarmonicFunction(chord: Chord, key: Key): HarmonicFunctio
       romanNumeral,
       function: harmonicFunction,
       isDiatonic: false,
+      isBorrowedChord: true,
     };
   }
 

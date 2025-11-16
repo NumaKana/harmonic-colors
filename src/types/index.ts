@@ -63,6 +63,10 @@ export interface HarmonicFunction {
   romanNumeral: string;
   function: HarmonicFunctionType;
   isDiatonic: boolean;
+  // Additional info for non-diatonic chords
+  isSecondaryDominant?: boolean;
+  isBorrowedChord?: boolean;
+  isChromaticMediant?: boolean; // For chromatic mediant relationships
 }
 
 export interface Section {
