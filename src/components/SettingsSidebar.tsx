@@ -112,8 +112,8 @@ const SettingsSidebar = ({
               </div>
               <button
                 className="hue-rotation-reset"
-                onClick={() => onMinorHueRotationChange(0)}
-                title="Reset minor hue to default (0°)"
+                onClick={() => onMinorHueRotationChange(90)}
+                title="Reset minor hue to default (90°)"
               >
                 Reset
               </button>
@@ -124,9 +124,9 @@ const SettingsSidebar = ({
               className="hue-rotation-reset-both"
               onClick={() => {
                 onMajorHueRotationChange(0);
-                onMinorHueRotationChange(0);
+                onMinorHueRotationChange(90);
               }}
-              title="Reset both major and minor hue rotations to default (0°)"
+              title="Reset both major and minor hue rotations to default (major: 0°, minor: 90°)"
             >
               Reset Both
             </button>

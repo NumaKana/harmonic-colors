@@ -79,7 +79,7 @@ function App() {
       return rotation;
     }
 
-    return 0;
+    return 90; // Default to 90° for relative minor alignment (e.g., C major and A minor)
   });
 
   // Load minorScaleType from LocalStorage (default: melodic)

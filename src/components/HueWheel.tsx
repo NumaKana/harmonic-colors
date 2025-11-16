@@ -36,34 +36,42 @@ const HueWheel = ({
   const handleOuterRingClick = (e: React.MouseEvent<SVGGElement>) => {
     e.stopPropagation();
     const svg = e.currentTarget.ownerSVGElement;
-    if (!svg) return;
+    if (!svg || !currentKey) return;
 
     const rect = svg.getBoundingClientRect();
     const x = e.clientX - rect.left - center;
     const y = e.clientY - rect.top - center;
 
-    // Calculate angle from center
-    let newAngle = Math.atan2(y, x) * (180 / Math.PI) + 90;
-    if (newAngle < 0) newAngle += 360;
+    // Calculate angle from center (0° = top)
+    let clickedAngle = Math.atan2(y, x) * (180 / Math.PI) + 90;
+    if (clickedAngle < 0) clickedAngle += 360;
 
-    onMajorChange(Math.round(newAngle % 360));
+    // Calculate rotation needed so that clicked position becomes the current key
+    const currentKeyHue = noteToHue(currentKey);
+    const newRotation = (clickedAngle - currentKeyHue + 360) % 360;
+
+    onMajorChange(Math.round(newRotation));
   };
 
   // Handle click on inner ring (minor)
   const handleInnerRingClick = (e: React.MouseEvent<SVGGElement>) => {
     e.stopPropagation();
     const svg = e.currentTarget.ownerSVGElement;
-    if (!svg) return;
+    if (!svg || !currentKey) return;
 
     const rect = svg.getBoundingClientRect();
     const x = e.clientX - rect.left - center;
     const y = e.clientY - rect.top - center;
 
-    // Calculate angle from center
-    let newAngle = Math.atan2(y, x) * (180 / Math.PI) + 90;
-    if (newAngle < 0) newAngle += 360;
+    // Calculate angle from center (0° = top)
+    let clickedAngle = Math.atan2(y, x) * (180 / Math.PI) + 90;
+    if (clickedAngle < 0) clickedAngle += 360;
 
-    onMinorChange(Math.round(newAngle % 360));
+    // Calculate rotation needed so that clicked position becomes the current key
+    const currentKeyHue = noteToHue(currentKey);
+    const newRotation = (clickedAngle - currentKeyHue + 360) % 360;
+
+    onMinorChange(Math.round(newRotation));
   };
 
   // Generate single unified hue wheel segments (uses major rotation for display)
@@ -154,62 +162,6 @@ const HueWheel = ({
           style={{ pointerEvents: 'none' }}
         />
 
-        {/* Center circle */}
-        <circle
-          cx={center}
-          cy={center}
-          r={centerRadius}
-          fill="#2a2a2a"
-          stroke="#555"
-          strokeWidth="2"
-          style={{ pointerEvents: 'none' }}
-        />
-
-        {/* Center text - show both rotations */}
-        <text
-          x={center}
-          y={center - 15}
-          textAnchor="middle"
-          dominantBaseline="central"
-          className="hue-wheel-text"
-          fill="#fff"
-          fontSize="14"
-          fontWeight="600"
-          style={{ pointerEvents: 'none' }}
-        >
-          Major: {majorRotation}°
-        </text>
-        <text
-          x={center}
-          y={center + 5}
-          textAnchor="middle"
-          dominantBaseline="central"
-          className="hue-wheel-text"
-          fill="#fff"
-          fontSize="14"
-          fontWeight="600"
-          style={{ pointerEvents: 'none' }}
-        >
-          Minor: {minorRotation}°
-        </text>
-
-        {/* Current key label in center */}
-        {currentKey && (
-          <text
-            x={center}
-            y={center + 23}
-            textAnchor="middle"
-            dominantBaseline="central"
-            className="hue-wheel-key-text"
-            fill="#aaa"
-            fontSize="12"
-            fontWeight="500"
-            style={{ pointerEvents: 'none' }}
-          >
-            {currentKey} {currentMode}
-          </text>
-        )}
-
         {/* 12音すべてのマーカーを外周に表示 */}
         {NOTES.map((note) => {
           const noteHue = noteToHue(note);
@@ -281,6 +233,20 @@ const HueWheel = ({
                   r={isMinorCurrentKey ? 4 : 2.5}
                   fill={`hsl(${minorActualHue}, 100%, 42%)`}
                 />
+
+                {/* 音名ラベル（マーカーの内側） */}
+                <text
+                  x={minorMarkerX - (minorMarkerX - center) * 0.35}
+                  y={minorMarkerY - (minorMarkerY - center) * 0.35}
+                  textAnchor="middle"
+                  dominantBaseline="central"
+                  className={`hue-wheel-note-label ${isMinorCurrentKey ? 'current' : ''}`}
+                  fill={isMinorCurrentKey ? '#fff' : '#888'}
+                  fontSize={isMinorCurrentKey ? '11' : '9'}
+                  fontWeight={isMinorCurrentKey ? '700' : '500'}
+                >
+                  {note}
+                </text>
               </g>
             </g>
           );
