@@ -390,6 +390,7 @@ function App() {
             onTimeSignatureChange={setTimeSignature}
             onBpmChange={setBpm}
             onMetronomeChange={setMetronomeEnabled}
+            metronomeEnabled={metronomeEnabled}
             majorHueRotation={majorHueRotation}
             minorHueRotation={minorHueRotation}
             minorScaleType={minorScaleType}
