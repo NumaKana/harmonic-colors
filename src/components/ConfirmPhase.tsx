@@ -42,11 +42,7 @@ const ConfirmPhase = ({
 }: ConfirmPhaseProps) => {
   return (
     <div className="confirm-phase">
-      <ChordNameBar
-        chords={allChords}
-        playbackPosition={playbackPosition}
-        bpm={bpm}
-      />
+      
       <VisualizationCanvas
         selectedKey={selectedKey}
         currentChord={currentChord}

@@ -4,6 +4,7 @@ import { Chord, Key, Section, MinorScaleType, VisualizationStyle } from '../type
 import TimelineVisualization from './TimelineVisualization';
 import CompactPlayButton from './CompactPlayButton';
 import './VisualizationCanvas.css';
+import ChordNameBar from './ChordNameBar';
 
 interface VisualizationCanvasProps {
   selectedKey: Key;
@@ -166,13 +167,19 @@ const VisualizationCanvas = ({
           Preview
         </button>
       </div>
+      
+      <ChordNameBar
+        chords={chordProgression}
+        playbackPosition={playbackPosition}
+        bpm={bpm}
+      />
 
       {webGLSupported ? (
         <>
           <div className="visualization-canvas-wrapper">
             {timelineMode === 'preview' && (
               <div className="timeline-hint">
-                💡 Drag to scroll horizontally
+                Drag to scroll horizontally
               </div>
             )}
             {onPlayingIndexChange && onPlaybackPositionChange && (

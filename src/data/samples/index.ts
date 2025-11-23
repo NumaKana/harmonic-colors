@@ -6,6 +6,7 @@
 import { Section } from '../../types';
 import { justTheTwoOfUs } from './justTheTwoOfUs';
 import { autumnLeaves } from './autumnLeaves';
+import { loveSoSweet } from './loveSoSweet';
 
 export interface SampleSong {
   id: string;
@@ -35,6 +36,13 @@ export const sampleSongs: SampleSong[] = [
     description: 'Classic jazz standard with key modulation',
     bpm: 140,
     sections: autumnLeaves
+  },
+{
+    id: 'love-so-sweet',
+    title: 'Love so Sweet',
+    artist: 'Arashi',
+    bpm: 139,
+    sections: loveSoSweet
   }
   // Add more samples here:
   // {

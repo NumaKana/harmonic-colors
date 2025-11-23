@@ -352,19 +352,19 @@ function App() {
   return (
     <div className="app">
       <header className="header">
-        <h1>Harmonic Colors</h1>
+        <p className='header-title'>Harmonic Colors</p>
         <div className="phase-tabs">
           <button
             className={`phase-tab ${currentPhase === 'build' ? 'active' : ''}`}
             onClick={() => setCurrentPhase('build')}
           >
-            組み立て
+            Create
           </button>
           <button
             className={`phase-tab ${currentPhase === 'confirm' ? 'active' : ''}`}
             onClick={() => setCurrentPhase('confirm')}
           >
-            確認
+            Show
           </button>
         </div>
         <div className="header-buttons">

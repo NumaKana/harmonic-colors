@@ -15,6 +15,7 @@
   background-color: #1a1a1a;
   border-radius: 6px;
   border: 1px solid #555;
+  width: fit-content;
 }
 
 .mode-button {
@@ -25,8 +26,7 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 0.9rem;
-  font-weight: 500;
-  transition: all 0.2s;
+    transition: all 0.2s;
 }
 
 .mode-button:hover:not(:disabled) {
@@ -36,9 +36,9 @@
 }
 
 .mode-button.active {
-  background-color: #667eea;
+  background-color: #4a5568;
   color: #fff;
-  border-color: #667eea;
+  border-color: #4a5568;
 }
 
 .mode-button:disabled {
@@ -90,7 +90,7 @@
   position: absolute;
   bottom: 8px;
   height: 8px;
-  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  background: #4a5568;
   border-radius: 4px;
   transition: left 0.1s ease-out;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -162,14 +162,12 @@
 .color-name {
   font-size: 0.85rem;
   color: #aaa;
-  font-weight: 500;
-}
+  }
 
 .color-value {
   font-size: 1rem;
   color: #fff;
-  font-weight: 600;
-}
+  }
 
 .harmonic-info {
   display: grid;
@@ -190,14 +188,12 @@
 .info-label {
   font-size: 0.85rem;
   color: #aaa;
-  font-weight: 500;
-}
+  }
 
 .info-value {
   font-size: 1rem;
   color: #fff;
-  font-weight: 600;
-}
+  }
 
 /* Responsive */
 @media (max-width: 1400px) {

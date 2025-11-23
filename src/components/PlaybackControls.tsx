@@ -1,19 +1,19 @@
 import { useState, useEffect, useRef } from 'react';
-import { Chord } from '../types';
+import { Chord, Section } from '../types';
 import { audioEngine } from '../utils/audioEngine';
 import './PlaybackControls.css';
 
 interface PlaybackControlsProps {
-  chords: Chord[];
   onPlayingIndexChange: (index: number) => void;
   onPlaybackPositionChange?: (position: number) => void;
   onTimeSignatureChange?: (timeSignature: number) => void;
   onBpmChange?: (bpm: number) => void;
   onMetronomeChange?: (enabled: boolean) => void;
   metronomeEnabled?: boolean;
+  currentSection: Section;
 }
 
-const PlaybackControls = ({ chords, onPlayingIndexChange, onPlaybackPositionChange, onTimeSignatureChange, onBpmChange, onMetronomeChange, metronomeEnabled: initialMetronomeEnabled = false }: PlaybackControlsProps) => {
+const PlaybackControls = ({ onPlayingIndexChange, onPlaybackPositionChange, onTimeSignatureChange, onBpmChange, onMetronomeChange, metronomeEnabled: initialMetronomeEnabled = false, currentSection }: PlaybackControlsProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [bpm, setBpm] = useState(120);
   const [metronomeEnabled, setMetronomeEnabled] = useState(initialMetronomeEnabled);
@@ -21,47 +21,14 @@ const PlaybackControls = ({ chords, onPlayingIndexChange, onPlaybackPositionChan
 
   const startTimeRef = useRef<number>(0);
   const currentIndexRef = useRef<number>(-1);
-  const animationFrameRef = useRef<number | null>(null);
 
   // Sync metronome state with audioEngine on mount
   useEffect(() => {
     audioEngine.setMetronomeEnabled(metronomeEnabled);
   }, [metronomeEnabled]);
 
-  // Animation loop to update playback position
-  useEffect(() => {
-    if (!isPlaying) {
-      if (animationFrameRef.current !== null) {
-        cancelAnimationFrame(animationFrameRef.current);
-        animationFrameRef.current = null;
-      }
-      return;
-    }
-
-    const updatePosition = () => {
-      const now = performance.now();
-      const elapsedMs = now - startTimeRef.current;
-      const beatsPerMs = bpm / 60000; // Convert BPM to beats per millisecond
-      const currentBeat = elapsedMs * beatsPerMs;
-
-      if (onPlaybackPositionChange) {
-        onPlaybackPositionChange(currentBeat);
-      }
-
-      animationFrameRef.current = requestAnimationFrame(updatePosition);
-    };
-
-    animationFrameRef.current = requestAnimationFrame(updatePosition);
-
-    return () => {
-      if (animationFrameRef.current !== null) {
-        cancelAnimationFrame(animationFrameRef.current);
-      }
-    };
-  }, [isPlaying, bpm, onPlaybackPositionChange]);
-
   const handlePlayProgression = async () => {
-    if (chords.length === 0) {
+    if (currentSection.chords.length === 0) {
       return;
     }
 
@@ -80,7 +47,7 @@ const PlaybackControls = ({ chords, onPlayingIndexChange, onPlaybackPositionChan
     currentIndexRef.current = 0;
 
     try {
-      await audioEngine.playProgression(chords, bpm, (index) => {
+      await audioEngine.playProgression(currentSection.chords, bpm, (index) => {
         currentIndexRef.current = index;
         onPlayingIndexChange(index);
         if (index === -1) {
@@ -139,18 +106,18 @@ const PlaybackControls = ({ chords, onPlayingIndexChange, onPlaybackPositionChan
     <div className="playback-controls">
       <div className="playback-controls-section">
         <button
-          className={`playback-button ${isPlaying ? 'playing' : ''}`}
+          className={`playback-button clickable ${isPlaying ? 'playing' : ''}`}
           onClick={handlePlayProgression}
-          disabled={chords.length === 0}
+          disabled={currentSection.chords.length === 0}
           title={
-            chords.length === 0
+            currentSection.chords.length === 0
               ? 'Add chords to the progression to enable playback'
               : isPlaying
               ? 'Stop progression playback'
               : `Play chord progression at ${bpm} BPM`
           }
         >
-          {isPlaying ? '⏸ Stop' : '▶ Play'}
+          {isPlaying ? '⏸ Stop' : '▶ Play Selected Section'}
         </button>
       </div>
 
