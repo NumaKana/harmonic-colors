@@ -84,16 +84,16 @@ function App() {
     return 90; // Default to 90° for relative minor alignment (e.g., C major and A minor)
   });
 
-  // Load minorScaleType from LocalStorage (default: melodic)
+  // Load minorScaleType from LocalStorage (default: harmonic)
   const [minorScaleType, setMinorScaleType] = useState<MinorScaleType>(() => {
     const saved = localStorage.getItem(MINOR_SCALE_TYPE_STORAGE_KEY);
-    return (saved as MinorScaleType) || 'melodic';
+    return (saved as MinorScaleType) || 'harmonic';
   });
 
-  // Load visualizationStyle from LocalStorage (default: marble)
+  // Load visualizationStyle from LocalStorage (default: stripes)
   const [visualizationStyle, setVisualizationStyle] = useState<VisualizationStyle>(() => {
     const saved = localStorage.getItem(VISUALIZATION_STYLE_STORAGE_KEY);
-    return (saved as VisualizationStyle) || 'marble';
+    return (saved as VisualizationStyle) || 'stripes';
   });
 
   // Settings sidebar state
