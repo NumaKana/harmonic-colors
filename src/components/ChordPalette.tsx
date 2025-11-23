@@ -86,14 +86,14 @@ const ChordPalette = ({ selectedKey, onChordSelect, hueRotation = 0, minorScaleT
   return (
     <div className="chord-palette">
       <div className="chord-palette-header">
-        <h3 className="chord-palette-title">Chord Palette</h3>
+        <p className="chord-palette-title title">Diatonic Chords Palette</p>
         <div className="chord-palette-controls">
           <button
-            className="new-chord-button"
+            className="new-chord-button clickable"
             onClick={handleNewChord}
             title="Create custom chord"
           >
-            + New Chord
+            + Other Chord
           </button>
           <div className="duration-selector">
             <label htmlFor="duration-select" className="duration-label">
@@ -115,7 +115,6 @@ const ChordPalette = ({ selectedKey, onChordSelect, hueRotation = 0, minorScaleT
           </div>
         </div>
       </div>
-      <h4 className="diatonic-section-title">Diatonic Chords</h4>
       <div className="chord-buttons">
         {diatonicChords.map((chord, index) => (
           <div key={index} className="chord-button-container">

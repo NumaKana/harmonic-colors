@@ -23,8 +23,7 @@
 .chord-name-item {
   position: absolute;
   font-size: 1.25rem;
-  font-weight: 600;
-  color: #888;
+    color: #888;
   transition: all 0.3s ease;
   white-space: nowrap;
   padding: 0.5rem 1rem;
@@ -42,7 +41,7 @@
   top: 0;
   bottom: 0;
   width: 3px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: white;
   box-shadow: 0 0 10px rgba(102, 126, 234, 0.6);
   pointer-events: none;
   z-index: 10;

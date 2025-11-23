@@ -52,8 +52,7 @@
 
 .settings-title {
   font-size: 1.25rem;
-  font-weight: 600;
-  color: #fff;
+    color: #fff;
   margin: 0;
 }
 
@@ -89,8 +88,7 @@
 
 .settings-section-title {
   font-size: 1rem;
-  font-weight: 600;
-  color: #ddd;
+    color: #ddd;
   margin: 0 0 1rem 0;
 }
 
@@ -115,8 +113,7 @@
 .settings-sidebar .hue-rotation-label {
   font-size: 0.9rem;
   color: #ccc;
-  font-weight: 500;
-}
+  }
 
 .settings-sidebar .hue-rotation-input-group {
   display: flex;
@@ -136,20 +133,19 @@
 }
 
 .settings-sidebar .hue-rotation-input:hover {
-  border-color: #667eea;
+  border-color: white;
 }
 
 .settings-sidebar .hue-rotation-input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: white;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
 }
 
 .settings-sidebar .hue-rotation-unit {
   font-size: 1rem;
   color: #aaa;
-  font-weight: 500;
-}
+  }
 
 .settings-sidebar .hue-rotation-reset {
   width: 100%;
@@ -161,12 +157,11 @@
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s;
-  font-weight: 500;
-}
+  }
 
 .settings-sidebar .hue-rotation-reset:hover {
   background-color: #333;
-  border-color: #667eea;
+  border-color: white;
   color: #fff;
 }
 
@@ -184,20 +179,18 @@
 .settings-sidebar .hue-rotation-reset-both {
   width: 100%;
   padding: 0.75rem 1rem;
-  background-color: #667eea;
-  border: 1px solid #667eea;
+  border: 1px solid #2d3748;
   border-radius: 6px;
   color: #fff;
   font-size: 0.95rem;
   cursor: pointer;
   transition: all 0.2s;
-  font-weight: 600;
-  margin-top: 0.5rem;
+    margin-top: 0.5rem;
 }
 
 .settings-sidebar .hue-rotation-reset-both:hover {
-  background-color: #5568d3;
-  border-color: #5568d3;
+  background-color: #2d3748;
+  border-color: #2d3748;
 }
 
 .settings-sidebar .hue-rotation-reset-both:active {
@@ -225,7 +218,7 @@
 }
 
 .settings-sidebar .visualization-style-option:hover {
-  border-color: #667eea;
+  border-color: white;
   background-color: #2f2f2f;
 }
 
@@ -234,9 +227,8 @@
 }
 
 .settings-sidebar .visualization-style-option input[type="radio"]:checked + .visualization-style-label {
-  color: #667eea;
-  font-weight: 600;
-}
+  color: #4a5568;
+  }
 
 .settings-sidebar .visualization-style-option input[type="radio"]:checked ~ .visualization-style-detail {
   color: #aaa;
@@ -244,26 +236,24 @@
 
 .settings-sidebar .visualization-style-option input[type="radio"]:checked + .visualization-style-label::before {
   content: '✓ ';
-  color: #667eea;
-  font-weight: bold;
-}
+  color: #4a5568;
+  }
 
 .settings-sidebar .visualization-style-option:has(input:checked) {
-  border-color: #667eea;
+  border-color: #4a5568;
   background-color: rgba(102, 126, 234, 0.1);
 }
 
 .settings-sidebar .visualization-style-label {
   font-size: 1rem;
   color: #ccc;
-  font-weight: 500;
-  transition: all 0.2s;
+    transition: all 0.2s;
 }
 
 .settings-sidebar .visualization-style-detail {
   font-size: 0.85rem;
   color: #888;
-  font-family: 'Courier New', monospace;
+  /* font-family: 'Courier New', monospace; */
 }
 
 /* Minor Scale Type Controls */
@@ -287,7 +277,7 @@
 }
 
 .settings-sidebar .minor-scale-option:hover {
-  border-color: #667eea;
+  border-color: #4a5568;
   background-color: #2f2f2f;
 }
 
@@ -296,9 +286,8 @@
 }
 
 .settings-sidebar .minor-scale-option input[type="radio"]:checked + .minor-scale-label {
-  color: #667eea;
-  font-weight: 600;
-}
+  color: #4a5568;
+  }
 
 .settings-sidebar .minor-scale-option input[type="radio"]:checked ~ .minor-scale-detail {
   color: #aaa;
@@ -306,26 +295,24 @@
 
 .settings-sidebar .minor-scale-option input[type="radio"]:checked + .minor-scale-label::before {
   content: '✓ ';
-  color: #667eea;
-  font-weight: bold;
-}
+  color: #4a5568;
+  }
 
 .settings-sidebar .minor-scale-option:has(input:checked) {
-  border-color: #667eea;
+  border-color: #4a5568;
   background-color: rgba(102, 126, 234, 0.1);
 }
 
 .settings-sidebar .minor-scale-label {
   font-size: 1rem;
   color: #ccc;
-  font-weight: 500;
-  transition: all 0.2s;
+    transition: all 0.2s;
 }
 
 .settings-sidebar .minor-scale-detail {
   font-size: 0.85rem;
   color: #888;
-  font-family: 'Courier New', monospace;
+  /* font-family: 'Courier New', monospace; */
 }
 
 /* Responsive */

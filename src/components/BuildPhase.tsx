@@ -101,7 +101,7 @@ const BuildPhase = ({
           onClick={() => setIsSampleSelectorOpen(true)}
           title="Load sample chord progression"
         >
-          📝 Load Sample
+          Load Sample
         </button>
       </div>
 
@@ -126,88 +126,92 @@ const BuildPhase = ({
         currentIndex={currentIndex}
         selectedIndex={selectedIndex}
         timeSignature={timeSignature}
-      />
-      <PlaybackControls
-        chords={allChords}
         onPlayingIndexChange={onPlayingIndexChange}
         onPlaybackPositionChange={onPlaybackPositionChange}
         onTimeSignatureChange={onTimeSignatureChange}
         onBpmChange={onBpmChange}
         onMetronomeChange={onMetronomeChange}
         metronomeEnabled={metronomeEnabled}
+        currentSection={sections.find(s => s.id === currentSectionId) || sections[0]}
       />
+      
+      <div className='visualization-and-edit'>
+        <div className='select-chord-info'>
+          <VisualizationPreview
+            selectedKey={selectedKey}
+            currentChord={currentChord}
+            hueRotation={hueRotation}
+            visualizationStyle={visualizationStyle}
+          />
 
-      <VisualizationPreview
-        selectedKey={selectedKey}
-        currentChord={currentChord}
-        hueRotation={hueRotation}
-        visualizationStyle={visualizationStyle}
-      />
-
-      <div className="visualization-info">
-        <div className="color-info">
-          <div className="color-block">
-            <div
-              className="color-swatch"
-              style={{ backgroundColor: hslToCSS(color1) }}
-            />
-            <div className="color-label">
-              <div className="color-name">Color 1 (Key)</div>
-              <div className="color-value">
-                {selectedKey.tonic} {selectedKey.mode}
-              </div>
-            </div>
-          </div>
-
-          {currentChord && (
-            <div className="color-block">
-              <div
-                className="color-swatch"
-                style={{ backgroundColor: hslToCSS(color2) }}
-              />
-              <div className="color-label">
-                <div className="color-name">Color 2 (Chord)</div>
-                <div className="color-value">
-                  {getChordDisplayName(currentChord)}
-                  {harmonicFunction && ` (${harmonicFunction.romanNumeral})`}
+          <div className="visualization-info">
+            <div className="color-info">
+              <div className="color-block">
+                <div
+                  className="color-swatch"
+                  style={{ backgroundColor: hslToCSS(color1) }}
+                />
+                <div className="color-label">
+                  <div className="color-name">Key</div>
+                  <div className="color-value">
+                    {selectedKey.tonic} {selectedKey.mode}
+                  </div>
                 </div>
               </div>
+
+              {currentChord && (
+                <div className="color-block">
+                  <div
+                    className="color-swatch"
+                    style={{ backgroundColor: hslToCSS(color2) }}
+                  />
+                  <div className="color-label">
+                    <div className="color-name">Chord</div>
+                    <div className="color-value">
+                      {getChordDisplayName(currentChord)}
+                      {harmonicFunction && ` (${harmonicFunction.romanNumeral})`}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-          )}
+
+            {currentChord && harmonicFunction && (
+              <div className="harmonic-info">
+                <div className="info-item">
+                  <span className="info-label">Chord:</span>
+                  <span className="info-value">{getChordDisplayName(currentChord)}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">Roman Numeral:</span>
+                  <span className="info-value">{harmonicFunction.romanNumeral}</span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">Function:</span>
+                  <span className="info-value">
+                    {harmonicFunction.function.charAt(0).toUpperCase() + harmonicFunction.function.slice(1)}
+                  </span>
+                </div>
+                <div className="info-item">
+                  <span className="info-label">Diatonic:</span>
+                  <span className="info-value">{harmonicFunction.isDiatonic ? 'Yes' : 'No'}</span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
-        {currentChord && harmonicFunction && (
-          <div className="harmonic-info">
-            <div className="info-item">
-              <span className="info-label">Chord:</span>
-              <span className="info-value">{getChordDisplayName(currentChord)}</span>
-            </div>
-            <div className="info-item">
-              <span className="info-label">Roman Numeral:</span>
-              <span className="info-value">{harmonicFunction.romanNumeral}</span>
-            </div>
-            <div className="info-item">
-              <span className="info-label">Function:</span>
-              <span className="info-value">
-                {harmonicFunction.function.charAt(0).toUpperCase() + harmonicFunction.function.slice(1)}
-              </span>
-            </div>
-            <div className="info-item">
-              <span className="info-label">Diatonic:</span>
-              <span className="info-value">{harmonicFunction.isDiatonic ? 'Yes' : 'No'}</span>
-            </div>
-          </div>
-        )}
+        <div style={{width: "100%"}}>
+          {/* Editable chord info when a chord is selected */}
+          {selectedIndex !== undefined && selectedIndex >= 0 && localSelectedIndex !== undefined && currentChord && (
+            <EditableChordInfo
+              chord={currentChord}
+              chordIndex={selectedIndex}
+              onUpdate={onUpdateChord}
+            />
+          )}
+        </div>
       </div>
-
-      {/* Editable chord info when a chord is selected */}
-      {selectedIndex !== undefined && selectedIndex >= 0 && localSelectedIndex !== undefined && currentChord && (
-        <EditableChordInfo
-          chord={currentChord}
-          chordIndex={selectedIndex}
-          onUpdate={onUpdateChord}
-        />
-      )}
     </div>
   );
 };

@@ -41,7 +41,7 @@ const SettingsSidebar = ({
         <div className="settings-header">
           <h2 className="settings-title">Settings</h2>
           <button
-            className="settings-close-button"
+            className="settings-close-button clickable"
             onClick={onClose}
             title="Close settings"
           >
@@ -121,7 +121,7 @@ const SettingsSidebar = ({
 
             {/* Reset Both Button */}
             <button
-              className="hue-rotation-reset-both"
+              className="hue-rotation-reset-both clickable"
               onClick={() => {
                 onMajorHueRotationChange(0);
                 onMinorHueRotationChange(90);

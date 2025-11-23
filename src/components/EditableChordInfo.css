@@ -1,16 +1,14 @@
 .editable-chord-info {
-  background-color: #1e1e1e;
-  border: 2px solid #667eea;
-  border-radius: 8px;
   padding: 1rem;
-  margin-top: 1rem;
+  background-color: #2a2a2a;
+  border-radius: 8px;
+  border: 1px solid #444;
 }
 
 .edit-section-title {
   margin: 0 0 1rem 0;
   font-size: 1.1rem;
-  color: #667eea;
-  font-weight: 600;
+  color: #aaa;
 }
 
 .edit-section {
@@ -26,8 +24,7 @@
   font-size: 0.9rem;
   color: #aaa;
   margin-bottom: 0.5rem;
-  font-weight: 500;
-}
+  }
 
 .edit-button-group {
   display: flex;
@@ -42,24 +39,21 @@
   border-radius: 6px;
   color: #ccc;
   font-size: 0.85rem;
-  font-weight: 500;
-  cursor: pointer;
   transition: all 0.2s;
   min-width: 40px;
 }
 
 .edit-button:hover {
   background-color: #333;
-  border-color: #667eea;
+  border-color: white;
 }
 
 .edit-button.active {
-  background-color: #667eea;
-  border-color: #667eea;
+  background-color: #4a5568;
+  border-color: white;
   color: #fff;
-  font-weight: 600;
-}
-
+  }
+  
 .edit-duration-select {
   width: 100%;
   padding: 0.5rem;
@@ -73,12 +67,12 @@
 }
 
 .edit-duration-select:hover {
-  border-color: #667eea;
+  border-color: white;
 }
 
 .edit-duration-select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: white;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
 }
 

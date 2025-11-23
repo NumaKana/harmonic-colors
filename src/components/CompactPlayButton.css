@@ -5,9 +5,8 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background-color: #667eea;
   color: #fff;
-  border: 2px solid #667eea;
+  border: 2px solid white;
   font-size: 1.2rem;
   cursor: pointer;
   transition: all 0.2s;
@@ -19,8 +18,8 @@
 }
 
 .compact-play-button:hover:not(:disabled) {
-  background-color: #5568d3;
-  border-color: #5568d3;
+  background-color: #88443f;
+  border-color: #88443f;
   transform: scale(1.05);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
@@ -30,13 +29,13 @@
 }
 
 .compact-play-button.playing {
-  background-color: #e53e3e;
-  border-color: #e53e3e;
+  background-color: #88443f;
+  border-color: #88443f;
 }
 
 .compact-play-button.playing:hover:not(:disabled) {
-  background-color: #c53030;
-  border-color: #c53030;
+  background-color: #4a5568;
+  border-color: #4a5568;
 }
 
 .compact-play-button:disabled {

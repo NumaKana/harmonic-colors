@@ -179,7 +179,7 @@ const ChordEditor = ({ initialRoot, initialQuality, initialDuration, onChordCrea
 
         <div className="chord-editor-content">
           {/* Chord Preview */}
-          <div className="chord-preview">
+          <div className="chord-preview clickable">
             <div className="chord-preview-label">Chord:</div>
             <div className="chord-preview-name">{getChordName()}</div>
           </div>
@@ -192,7 +192,7 @@ const ChordEditor = ({ initialRoot, initialQuality, initialDuration, onChordCrea
                 {ALL_NOTES.map((note) => (
                   <button
                     key={note}
-                    className={`option-button ${root === note ? 'active' : ''}`}
+                    className={`option-button clickable ${root === note ? 'active' : ''}`}
                     onClick={() => setRoot(note)}
                   >
                     {note}
@@ -219,7 +219,7 @@ const ChordEditor = ({ initialRoot, initialQuality, initialDuration, onChordCrea
               {availableQualities.map((q) => (
                 <button
                   key={q}
-                  className={`option-button ${quality === q ? 'active' : ''}`}
+                  className={`option-button clickable ${quality === q ? 'active' : ''}`}
                   onClick={() => handleQualityChange(q)}
                 >
                   {q === 'major' ? 'Major' : q === 'minor' ? 'Minor' : q === 'diminished' ? 'Dim' : 'Aug'}
@@ -235,7 +235,7 @@ const ChordEditor = ({ initialRoot, initialQuality, initialDuration, onChordCrea
               {availableSeventhOptions.map((option) => (
                 <button
                   key={option.label}
-                  className={`option-button ${seventh === option.value ? 'active' : ''}`}
+                  className={`option-button clickable ${seventh === option.value ? 'active' : ''}`}
                   onClick={() => setSeventh(option.value)}
                 >
                   {option.label}
@@ -251,7 +251,7 @@ const ChordEditor = ({ initialRoot, initialQuality, initialDuration, onChordCrea
               {TENSION_OPTIONS.map((tension) => (
                 <button
                   key={tension}
-                  className={`option-button ${tensions.includes(tension) ? 'active' : ''}`}
+                  className={`option-button clickable ${tensions.includes(tension) ? 'active' : ''}`}
                   onClick={() => toggleTension(tension)}
                 >
                   {tension}th
@@ -267,7 +267,7 @@ const ChordEditor = ({ initialRoot, initialQuality, initialDuration, onChordCrea
               {ALTERATION_OPTIONS.map((alteration) => (
                 <button
                   key={alteration}
-                  className={`option-button ${alterations.includes(alteration) ? 'active' : ''}`}
+                  className={`option-button clickable ${alterations.includes(alteration) ? 'active' : ''}`}
                   onClick={() => toggleAlteration(alteration)}
                 >
                   {alteration}
@@ -297,7 +297,7 @@ const ChordEditor = ({ initialRoot, initialQuality, initialDuration, onChordCrea
           <button className="cancel-button" onClick={onCancel}>
             Cancel
           </button>
-          <button className="create-button" onClick={handleCreate}>
+          <button className="create-button clickable" onClick={handleCreate}>
             Add Chord
           </button>
         </div>

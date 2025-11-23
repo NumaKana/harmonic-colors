@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Chord, Note, ChordQuality, SeventhType, Tension, Alteration } from '../types';
 import './EditableChordInfo.css';
+import { audioEngine } from '../utils/audioEngine';
 
 interface EditableChordInfoProps {
   chord: Chord;
@@ -123,9 +124,29 @@ const EditableChordInfo = ({ chord, chordIndex, onUpdate }: EditableChordInfoPro
     onUpdate(chordIndex, updatedChord);
   };
 
+  const handleChordPlay = async () => {
+    // Play preview
+    try {
+      await audioEngine.playChord(chord, 1);
+    } catch (error) {
+      console.error('Failed to play chord preview:', error);
+    }
+  };
+
   return (
     <div className="editable-chord-info">
-      <h4 className="edit-section-title">Edit Chord</h4>
+      <div style={{display: "flex", justifyContent: "space-between"}}>
+        <p className="edit-section-title title">Edit Chord</p>
+        <div className="playback-controls-section">
+          <button
+            className={`playback-button clickable`}
+            onClick={() => handleChordPlay()}
+            title={"Play a chord"}
+          >
+            ▶ Play
+          </button>
+        </div>
+      </div>
 
       {/* Root Selection */}
       <div className="edit-section">

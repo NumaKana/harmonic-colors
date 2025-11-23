@@ -27,7 +27,7 @@ const SectionManager = ({
     <div className="section-manager">
       <div className="section-header">
         <h3>Sections</h3>
-        <button className="add-section-button" onClick={onSectionAdd} title="Add new section">
+        <button className="add-section-button clickable" onClick={onSectionAdd} title="Add new section">
           + Add Section
         </button>
       </div>

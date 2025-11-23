@@ -17,8 +17,7 @@
 .key-selector-group label {
   font-size: 0.9rem;
   color: #aaa;
-  font-weight: 500;
-}
+  }
 
 .key-select {
   padding: 0.5rem 0.75rem;
@@ -33,22 +32,13 @@
 }
 
 .key-select:hover {
-  border-color: #667eea;
+  border-color: white;
 }
 
 .key-select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: white;
   box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
-}
-
-.selected-key-display {
-  margin-left: 1rem;
-  padding: 0.5rem 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 4px;
-  font-weight: 600;
-  font-size: 1rem;
 }
 
 /* Compact mode for inline use */
@@ -105,12 +95,6 @@
   .key-selector-compact .key-selector-group {
     flex: 1;
     min-width: calc(50% - 0.25rem);
-  }
-
-  .key-selector-compact .selected-key-display {
-    flex: 1;
-    margin-left: 0;
-    font-size: 0.9rem;
   }
 
   .key-selector-group label {

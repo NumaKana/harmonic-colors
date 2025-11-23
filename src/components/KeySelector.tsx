@@ -56,10 +56,6 @@ const KeySelector = ({ selectedKey, onKeyChange, compact = false }: KeySelectorP
           <option value="minor">Minor</option>
         </select>
       </div>
-
-      <div className="selected-key-display">
-        {selectedKey.tonic} {selectedKey.mode === 'major' ? 'Major' : 'Minor'}
-      </div>
     </div>
   );
 };

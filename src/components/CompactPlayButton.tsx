@@ -106,7 +106,7 @@ const CompactPlayButton = ({
 
   return (
     <button
-      className={`compact-play-button ${isPlaying ? 'playing' : ''}`}
+      className={`compact-play-button clickable ${isPlaying ? 'playing' : ''}`}
       onClick={handlePlayProgression}
       disabled={chords.length === 0}
       title={

@@ -4,6 +4,7 @@ import { getChordDisplayName } from '../utils/diatonic';
 import { audioEngine } from '../utils/audioEngine';
 import KeySelector from './KeySelector';
 import './ChordSequence.css';
+import PlaybackControls from './PlaybackControls';
 
 interface ChordSequenceProps {
   sections: Section[];
@@ -18,6 +19,13 @@ interface ChordSequenceProps {
   currentIndex?: number;
   selectedIndex?: number;
   timeSignature?: number;
+  onPlayingIndexChange: (index: number) => void;
+  onPlaybackPositionChange?: (position: number) => void;
+  onTimeSignatureChange?: (timeSignature: number) => void;
+  onBpmChange?: (bpm: number) => void;
+  onMetronomeChange?: (enabled: boolean) => void;
+  metronomeEnabled?: boolean;
+  currentSection: Section;
 }
 
 interface MeasureChord {
@@ -147,7 +155,7 @@ const groupMeasuresIntoRows = (measures: Measure[], measuresPerRow: number = 4):
   return rows;
 };
 
-const ChordSequence = ({ sections, currentSectionId, currentSectionKey, onRemoveChord, onSelectChord, onSectionSelect, onSectionAdd, onSectionRemove, onSectionKeyChange, currentIndex, selectedIndex, timeSignature = 4 }: ChordSequenceProps) => {
+const ChordSequence = ({ sections, currentSectionId, currentSectionKey, onRemoveChord, onSelectChord, onSectionSelect, onSectionAdd, onSectionRemove, onSectionKeyChange, currentIndex, selectedIndex, timeSignature = 4, onPlayingIndexChange, onPlaybackPositionChange, onTimeSignatureChange, onBpmChange, onMetronomeChange, metronomeEnabled }: ChordSequenceProps) => {
   // Track window width to determine columns per row
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1000);
 
@@ -182,7 +190,7 @@ const ChordSequence = ({ sections, currentSectionId, currentSectionKey, onRemove
 
   // Generate measures (empty sections will have one empty measure each)
   const measures = groupSectionsIntoMeasures(sections, timeSignature);
-  const rows = groupMeasuresIntoRows(measures, 4);
+  const rows = groupMeasuresIntoRows(measures, columnsPerRow);
 
   // Calculate section brackets for each row
   const sectionBracketsByRow: Array<Array<{ sectionId: string; startCol: number; endCol: number }>> = [];
@@ -221,18 +229,27 @@ const ChordSequence = ({ sections, currentSectionId, currentSectionKey, onRemove
 
   return (
     <div className="chord-sequence">
+      <PlaybackControls
+        onPlayingIndexChange={onPlayingIndexChange}
+        onPlaybackPositionChange={onPlaybackPositionChange}
+        onTimeSignatureChange={onTimeSignatureChange}
+        onBpmChange={onBpmChange}
+        onMetronomeChange={onMetronomeChange}
+        metronomeEnabled={metronomeEnabled}
+        currentSection={sections.find(s => s.id === currentSectionId) || sections[0]}
+      />
       <div className="chord-sequence-header">
-        <h3 className="chord-sequence-title">
+        <p className="chord-sequence-title title">
           Chord Progression ({totalChords} chord{totalChords !== 1 ? 's' : ''}, {measures.length} measure{measures.length !== 1 ? 's' : ''})
-        </h3>
+        </p>
         <div className="chord-sequence-controls">
           <KeySelector
             selectedKey={currentSectionKey}
             onKeyChange={(key) => onSectionKeyChange(currentSectionId, key)}
             compact={true}
           />
-          <button className="add-key-button" onClick={onSectionAdd} title="Add new section with different key">
-            + Add Key
+          <button className="add-key-button clickable" onClick={onSectionAdd} title="Add new section with different key">
+            + Add Section
           </button>
         </div>
       </div>
@@ -271,14 +288,15 @@ const ChordSequence = ({ sections, currentSectionId, currentSectionKey, onRemove
 
                   const widthPercent = ((actualEndCol - startVisualCol) / columnsPerRow) * 100;
                   const leftPercent = (startVisualCol / columnsPerRow) * 100;
+                  const margin = startVisualCol === 0 ? 0 : 0.8;
 
                   return (
                     <div
                       key={bracketIndex}
                       className={`section-bracket ${section.id === currentSectionId ? 'section-bracket-current' : ''}`}
                       style={{
-                        left: `${leftPercent}%`,
-                        width: `${widthPercent}%`
+                        left: `${leftPercent + margin}%`,
+                        width: `${widthPercent - margin}%`,
                       }}
                       onClick={() => onSectionSelect(section.id)}
                       title={`Click to edit ${section.name}`}
