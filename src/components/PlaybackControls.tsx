@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Chord, Section } from '../types';
+import { Section } from '../types';
 import { audioEngine } from '../utils/audioEngine';
 import './PlaybackControls.css';
 

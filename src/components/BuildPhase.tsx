@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Key, Chord, Section, MinorScaleType, VisualizationStyle } from '../types';
 import ChordPalette from './ChordPalette';
 import ChordSequence from './ChordSequence';
-import PlaybackControls from './PlaybackControls';
 import VisualizationPreview from './VisualizationPreview';
 import EditableChordInfo from './EditableChordInfo';
 import SampleSelector from './SampleSelector';
@@ -47,7 +46,6 @@ interface BuildPhaseProps {
 const BuildPhase = ({
   selectedKey,
   chords,
-  allChords,
   onChordSelect,
   onRemoveChord,
   onSelectChord,

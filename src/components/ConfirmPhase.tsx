@@ -1,6 +1,5 @@
 import { Key, Chord, Section, MinorScaleType, VisualizationStyle } from '../types';
 import VisualizationCanvas from './VisualizationCanvas';
-import ChordNameBar from './ChordNameBar';
 import './ConfirmPhase.css';
 
 interface ConfirmPhaseProps {
